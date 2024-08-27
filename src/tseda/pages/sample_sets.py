@@ -26,6 +26,14 @@ palette = list(mcolors.CSS4_COLORS.keys())
 #     ]
 
 
+def make_new_sample_set_button():
+    create_button = pn.widgets.Button(
+        name="➕ Create new sample set",
+        button_type="primary",
+    )
+    return create_button
+
+
 def make_sample_sets_table(sample_sets_df):
     sample_editors = {}
     sample_editors["color"] = {
@@ -81,10 +89,9 @@ def sample_sets_md():
         """
         ## Sample sets
 
-        You can change the name and color of each sample set. You can
-        also add new sample set definitions which are inserted
-        sequentially. In the individuals table, you can assign
-        individuals to sample sets.
+        The name and color of each sample set are editable. In the
+        individuals table, you can assign individuals to sample set
+        ids.
 
         """
     )
@@ -95,9 +102,8 @@ def individuals_md():
         """
         ## Individuals
 
-        In the individuals table, you can assign
-        individuals to sample sets and toggle their selection
-        status. 
+        Assign individuals to sample sets and toggle their selection
+        status for analyses and plots.
         """
     )
 
@@ -134,8 +140,28 @@ def page(tsm):
     individuals_table = make_individuals_table(df, sample_sets_df)
     individuals_table.on_edit(update_individual)
 
+    new_sample_set_name = pn.widgets.TextInput(
+        name="New sample set name",
+        placeholder="Enter a string here...",
+        max_length=128,
+    )
+    # TODO: alert is not responsive
+    alert = pn.pane.Alert("", alert_type="success", visible=False)
+
+    def create_new_sample_set(event):
+        name = new_sample_set_name.value
+        if name is not None and name != "":
+            newid = tsm.create_sample_set(name)
+            alert.object = f"Successfully created sample set {newid}:{name}"
+            alert.visible = True
+
+    create_button = make_new_sample_set_button()
+    create_button.on_click(create_new_sample_set)
+
     return pn.Column(
         sample_sets_md(),
+        new_sample_set_name,
+        create_button,
         sample_sets_table,
         individuals_md(),
         individuals_table,

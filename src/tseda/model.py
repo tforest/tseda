@@ -246,6 +246,12 @@ class TSEdaModel(TSModel):
         for sid in self.individuals[ind_id].samples:
             self.samples[sid].select()
 
+    def create_sample_set(self, name):
+        newid = len(self.sample_sets)
+        ss = SampleSet(id=np.int32(newid), name=name)
+        self.sample_sets.append(ss)
+        return newid
+
     def make_sample_sets(self):
         """Make sample sets"""
         sample_sets = {}

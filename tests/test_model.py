@@ -36,6 +36,11 @@ def test_sample_set_init(ts):
         assert ss.id == pop.id
         assert ss.name == json.loads(pop.metadata.decode())["population"]
         assert ss.color == ss.colormap[pop.id]
+    ss = model.SampleSet(0, name="test")
+    assert ss is not None
+    assert ss.id == 0
+    assert ss.name == "test"
+    assert ss.population is None
 
 
 def test_update_individual_sample_set(tsm):
