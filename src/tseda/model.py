@@ -92,7 +92,7 @@ class Individual(tskit.Individual):
     latitude: np.float64 = None
     name: str = None
     sample_set_id: np.int32 = None
-    active: bool = True
+    selected: bool = True
 
     def __init__(self, individual: tskit.Individual):
         super().__init__(
@@ -117,13 +117,13 @@ class Individual(tskit.Individual):
         return self.nodes
 
     def toggle(self) -> None:
-        self.active = not self.active
+        self.selected = not self.selected
 
-    def activate(self) -> None:
-        self.active = True
+    def select(self) -> None:
+        self.selected = True
 
-    def deactivate(self) -> None:
-        self.active = False
+    def deselect(self) -> None:
+        self.selected = False
 
 
 @dataclasses.dataclass
@@ -131,7 +131,7 @@ class Sample(tskit.Node):
     """A class to handle samples."""
 
     sample_set_id: np.int32 = None
-    active: bool = True
+    selected: bool = True
 
     def __init__(self, node: tskit.Node):
         super().__init__(
@@ -148,17 +148,17 @@ class Sample(tskit.Node):
         self.sample_set_id = self.population
 
     def toggle(self) -> None:
-        self.active = not self.active
+        self.selected = not self.selected
 
-    def activate(self) -> None:
-        self.active = True
+    def select(self) -> None:
+        self.selected = True
 
-    def deactivate(self) -> None:
-        self.active = False
+    def deselect(self) -> None:
+        self.selected = False
 
 
 # TODO: add relevant methods to caching. Cache id should be calculated
-# with respect to the active sample sets
+# with respect to the selected sample sets
 class TSEdaModel(TSModel):
     """Tree sequence eda model"""
 
@@ -170,7 +170,7 @@ class TSEdaModel(TSModel):
             for pop in self.ts.populations()
         ]
         # TODO: Make hidden and write properties to filter on
-        # active/inactive?
+        # selected/deselected?
         self.individuals = self._init_individuals()
         self.samples = self._init_samples()
 
@@ -189,11 +189,11 @@ class TSEdaModel(TSModel):
                 result.append(sample)
         return result
 
-    def _get_data(self, attr="individuals", astype="list", inactive=True):
-        if inactive:
+    def _get_data(self, attr="individuals", astype="list", deselected=True):
+        if deselected:
             data = self.__getattribute__(attr)
         else:
-            data = [d for d in self.__getattribute__(attr) if d.active]
+            data = [d for d in self.__getattribute__(attr) if d.selected]
         if astype == "list":
             return data
         if astype == DataTypes.DATAFRAME.value:
@@ -206,22 +206,22 @@ class TSEdaModel(TSModel):
                 geometry=geopandas.points_from_xy(df.longitude, df.latitude),
             )
 
-    def get_individuals(self, astype="list", inactive=True):
+    def get_individuals(self, astype="list", deselected=True):
         """
         Returns a list / DataFrame / GeoDataFrame of individuals.
         """
-        data = self._get_data("individuals", astype, inactive)
+        data = self._get_data("individuals", astype, deselected)
         if isinstance(data, list):
             return data
         return data.set_index(["id"])
 
-    def get_samples(self, astype="list", inactive=True):
+    def get_samples(self, astype="list", deselected=True):
         """
         Returns a list / DataFrame of samples.
         """
         if astype == DataTypes.GEO_DATAFRAME.value:
             raise ValueError("geo data frame not supported for samples")
-        data = self._get_data("samples", astype, inactive)
+        data = self._get_data("samples", astype, deselected)
         if isinstance(data, list):
             return data
         return data.set_index(["id"])
@@ -236,22 +236,22 @@ class TSEdaModel(TSModel):
         for sid in self.individuals[ind_id].samples:
             self.samples[sid].toggle()
 
-    def deactivate_individual(self, ind_id):
-        self.individuals[ind_id].deactivate()
+    def deselect_individual(self, ind_id):
+        self.individuals[ind_id].deselect()
         for sid in self.individuals[ind_id].samples:
-            self.samples[sid].deactivate()
+            self.samples[sid].deselect()
 
-    def activate_individual(self, ind_id):
-        self.individuals[ind_id].activate()
+    def select_individual(self, ind_id):
+        self.individuals[ind_id].select()
         for sid in self.individuals[ind_id].samples:
-            self.samples[sid].activate()
+            self.samples[sid].select()
 
     def make_sample_sets(self):
         """Make sample sets"""
         sample_sets = {}
         samples = []
         for sample in self.samples:
-            if not sample.active:
+            if not sample.selected:
                 continue
             samples.append(sample.id)
             if sample.sample_set_id not in sample_sets:
@@ -278,15 +278,15 @@ class TSEdaModel(TSModel):
         df.set_index(["sample_set_id", "sample_id", "id"], inplace=True)
         return df
 
-    def colormap(self, by_sample=False, inactive=True):
+    def colormap(self, by_sample=False, deselected=True):
         """
         Get colormap for individuals or samples
         """
         result = []
         if by_sample:
-            data = self.get_samples(inactive=inactive)
+            data = self.get_samples(deselected=deselected)
         else:
-            data = self.get_individuals(inactive=inactive)
+            data = self.get_individuals(deselected=deselected)
         for d in data:
             result.append(self.sample_sets[d.sample_set_id].color)
         return np.array(result)

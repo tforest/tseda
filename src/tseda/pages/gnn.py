@@ -26,7 +26,7 @@ def setup_vbar_data(tsm):
     data.reset_index(inplace=True)
     data["x"] = factors
     data["name"] = [tsm.individuals[data["id"][x]].name for x in data.index]
-    return data, levels, groups, color
+    return data, levels, groups, color, factors
 
 
 def setup_geomap_data(tsm):
@@ -46,8 +46,8 @@ def vbar(source, levels, groups, color, factors):
     # factors = data["x"]
     bars = figure(
         x_range=FactorRange(*factors, group_padding=0.1, subgroup_padding=0),
-        width=1200,
-        height=300,
+        height=400,
+        sizing_mode="stretch_width",
     )
 
     bars.vbar_stack(
@@ -94,14 +94,13 @@ def vbar(source, levels, groups, color, factors):
 
 def world_map(gdf, colormap):
     """Make world map plot"""
-    # return gdf[~gdf.geometry.is_empty].hvplot.points(
     return gdf.hvplot.points(
         hover_cols=["id", "population", "sample_set_id"],
         geo=True,
         tiles=xyz.Esri.WorldPhysical,
         tiles_opts={"alpha": 0.5},
-        width=1200,
-        height=600,
+        width=1400,
+        height=800,
         size=100,
         color=colormap,
         tools=["wheel_zoom", "box_select", "tap", "pan", "reset"],
@@ -112,11 +111,10 @@ def world_map(gdf, colormap):
 
 def page(tsm):
     geomap_df, colormap = setup_geomap_data(tsm)
-    bars_df, levels, groups, color = setup_vbar_data(tsm)
+    bars_df, levels, groups, color, factors = setup_vbar_data(tsm)
 
     geomap = world_map(geomap_df, colormap)
     bars_df_source = ColumnDataSource(bars_df)
-    factors = bars_df["x"]
     bars = vbar(bars_df_source, levels, groups, color, factors)
 
     # bars_df_source.selected.on_change("indices", callback)

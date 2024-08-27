@@ -50,17 +50,17 @@ def test_update_individual_sample_set(tsm):
 
 
 def test_toggle_individual(tsm):
-    assert tsm.individuals[0].active
-    assert tsm.samples[tsm.individuals[0].samples[0]].active
-    assert tsm.samples[tsm.individuals[0].samples[1]].active
+    assert tsm.individuals[0].selected
+    assert tsm.samples[tsm.individuals[0].samples[0]].selected
+    assert tsm.samples[tsm.individuals[0].samples[1]].selected
     tsm.toggle_individual(0)
-    assert not tsm.individuals[0].active
-    assert not tsm.samples[tsm.individuals[0].samples[0]].active
-    assert not tsm.samples[tsm.individuals[0].samples[1]].active
+    assert not tsm.individuals[0].selected
+    assert not tsm.samples[tsm.individuals[0].samples[0]].selected
+    assert not tsm.samples[tsm.individuals[0].samples[1]].selected
     tsm.toggle_individual(0)
-    assert tsm.individuals[0].active
-    assert tsm.samples[tsm.individuals[0].samples[0]].active
-    assert tsm.samples[tsm.individuals[0].samples[1]].active
+    assert tsm.individuals[0].selected
+    assert tsm.samples[tsm.individuals[0].samples[0]].selected
+    assert tsm.samples[tsm.individuals[0].samples[1]].selected
 
 
 def test_gnn(tsm2):
