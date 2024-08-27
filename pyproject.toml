@@ -1,0 +1,85 @@
+[project]
+name = "tseda"
+version = "0.1.0"
+description = "Tree sequence exploratory data analysis"
+authors = [
+    { name = "Per Unneberg", email = "per.unneberg@scilifelab.se" }
+]
+dependencies = [
+    "panel~=1.4.5",
+    "tskit~=0.5.8",
+    "tszip~=0.2.5",
+    "click~=8.1.7",
+    "daiquiri~=3.2.5.1",
+    "holoviews~=1.19.1",
+    "numba~=0.60.0",
+    "diskcache~=5.6.3",
+    "appdirs~=1.4.4",
+    "geoviews~=1.12.0",
+    "datashader~=0.16.3",
+    "cartopy~=0.23.0",
+    "geopandas~=1.0.1",
+    "dask[dataframe]~=2024.8.1",
+    "hvplot~=0.10.0",
+    "xyzservices~=2024.6.0",
+    "tsqc @ git+https://github.com/tskit-dev/tsqc",
+]
+readme = "README.md"
+requires-python = ">= 3.12"
+
+[build-system]
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
+
+[tool.rye]
+managed = true
+dev-dependencies = [
+    "jupyter~=1.0.0",
+    "pyright~=1.1.377",
+    "pytest~=8.3.2",
+    "stdpopsim~=0.2.0",
+    "geodatasets~=2024.7.0",
+]
+
+[project.scripts]
+"tseda" = "tseda:main"
+
+[tool.ruff]
+target-version = "py312"
+line-length = 79
+
+[tool.ruff.lint]
+select = [
+  "A",    # warn about shadowing built-ins
+  "E",    # style stuff, whitespaces
+  "F",    # important pyflakes lints
+  "I",    # import sorting
+  "N",    # naming
+  "T100", # breakpoints (probably don't want these in prod!)
+]
+
+[tool.ruff.lint.isort]
+# so it knows to group first-party stuff last
+known-first-party = ["tseda"]
+
+
+[tool.pyright]
+venvPath = "."          # rye installs the venv in the current dir
+venv = ".venv"          #       in a folder called `.venv`
+include = ["src"]
+pythonVersion = "3.12"  # if library, specify the _lowest_ you support
+reportMissingTypeStubs = false
+reportAttributeAccessIssue = false
+reportCallIssue = false
+reportOptionalMemberAccess = false
+reportAssignmentType = false
+
+[tool.rye.scripts]
+fmt = "rye fmt"
+lint = "rye lint --fix"
+check = "pyright"
+test = "rye test"
+all = { chain = ["fmt", "lint", "check", "test"] }
+
+[tool.pytest.ini_options]
+addopts = "--doctest-modules"
