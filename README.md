@@ -20,4 +20,6 @@ python -m pip install git+https://github.com/percyfal/tseda
 
 ## Tests
 
-The package comes with a test data file residing in `tests/data.test.ts`. To try it out, clone the repo, install and load the file.
+The package comes with a test data file residing in
+`tests/data.test.trees`. To try it out, clone the repo, install and
+load the file.
