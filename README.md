@@ -6,9 +6,14 @@ functionality. tseda adds functionality to view the spatial
 distribution of population data and connect that information to the
 genetic structure of the populations.
 
-To launche the app use:
+To launch the app use:
 
 `python -m tseda /path/to/trees-file`
+
+
+| <img src="./static/GNN-screenshot.jpg" width="50%" alt="Screenshot of the GNN tab"> |
+|:--:| 
+| Screenshot of the prototype GNN viewer |
 
 ## Installation
 
