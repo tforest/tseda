@@ -83,4 +83,4 @@ def page(tsm):
     )
 
     gnn = GNNHaplotype(tsm)
-    return pn.Column(md, pn.Row(gnn.param[0], gnn.param[1]), gnn.panel)
+    return pn.Column(md, gnn.param, gnn.panel)
