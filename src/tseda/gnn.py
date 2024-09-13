@@ -27,7 +27,6 @@ def windowed_genealogical_nearest_neighbours(  # noqa: C901
     span_normalise=True,
     time_normalise=True,
 ):
-    # Remap sample sets indexes to consecutive integers
     reference_sets = {}
     index_map = {}
     for i, j in enumerate(sample_sets):
@@ -55,13 +54,9 @@ def windowed_genealogical_nearest_neighbours(  # noqa: C901
     time = ts.tables.nodes.time
     norm = np.zeros((num_windows, num_time_windows, len(focal)))
 
-    # Set the initial conditions.
-    # index_map = {i: u for i, u in enumerate(reference_sets)}
+    # Set the initial conditions
     for j in range(K):
         sample_count[reference_sets[j], j] = 1
-    # for i, j in enumerate(sorted(reference_sets)):
-    # for j in index_map:
-    #     sample_count[reference_sets[index_map[j]], j] = 1
 
     window_index = 0
     # Loop the tree sequence
