@@ -88,7 +88,10 @@ class OnewayStats(param.Parameterized):
             self.window_size, self.tsm.ts.sequence_length
         )
         self.sample_sets_list = eval_sample_sets(self.sample_sets)
-        sample_sets = self.tsm.get_sample_sets(self.sample_sets_list)
+        try:
+            sample_sets = self.tsm.get_sample_sets(self.sample_sets_list)
+        except KeyError:
+            return pn.pane.Alert("Sample set error. Check sample set indexes.")
 
         if self.statistic == "Tajimas_D":
             return self.tsm.ts.Tajimas_D(
@@ -102,6 +105,8 @@ class OnewayStats(param.Parameterized):
             raise ValueError("Invalid statistic")
 
     def panel(self):
+        if isinstance(self.data, pn.pane.alert.Alert):
+            return self.data
         data = pd.DataFrame(
             self.data,
             columns=[
@@ -194,7 +199,10 @@ class MultiwayStats(param.Parameterized):
         )
         self.sample_sets_list = eval_sample_sets(self.sample_sets)
         self.indexes_list = eval_indexes(self.indexes)
-        sample_sets = self.tsm.get_sample_sets(self.sample_sets_list)
+        try:
+            sample_sets = self.tsm.get_sample_sets(self.sample_sets_list)
+        except KeyError:
+            return pn.pane.Alert("Sample set error. Check sample set indexes.")
         if self.statistic == "Fst":
             return self.tsm.ts.Fst(
                 sample_sets,
@@ -214,6 +222,8 @@ class MultiwayStats(param.Parameterized):
 
     @param.depends("colormap")
     def panel(self):
+        if isinstance(self.data, pn.pane.alert.Alert):
+            return self.data
         data = pd.DataFrame(
             self.data,
             columns=[

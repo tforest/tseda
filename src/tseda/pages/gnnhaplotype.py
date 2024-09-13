@@ -10,6 +10,8 @@ TODO:
 - move common make_windows function to a common place (see .stats)
 - hvplot bar plot is not working as expected, need to investigate, but
   area plot could be used instead
+- for larger datasets, the underlying computation is slow, so either
+  needs caching or async processing
 """
 
 import holoviews as hv
@@ -19,7 +21,7 @@ import panel as pn
 import param
 
 hv.extension("bokeh")
-pn.extension()
+pn.extension(width_policy="max")
 
 
 def make_windows(window_size, sequence_length):
@@ -32,7 +34,9 @@ def make_windows(window_size, sequence_length):
 
 class GNNHaplotype(param.Parameterized):
     individual_id = param.Integer(
-        default=0, bounds=(0, None), doc="Individual ID (0-indexed)"
+        default=None,
+        bounds=(0, None),
+        doc="Individual ID (0-indexed)",
     )
     window_size = param.Integer(
         default=10000, bounds=(1, None), doc="Size of window"
@@ -64,13 +68,25 @@ class GNNHaplotype(param.Parameterized):
             self.tsm.get_sample_set_by_name(x).color for x in populations
         ]
         return df.hvplot.area(
-            x="start", y=populations, color=colormap, legend="right"
-        ).opts(width=1200)
+            x="start",
+            y=populations,
+            color=colormap,
+            legend="right",
+            fill_alpha=0.5,
+            min_width=800,
+            min_height=300,
+            responsive=True,
+        )
 
     @param.depends("individual_id", "window_size")
     def panel(self):
+        if self.individual_id is None:
+            return pn.Column()
         self._data = self.tsm.haplotype_gnn(self.individual_id)
-        return pn.Column(self.plot(0), self.plot(1))
+        return pn.Column(
+            self.plot(0),
+            self.plot(1),
+        )
 
 
 def page(tsm):
