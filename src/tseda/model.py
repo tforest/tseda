@@ -422,7 +422,6 @@ class TSEdaModel(TSModel):
         )
         dflist = []
         sample_set_names = [self.sample_sets[i].name for i in sample_sets]
-        print(sample_set_names)
         if windows is None:
             for i in range(hap.shape[0]):
                 x = pd.DataFrame(hap[i, :])
