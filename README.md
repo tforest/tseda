@@ -21,7 +21,7 @@ Tseda is currently in development. To install the latest dev version
 from github, run
 
 ```
-python -m pip install git+https://github.com/percyfal/tseda
+python -m pip install git+https://github.com/tforest/tseda
 ```
 
 ## Tests
