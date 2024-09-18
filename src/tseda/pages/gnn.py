@@ -25,9 +25,12 @@ from bokeh.models import (
     HoverTool,
 )
 from .map import GeoMap
+from .gnnhaplotype import GNNHaplotype
+
 import param
 
 hv.extension("bokeh")
+pn.extension(sizing_mode="stretch_width")
 
 
 class VBar(param.Parameterized):
@@ -159,6 +162,7 @@ class VBar(param.Parameterized):
 def page(tsm):
     geomap = GeoMap(tsm)
     vbar = VBar(tsm)
+    hap = GNNHaplotype(tsm)
 
     layout = pn.Column(
         pn.Row(
@@ -167,6 +171,8 @@ def page(tsm):
         ),
         vbar.param,
         vbar.plot,
+        hap.param,
+        hap.panel,
     )
 
     return layout

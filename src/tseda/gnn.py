@@ -21,19 +21,24 @@ def parse_time_windows(ts, time_windows):
 def windowed_genealogical_nearest_neighbours(  # noqa: C901
     ts,
     focal,
-    reference_sets,
+    sample_sets,
     windows=None,
     time_windows=None,
     span_normalise=True,
     time_normalise=True,
 ):
+    reference_sets = {}
+    index_map = {}
+    for i, j in enumerate(sample_sets):
+        reference_sets[i] = sample_sets[j]
+        index_map[i] = j
+
     reference_set_map = np.full(ts.num_nodes, tskit.NULL, dtype=int)
     for k, reference_set in reference_sets.items():
         for u in reference_set:
             if reference_set_map[u] != tskit.NULL:
                 raise ValueError("Duplicate value in reference sets")
             reference_set_map[u] = k
-
     windows_used = windows is not None
     time_windows_used = time_windows is not None
     windows = ts.parse_windows(windows)
@@ -49,10 +54,7 @@ def windowed_genealogical_nearest_neighbours(  # noqa: C901
     time = ts.tables.nodes.time
     norm = np.zeros((num_windows, num_time_windows, len(focal)))
 
-    # Set the initial conditions.
-    for k, v in reference_sets.items():
-        print(k, v)
-    print(list(reference_sets.keys()))
+    # Set the initial conditions
     for j in range(K):
         sample_count[reference_sets[j], j] = 1
 

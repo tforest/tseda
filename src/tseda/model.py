@@ -441,7 +441,6 @@ class TSEdaModel(TSModel):
                 dflist.append(x)
 
         df = pd.concat(dflist)
-        # df = df[df.haplotype == (haplotype - 1)]
         df.set_index(["haplotype", "start", "end"], inplace=True)
 
         return df

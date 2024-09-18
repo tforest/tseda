@@ -159,6 +159,8 @@ class SampleSetTable(param.Parameterized):
         label="New sample set name",
     )
 
+    page_size = param.Selector(objects=[10, 20, 50, 100], default=20)
+
     def __init__(self, tsm, **kwargs):
         super().__init__(**kwargs)
         self.tsm = tsm
@@ -180,7 +182,7 @@ class SampleSetTable(param.Parameterized):
             layout="fit_columns",
             selectable=True,
             pagination="remote",
-            page_size=10,
+            page_size=self.page_size,
             editors=self.sample_editors,
             formatters=self.sample_formatters,
         )
@@ -194,7 +196,7 @@ class SampleSetTable(param.Parameterized):
     def update_sample_set(self, event):
         self.tsm.update_sample_set(event.row, event.column, event.value)
 
-    @param.depends("create_sample_set_textinput")
+    @param.depends("create_sample_set_textinput", "page_size")
     def panel(self, *args, **kwargs):
         if self.create_sample_set_textinput:
             self.tsm.create_sample_set(self.create_sample_set_textinput)
