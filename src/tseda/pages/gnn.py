@@ -98,8 +98,13 @@ class VBar(param.Parameterized):
         """Make vbar plot. Holoviews does not support grouping by default
         so we need to implement it using low-level bokeh API."""
         hover = HoverTool()
-        hover.tooltips = list(
-            map(lambda x: (x[0], f"@{x[1]}"), zip(self.levels, self.levels))
+        hover.tooltips = list([("name", "@name")])
+        hover.tooltips.extend(
+            list(
+                map(
+                    lambda x: (x[0], f"@{x[1]}"), zip(self.levels, self.levels)
+                )
+            )
         )
         hover.tooltips.extend(
             list(
@@ -109,6 +114,7 @@ class VBar(param.Parameterized):
                 )
             )
         )
+
         data = self.data
         if len(self.sort_order) > 0:
             sort_order = (
