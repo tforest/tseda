@@ -160,7 +160,9 @@ class VBar(param.Parameterized):
         self._fig.axis.axis_line_color = None
         self._fig.grid.grid_line_color = None
         self._fig.outline_line_color = "black"
-        self._fig.xaxis.separator_line_width = 0.0
+        self._fig.xaxis.separator_line_width = 2.0
+        self._fig.xaxis.separator_line_color = "grey"
+        self._fig.xaxis.separator_line_alpha = 0.5
 
         return self._fig
 
