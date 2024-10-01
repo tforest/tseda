@@ -102,15 +102,15 @@ class VBar(param.Parameterized):
         hover.tooltips.extend(
             list(
                 map(
-                    lambda x: (x[0], f"@{x[1]}"), zip(self.levels, self.levels)
+                    lambda x: (x, f"@{x}"), self.levels
                 )
             )
         )
         hover.tooltips.extend(
             list(
                 map(
-                    lambda x: (x[0], f"@{x[1]}{{%0.1f}}"),
-                    zip(self.groups, self.groups),
+                    lambda x: (x, f"@{x}{{%0.1f}}"),
+                    self.groups,
                 )
             )
         )
