@@ -204,36 +204,41 @@ class SampleSetTable(param.Parameterized):
         return pn.Column(self.tooltip, self.table)
 
 
-def page(tsm):
-    geomap = GeoMap(tsm)
-    ss_table = SampleSetTable(tsm)
-    ind_table = IndividualsTable(tsm)
+class SampleSetsPage:
+    key = "sample_sets"
+    title = "Sample sets editor"
 
-    doc = __doc__.split("\n")[1:]
-    for i, line in enumerate(doc):
-        if line == "":
-            doc[i] = "<br>"
+    def __init__(self, tsm):
+        geomap = GeoMap(tsm)
+        ss_table = SampleSetTable(tsm)
+        ind_table = IndividualsTable(tsm)
 
-    layout = pn.Column(
-        pn.pane.Markdown("""## Sample set editor"""),
-        pn.pane.Alert(
-            """Example of using module docstring to document page"""
-        ),
-        pn.pane.Markdown(" ".join(doc)),
-        pn.Row(
-            pn.Param(geomap.param, width=200),
-            geomap.plot,
-        ),
-        pn.Row(
-            pn.Column(
-                pn.Param(ss_table.param, width=200),
-                ss_table.panel,
+        doc = __doc__.split("\n")[1:]
+        for i, line in enumerate(doc):
+            if line == "":
+                doc[i] = "<br>"
+
+        self.content = pn.Column(
+            pn.pane.Markdown("""## Sample set editor"""),
+            pn.pane.Alert(
+                """Example of using module docstring to document page"""
             ),
-            pn.Column(
-                pn.Param(ind_table.param, width=200),
+            pn.pane.Markdown(" ".join(doc)),
+            pn.Row(
+                geomap.plot,
+            ),
+            pn.Row(
+                ss_table.panel,
                 ind_table.panel,
             ),
-        ),
-    )
+        )
 
-    return layout
+        self.sidebar = pn.Column(
+            pn.pane.Markdown("# Sample sets editor"),
+            pn.pane.Markdown("## GeoMap configuration options"),
+            pn.Param(geomap.param, width=200),
+            pn.pane.Markdown("## SampleSet table options"),
+            pn.Param(ss_table.param, width=200),
+            pn.pane.Markdown("## Individuals table options"),
+            pn.Param(ind_table.param, width=200),
+        )

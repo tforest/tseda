@@ -159,20 +159,24 @@ class VBar(param.Parameterized):
         return self._fig
 
 
-def page(tsm):
-    geomap = GeoMap(tsm)
-    vbar = VBar(tsm)
-    hap = GNNHaplotype(tsm)
+class GNNPage:
+    key = "GNN"
+    title = "GNN analysis"
 
-    layout = pn.Column(
-        pn.Row(
-            pn.Param(geomap.param, width=200),
-            geomap.plot,
-        ),
-        vbar.param,
-        vbar.plot,
-        hap.param,
-        hap.panel,
-    )
+    def __init__(self, tsm):
+        self.tsm = tsm
+        self.geomap = GeoMap(tsm)
+        self.vbar = VBar(tsm)
+        self.hap = GNNHaplotype(tsm)
 
-    return layout
+        self.content = pn.Column(
+            self.geomap.plot,
+            self.vbar.plot,
+            self.hap.panel,
+        )
+        self.sidebar = pn.Column(
+            pn.pane.Markdown("# GNN analysis options"),
+            pn.Param(self.geomap.param, width=200),
+            pn.Param(self.vbar.param, width=200),
+            pn.Param(self.hap.param, width=200),
+        )

@@ -8,12 +8,14 @@ from . import (
     trees,  # noqa: F401
 )
 
-PAGES_MAP = {
-    "Overview": overview,
-    "Sample set editor": sample_sets,
-    "Popgen statistics": stats,
-    "Structure overview": structure,
-    "Individual GNN plots": gnn,
-    "Haplotype GNN plots": gnnhaplotype,
-    "Trees": trees,
-}
+PAGES = [
+    overview.OverviewPage,
+    sample_sets.SampleSetsPage,
+    structure.StructurePage,
+    stats.StatsPage,
+    gnn.GNNPage,
+    trees.TreesPage,
+]
+
+PAGES_MAP = {page.key: page for page in PAGES}
+PAGES_BY_TITLE = {page.title: page for page in PAGES}

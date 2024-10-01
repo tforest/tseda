@@ -255,24 +255,29 @@ class MultiwayStats(param.Parameterized):
         return holomap.overlay("sspair").opts(legend_position="right")
 
 
-def page(tsm):
-    # TODO: Make it possible to view more than one statistic at a time?
-    oneway = OnewayStats(tsm)
-    multiway = MultiwayStats(tsm)
+class StatsPage:
+    key = "stats"
+    title = "Statistics"
 
-    return pn.Column(
-        pn.Row(
-            pn.Param(oneway.param, width=200),
+    def __init__(self, tsm):
+        self.tsm = tsm
+        self.oneway = OnewayStats(tsm)
+        self.multiway = MultiwayStats(tsm)
+
+        self.content = pn.Column(
             pn.Column(
-                oneway.tooltip,
-                oneway.panel,
+                self.oneway.tooltip,
+                self.oneway.panel,
             ),
-        ),
-        pn.Row(
-            pn.Param(multiway.param, width=200),
             pn.Column(
-                multiway.tooltip,
-                multiway.panel,
+                self.multiway.tooltip,
+                self.multiway.panel,
             ),
-        ),
-    )
+        )
+        self.sidebar = pn.Column(
+            pn.pane.Markdown("# Statistics"),
+            pn.pane.Markdown("## Oneway statistics options"),
+            pn.Param(self.oneway.param, width=200),
+            pn.pane.Markdown("## Multiway statistics options"),
+            pn.Param(self.multiway.param, width=200),
+        )
