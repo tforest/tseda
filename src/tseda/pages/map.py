@@ -50,10 +50,10 @@ class GeoMap(param.Parameterized):
 
     def update_gdf(self):
         gdf = self.tsm.get_individuals(astype="gdf")[
-            ["sample_set_id", "population", "geometry"]
+            ["sample_set_id", "population", "name", "geometry"]
         ]
         gdf = gdf.reset_index().set_index(
-            ["id", "sample_set_id", "population"]
+            ["id", "sample_set_id", "population", "name"]
         )
         self._colormap = self.tsm.colormap()[~gdf.geometry.is_empty]
         self._gdf = gdf[~gdf.geometry.is_empty]
@@ -71,7 +71,7 @@ class GeoMap(param.Parameterized):
     def world_map(self, height, width):
         """Make world map plot using hvplot."""
         return self._gdf.hvplot.points(
-            hover_cols=["id", "population", "sample_set_id"],
+            hover_cols=["id", "name", "population", "sample_set_id"],
             geo=True,
             tiles=self.tiles,
             tiles_opts={"alpha": 0.5},

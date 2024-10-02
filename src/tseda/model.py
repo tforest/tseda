@@ -15,6 +15,7 @@ TODO:
 
 import dataclasses
 import json
+import pathlib
 import re
 from enum import Enum
 
@@ -188,8 +189,9 @@ class Sample(tskit.Node):
 class TSEdaModel(TSModel):
     """Tree sequence eda model"""
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, tseda_path):
+        tseda_path = pathlib.Path(tseda_path)
+        super().__init__(tseda_path)
 
         self.sample_sets = [
             SampleSet(id=pop.id, population=pop)

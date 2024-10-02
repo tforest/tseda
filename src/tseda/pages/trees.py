@@ -70,9 +70,15 @@ class Tree(param.Parameterized):
         )
 
 
-def page(tsm):
-    tree = Tree(tsm)
-    return pn.Row(
-        pn.Param(tree.param, width=300),
-        tree.plot,
-    )
+class TreesPage:
+    key = "trees"
+    title = "Trees"
+
+    def __init__(self, tsm):
+        self.tsm = tsm
+        self.tree = Tree(tsm)
+        self.content = pn.Column(self.tree.plot)
+        self.sidebar = pn.Column(
+            pn.pane.Markdown("# Trees"),
+            pn.Param(self.tree.param, width=300),
+        )

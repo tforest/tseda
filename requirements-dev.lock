@@ -521,7 +521,7 @@ traitlets==5.14.3
     # via qtconsole
 trove-classifiers==2024.7.2
     # via hatchling
-tsbrowse @ git+https://github.com/tskit-dev/tsbrowse@de1eb0e7f110a72e37d310b560c08d2b7ebd36cd
+tsbrowse @ git+https://github.com/tskit-dev/tsbrowse@f16f902510ee4410f0ea75c992bf3aab484f2abb
     # via tseda
 tskit==0.5.8
     # via msprime

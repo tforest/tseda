@@ -238,7 +238,7 @@ tornado==6.4.1
     # via bokeh
 tqdm==4.66.5
     # via panel
-tsbrowse @ git+https://github.com/tskit-dev/tsbrowse@de1eb0e7f110a72e37d310b560c08d2b7ebd36cd
+tsbrowse @ git+https://github.com/tskit-dev/tsbrowse@f16f902510ee4410f0ea75c992bf3aab484f2abb
     # via tseda
 tskit==0.5.8
     # via tsbrowse

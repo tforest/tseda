@@ -98,17 +98,23 @@ class VBar(param.Parameterized):
         """Make vbar plot. Holoviews does not support grouping by default
         so we need to implement it using low-level bokeh API."""
         hover = HoverTool()
-        hover.tooltips = list(
-            map(lambda x: (x[0], f"@{x[1]}"), zip(self.levels, self.levels))
+        hover.tooltips = list([("name", "@name")])
+        hover.tooltips.extend(
+            list(
+                map(
+                    lambda x: (x, f"@{x}"), self.levels
+                )
+            )
         )
         hover.tooltips.extend(
             list(
                 map(
-                    lambda x: (x[0], f"@{x[1]}{{%0.1f}}"),
-                    zip(self.groups, self.groups),
+                    lambda x: (x, f"@{x}{{%0.1f}}"),
+                    self.groups,
                 )
             )
         )
+
         data = self.data
         if len(self.sort_order) > 0:
             sort_order = (
@@ -154,25 +160,31 @@ class VBar(param.Parameterized):
         self._fig.axis.axis_line_color = None
         self._fig.grid.grid_line_color = None
         self._fig.outline_line_color = "black"
-        self._fig.xaxis.separator_line_width = 0.0
+        self._fig.xaxis.separator_line_width = 2.0
+        self._fig.xaxis.separator_line_color = "grey"
+        self._fig.xaxis.separator_line_alpha = 0.5
 
         return self._fig
 
 
-def page(tsm):
-    geomap = GeoMap(tsm)
-    vbar = VBar(tsm)
-    hap = GNNHaplotype(tsm)
+class GNNPage:
+    key = "GNN"
+    title = "GNN analysis"
 
-    layout = pn.Column(
-        pn.Row(
-            pn.Param(geomap.param, width=200),
-            geomap.plot,
-        ),
-        vbar.param,
-        vbar.plot,
-        hap.param,
-        hap.panel,
-    )
+    def __init__(self, tsm):
+        self.tsm = tsm
+        self.geomap = GeoMap(tsm)
+        self.vbar = VBar(tsm)
+        self.hap = GNNHaplotype(tsm)
 
-    return layout
+        self.content = pn.Column(
+            self.geomap.plot,
+            self.vbar.plot,
+            self.hap.panel,
+        )
+        self.sidebar = pn.Column(
+            pn.pane.Markdown("# GNN analysis options"),
+            pn.Param(self.geomap.param, width=200),
+            pn.Param(self.vbar.param, width=200),
+            pn.Param(self.hap.param, width=200),
+        )
