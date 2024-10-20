@@ -10,7 +10,10 @@ from . import app  # noqa
 from . import config  # noqa
 from . import model  # noqa
 from . import pages  # noqa
+from . import datastore  # noqa
+from .views import IndividualsTable  # noqa
 from tsbrowse import preprocess as preprocess_  # noqa
+from tsbrowse.model import TSModel
 
 
 logger = daiquiri.getLogger("tseda")
@@ -84,6 +87,43 @@ def preprocess(tszip_path, output):
         output = tszip_path.with_suffix(".tseda")
 
     preprocess_.preprocess(tszip_path, output, show_progress=True)
+
+
+@cli.command()
+@click.argument("path", type=click.Path(exists=True, dir_okay=False))
+@click.option("--port", default=8080, help="Port to serve on")
+@click.option(
+    "--show/--no-show",
+    default=True,
+    help="Launch a web-browser showing the app",
+)
+@click.option("--log-level", default="INFO", help="Logging level")
+@click.option(
+    "--no-log-filter",
+    default=False,
+    is_flag=True,
+    help="Do not filter the output log (advanced debugging only)",
+)
+def serve2(path, port, show, log_level, no_log_filter):
+    """
+    Run the tseda datastore server.
+    """
+    setup_logging(log_level, no_log_filter)
+
+    tsm = TSModel(path)
+    individuals_table, sample_sets_table = datastore.preprocess(tsm)
+
+    logger.info("Starting panel server")
+    app_ = app.DataStoreApp(
+        datastore=datastore.DataStore(
+            tsm=tsm,
+            individuals_table=individuals_table,
+            sample_sets_table=sample_sets_table,
+        ),
+        title="TSEda Datastore App",
+        views=[IndividualsTable],
+    )
+    pn.serve(app_.view(), port=port, show=show, verbose=False)
 
 
 if __name__ == "__main__":

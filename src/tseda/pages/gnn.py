@@ -99,13 +99,7 @@ class VBar(param.Parameterized):
         so we need to implement it using low-level bokeh API."""
         hover = HoverTool()
         hover.tooltips = list([("name", "@name")])
-        hover.tooltips.extend(
-            list(
-                map(
-                    lambda x: (x, f"@{x}"), self.levels
-                )
-            )
-        )
+        hover.tooltips.extend(list(map(lambda x: (x, f"@{x}"), self.levels)))
         hover.tooltips.extend(
             list(
                 map(

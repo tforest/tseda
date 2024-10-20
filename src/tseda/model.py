@@ -85,6 +85,7 @@ class SampleSet:
     name: str = None
     color: str = None
     population: dataclasses.InitVar[tskit.Population | None] = None
+    immutable_id: bool = False
 
     colormap = palette()
 
@@ -182,6 +183,16 @@ class Sample(tskit.Node):
     def deselect(self) -> None:
         """Deselect sample"""
         self.selected = False
+
+
+# TODO: if reactivity possible with this setup would prefer to use
+# classes that encapsulate the data and methods
+class IndividualsTable:
+    pass
+
+
+class SampleSetsTable:
+    pass
 
 
 # TODO: add relevant methods to caching. Cache id should be calculated
