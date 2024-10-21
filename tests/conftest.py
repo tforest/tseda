@@ -2,9 +2,9 @@ import os
 
 import tskit
 from pytest import fixture
+from tsbrowse import model as tsb_model
 
 from tseda import model
-from tsbrowse import model as tsb_model
 
 dirname = os.path.abspath(os.path.dirname(__file__))
 

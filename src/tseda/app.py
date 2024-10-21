@@ -5,9 +5,8 @@ import holoviews as hv
 import panel as pn
 import param
 from holoviews import opts
-from panel.viewable import Viewer
 
-from tseda import config, pages, datastore, vpages
+from tseda import config, datastore, pages, vpages
 
 logger = daiquiri.getLogger("tseda")
 
