@@ -3,6 +3,8 @@ from . import (
     individuals,
     overview,
     sample_sets,
+    stats,
+    trees,
 )
 
 PAGES = [
@@ -10,6 +12,8 @@ PAGES = [
     sample_sets.SampleSetsPage,
     individuals.IndividualsPage,
     gnn.GNNPage,
+    stats.StatsPage,
+    trees.TreesPage,
 ]
 
 PAGES_MAP = {page.key: page for page in PAGES}

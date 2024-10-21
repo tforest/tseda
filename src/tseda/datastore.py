@@ -5,7 +5,10 @@ import param
 from panel.viewable import Viewer
 from tsbrowse import model
 
+from tseda import config
 from tseda.model import Individual, SampleSet
+
+from .gnn import windowed_genealogical_nearest_neighbours
 
 logger = daiquiri.getLogger("tseda")
 
@@ -41,7 +44,6 @@ class IndividualsTable(Viewer):
     change filter."""
 
     columns = [
-        "id",
         "name",
         "population",
         "sample_set_id",
@@ -92,6 +94,7 @@ class IndividualsTable(Viewer):
 
     def __init__(self, **params):
         super().__init__(**params)
+        self.table.set_index(["id"], inplace=True)
         self.data = self.param.table.rx()
 
     @property
@@ -117,19 +120,39 @@ class IndividualsTable(Viewer):
         samples = []
         inds = self.data.rx.value
         for _, ind in inds.iterrows():
+            if not ind.selected:
+                continue
             sample_set = ind.sample_set_id
             if sample_set not in sample_sets:
                 sample_sets[sample_set] = []
-            sample_sets[sample_set].append(ind.id)
-            samples.append(ind.id)
+            sample_sets[sample_set].extend(ind.nodes)
+            samples.extend(ind.nodes)
         return samples, sample_sets
+
+    def get_sample_sets(self, indexes=None):
+        """Return list of sample sets and their samples."""
+        samples, sample_sets = self.sample_sets()
+        if indexes:
+            return [sample_sets[i] for i in indexes]
+        return [sample_sets[i] for i in sample_sets]
+
+    @property
+    def sample2ind(self):
+        """Map sample (tskit node) ids to individual ids"""
+        inds = self.data.rx.value
+        d = {}
+        for index, ind in inds.iterrows():
+            for node in ind.nodes:
+                d[node] = index
+        return d
+
+    def loc(self, i):
+        """Return individual by index"""
+        return self.data.rx.value.loc[i]
 
     @pn.depends("page_size", "toggle", "sample_set_to")
     def __panel__(self):
         if self.toggle is not None:
-            # self.table.loc[self.toggle == self.table.sample_set_id, "selected"] = not self.table.loc[
-            #     self.toggle, "selected"
-            # ]
             self.data.rx.value.loc[
                 self.toggle == self.data.rx.value.sample_set_id, "selected"
             ] = not self.data.rx.value.loc[self.toggle, "selected"]
@@ -156,18 +179,79 @@ class IndividualsTable(Viewer):
         )
         return pn.Column(self.tooltip, table)
 
+    def sidebar(self):
+        return pn.Card(
+            self.param.page_size,
+            self.param.toggle,
+            self.param.population_from,
+            self.param.sample_set_to,
+            collapsed=True,
+            title="Individuals table options",
+            header_background=config.SIDEBAR_BACKGROUND,
+            active_header_background=config.SIDEBAR_BACKGROUND,
+            styles=config.VCARD_STYLE,
+        )
+
 
 class SampleSetsTable(Viewer):
     table = param.DataFrame()
 
     def __init__(self, **params):
         super().__init__(**params)
+        self.table.set_index(["id"], inplace=True)
         self.data = self.param.table.rx()
 
     def __panel__(self):
         return pn.Column(
             self.data,
         )
+
+    def sidebar(self):
+        return pn.Card(
+            title="Sample sets table options",
+            collapsed=True,
+            header_background=config.SIDEBAR_BACKGROUND,
+            active_header_background=config.SIDEBAR_BACKGROUND,
+            styles=config.VCARD_STYLE,
+        )
+
+    @property
+    def color(self):
+        """Return the color of all sample sets as a dictionary"""
+        d = {}
+        for index, row in self.data.rx.value.iterrows():
+            d[index] = row.color
+        return d
+
+    @property
+    def color_by_name(self):
+        """Return the color of all sample sets as a dictionary with
+        sample set names as keys"""
+        d = {}
+        for _, row in self.data.rx.value.iterrows():
+            d[row["name"]] = row.color
+        return d
+
+    @property
+    def names(self):
+        """Return the names of all sample sets as a dictionary"""
+        d = {}
+        for index, row in self.data.rx.value.iterrows():
+            d[index] = row["name"]
+        return d
+
+    @property
+    def names2id(self):
+        """Return the sample sets as dictionary with names as keys,
+        ids as values"""
+        d = {}
+        for index, row in self.data.rx.value.iterrows():
+            d[row["name"]] = index
+        return d
+
+    def loc(self, i):
+        """Return sample set by index"""
+        return self.data.rx.value.loc[i]
 
 
 class DataStore(Viewer):
@@ -179,13 +263,45 @@ class DataStore(Viewer):
 
     @property
     def color(self):
+        """Return colors of selected individuals"""
         color = pd.merge(
             self.individuals_table.data.rx.value,
             self.sample_sets_table.data.rx.value,
             left_on="sample_set_id",
-            right_on="id",
+            right_index=True,
         )
         return color.loc[color.selected].color
+
+    def haplotype_gnn(self, focal_ind, windows=None):
+        samples, sample_sets = self.individuals_table.sample_sets()
+        ind = self.individuals_table.loc(focal_ind)
+        hap = windowed_genealogical_nearest_neighbours(
+            self.tsm.ts, ind.nodes, sample_sets, windows=windows
+        )
+        dflist = []
+        sample_set_names = [
+            self.sample_sets_table.loc(i)["name"] for i in sample_sets
+        ]
+        if windows is None:
+            for i in range(hap.shape[0]):
+                x = pd.DataFrame(hap[i, :])
+                x = x.T
+                x.columns = sample_set_names
+                x["haplotype"] = i
+                x["start"] = 0
+                x["end"] = self.tsm.ts.sequence_length
+                dflist.append(x)
+        else:
+            for i in range(hap.shape[1]):
+                x = pd.DataFrame(hap[:, i, :])
+                x.columns = sample_set_names
+                x["haplotype"] = i
+                x["start"] = windows[0:-1]
+                x["end"] = windows[1:]
+                dflist.append(x)
+        df = pd.concat(dflist)
+        df.set_index(["haplotype", "start", "end"], inplace=True)
+        return df
 
     # Not needed? Never used?
     def __panel__(self):

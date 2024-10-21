@@ -21,5 +21,5 @@ class SampleSetsPage(View):
         )
         return table
 
-    # def sidebar(self):
-    #     return pn.Column(pn.pane.Markdown("# Sample Sets"))
+    def sidebar(self):
+        return pn.Column(self.datastore.sample_sets_table.sidebar)

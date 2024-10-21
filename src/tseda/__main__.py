@@ -13,7 +13,7 @@ from . import pages  # noqa
 from . import datastore  # noqa
 from .views import IndividualsTable  # noqa
 from tsbrowse import preprocess as preprocess_  # noqa
-from tsbrowse.model import TSModel
+from tsbrowse.model import TSModel  # noqa
 
 
 logger = daiquiri.getLogger("tseda")

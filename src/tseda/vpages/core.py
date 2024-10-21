@@ -1,3 +1,4 @@
+import numpy as np
 import panel as pn
 import param
 from panel.viewable import Viewer
@@ -16,3 +17,23 @@ class View(Viewer):
 
     def sidebar(self):
         return pn.Column(pn.pane.Markdown(f"# {self.title}"))
+
+
+def make_windows(window_size, sequence_length):
+    """Make windows for statistics."""
+    num_windows = int(sequence_length / window_size)
+    windows = np.linspace(0, sequence_length, num_windows + 1)
+    windows[-1] = sequence_length
+    return windows
+
+
+def make_sample_sets(inds):
+    sample_sets = {}
+    samples = []
+    for _, ind in inds.iterrows():
+        sample_set = ind.sample_set_id
+        if sample_set not in sample_sets:
+            sample_sets[sample_set] = []
+        sample_sets[sample_set].append(ind.id)
+        samples.append(ind.id)
+    return sample_sets

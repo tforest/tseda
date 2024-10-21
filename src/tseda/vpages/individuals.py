@@ -24,9 +24,5 @@ class IndividualsPage(View):
     def sidebar(self):
         return pn.Column(
             self.geomap.sidebar,
-            pn.pane.Markdown("## Individuals table options"),
-            self.data.param.page_size,
-            self.data.param.toggle,
-            self.data.param.population_from,
-            self.data.param.sample_set_to,
+            self.data.sidebar,
         )

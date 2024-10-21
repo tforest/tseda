@@ -43,7 +43,7 @@ class GeoMap(View):
         color = color.loc[~gdf.geometry.is_empty.values]
         gdf = gdf[~gdf.geometry.is_empty]
         return gdf.hvplot.points(
-            hover_cols=["id", "name", "population", "sample_set_id"],
+            hover_cols=["name", "population", "sample_set_id"],
             geo=True,
             tiles=self.tiles,
             tiles_opts={"alpha": 0.5},
@@ -54,6 +54,7 @@ class GeoMap(View):
             tools=["wheel_zoom", "box_select", "tap", "pan", "reset"],
             fill_alpha=0.5,
             line_color="black",
+            # responsive=True,
         )
 
     def sidebar(self):
@@ -63,5 +64,7 @@ class GeoMap(View):
             self.param.width,
             collapsed=True,
             title="Map options",
+            header_background=config.SIDEBAR_BACKGROUND,
+            active_header_background=config.SIDEBAR_BACKGROUND,
             styles=config.VCARD_STYLE,
         )

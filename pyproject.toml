@@ -18,7 +18,7 @@ dependencies = [
     "cartopy~=0.23.0",
     "geopandas~=1.0.1",
     "dask[dataframe]~=2024.8.1",
-    "hvplot~=0.11.0",
+    "hvplot~=0.11.1",
     "xyzservices~=2024.6.0",
     "tsbrowse @ git+https://github.com/tskit-dev/tsbrowse@2faab76ad3a1f4bb51e6a39ce1c244dc1ac8209b",
 ]

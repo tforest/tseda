@@ -2,8 +2,6 @@ import holoviews as hv
 import hvplot.pandas  # noqa
 import pandas as pd
 import panel as pn
-
-# from .gnnhaplotype import GNNHaplotype
 import param
 from bokeh.models import (
     ColumnDataSource,
@@ -12,23 +10,95 @@ from bokeh.models import (
 )
 from bokeh.plotting import figure
 
-from .core import View
+from tseda import config
+
+from .core import View, make_windows
 from .map import GeoMap
 
 hv.extension("bokeh")
 pn.extension(sizing_mode="stretch_width")
 
 
-def make_sample_sets(inds):
-    sample_sets = {}
-    samples = []
-    for _, ind in inds.iterrows():
-        sample_set = ind.sample_set_id
-        if sample_set not in sample_sets:
-            sample_sets[sample_set] = []
-        sample_sets[sample_set].append(ind.id)
-        samples.append(ind.id)
-    return sample_sets
+class GNNHaplotype(View):
+    """Make GNN haplotype plot."""
+
+    individual_id = param.Integer(
+        default=None,
+        bounds=(0, None),
+        doc="Individual ID (0-indexed)",
+    )
+    window_size = param.Integer(
+        default=10000, bounds=(1, None), doc="Size of window"
+    )
+
+    def plot(self, haplotype=0):
+        if self.individual_id is None:
+            return
+        if self.window_size is not None:
+            windows = make_windows(
+                self.window_size, self.datastore.tsm.ts.sequence_length
+            )
+        else:
+            windows = None
+        data = self.datastore.haplotype_gnn(
+            self.individual_id, windows=windows
+        )
+        df = data.loc[data.index.get_level_values("haplotype") == haplotype]
+        df = df.droplevel(["haplotype", "end"])
+        populations = [str(x) for x in df.columns]
+        colormap = [
+            self.datastore.sample_sets_table.color_by_name[x]
+            for x in df.columns
+        ]
+        df.reset_index(inplace=True)
+        # TODO: hvplot ignores tools/default_tools parameter
+        p = df.hvplot.area(
+            x="start",
+            y=populations,
+            color=colormap,
+            legend="right",
+            fill_alpha=0.5,
+            min_width=800,
+            min_height=300,
+            responsive=True,
+            tools=["xpan", "xwheel_zoom", "box_select", "save", "reset"],
+        )
+        p.opts(
+            default_tools=[
+                "xpan",
+                "xwheel_zoom",
+                "box_select",
+                "save",
+                "reset",
+            ],
+            active_tools=[
+                "xpan",
+                "xwheel_zoom",
+                "box_select",
+                "save",
+                "reset",
+            ],
+            tools=["xpan", "xwheel_zoom", "box_select", "save", "reset"],
+        )
+        return p
+
+    @pn.depends("individual_id", "window_size")
+    def __panel__(self, **params):
+        return pn.Column(
+            self.plot(0),
+            self.plot(1),
+        )
+
+    def sidebar(self):
+        return pn.Card(
+            self.param.individual_id,
+            self.param.window_size,
+            collapsed=True,
+            title="GNN haplotype options",
+            header_background=config.SIDEBAR_BACKGROUND,
+            active_header_background=config.SIDEBAR_BACKGROUND,
+            styles=config.VCARD_STYLE,
+        )
 
 
 class VBar(View):
@@ -44,6 +114,7 @@ class VBar(View):
         ),
     )
 
+    # TODO: move to DataStore class?
     def gnn(self):
         inds = self.datastore.individuals_table.data.rx.value
         samples, sample_sets = self.datastore.individuals_table.sample_sets()
@@ -54,119 +125,67 @@ class VBar(View):
             gnn,
             columns=[i for i in sample_sets],
         )
-        df["sample_set_id"] = [
-            inds.loc[inds.id.loc[i]].sample_set_id for i in samples
+        samples2ind = [
+            self.datastore.individuals_table.sample2ind[i] for i in samples
         ]
-        df["id"] = [inds.loc[inds.id.loc[i]].id for i in samples]
+        df["id"] = samples2ind
         df["sample_id"] = df.index
+        df["sample_set_id"] = [inds.loc[i].sample_set_id for i in samples2ind]
         df.set_index(["sample_set_id", "sample_id", "id"], inplace=True)
         return df
 
+    @pn.depends("sort_order")
     def __panel__(self):
         df = self.gnn()
         sample_sets = self.datastore.sample_sets_table.data.rx.value
-        color = self.datastore.color
-        table = pn.widgets.Tabulator(
-            df,
-            layout="fit_columns",
-            height=400,
-            pagination="remote",
-            page_size=10,
-            theme="midnight",
+        inds = self.datastore.individuals_table.data.rx.value
+        color = [sample_sets.color[i] for i in df.columns]
+        groups = [sample_sets.name[i] for i in df.columns]
+        levels = df.index.names
+        factors = list(
+            tuple([self.datastore.sample_sets_table.names[x[0]], str(x[1])])
+            for x in df.index
         )
-        return table
-        # return pn.Column(self.plot)
+        df.columns = groups
+        df.reset_index(inplace=True)
+        df["x"] = factors
+        samples2ind = self.datastore.individuals_table.sample2ind
+        df["name"] = [inds.loc[samples2ind[x]].name for x in df.index]
 
-    # def __init__(self, **kwargs):
-    #     super().__init__(**kwargs)
-    #     self.tsm = self.datastore.tsm
-    #     table = self.datastore.individuals_table
-    #     inds = table.table.loc[table.table.selected]
-    #     print(inds.shape)
-    #     self._data = inds
-    # self._data = self.tsm.gnn()
-    # self._color = [
-    #     self.tsm.sample_sets[i].color for i in self._data.columns
-    # ]
-    # self._groups = [
-    #     self.tsm.sample_sets[i].name for i in self._data.columns
-    # ]
-    # self._levels = self._data.index.names
-    # self._factors = list(
-    #     tuple([tsm.sample_sets[x[0]].name, str(x[1])])
-    #     for x in self._data.index
-    # )
-    # self._data.columns = self.groups
-    # self._data.reset_index(inplace=True)
-    # self._data["x"] = self.factors
-    # self._data["name"] = [
-    #     tsm.individuals[self._data["id"][x]].name for x in self._data.index
-    # ]
-
-    @property
-    def data(self):
-        return self._data
-
-    @property
-    def color(self):
-        """Color mapping for groups"""
-        return self._color
-
-    @property
-    def groups(self):
-        """Group (sample sets) names"""
-        return self._groups
-
-    @property
-    def levels(self):
-        """Sample index levels"""
-        return self._levels
-
-    @property
-    def factors(self):
-        """Factors consist of 2-tuples that correspond to
-        (individual, population) grouping"""
-        return self._factors
-
-    @param.depends("sort_order")
-    def plot(self):
-        """Make vbar plot. Holoviews does not support grouping by default
-        so we need to implement it using low-level bokeh API."""
         hover = HoverTool()
         hover.tooltips = list([("name", "@name")])
-        hover.tooltips.extend(list(map(lambda x: (x, f"@{x}"), self.levels)))
+        hover.tooltips.extend(list(map(lambda x: (x, f"@{x}"), levels)))
         hover.tooltips.extend(
             list(
                 map(
                     lambda x: (x, f"@{x}{{%0.1f}}"),
-                    self.groups,
+                    groups,
                 )
             )
         )
 
-        data = self.data
         if len(self.sort_order) > 0:
             sort_order = (
                 ["sample_set_id"] + self.sort_order + ["sample_id", "id"]
             )
-            data.sort_values(sort_order, axis=0, inplace=True)
-            self._factors = data["x"].values
-        source = ColumnDataSource(data)
-        self._fig = figure(
+            df.sort_values(sort_order, axis=0, inplace=True)
+            factors = df["x"].values
+        source = ColumnDataSource(df)
+        fig = figure(
             x_range=FactorRange(
-                *self.factors, group_padding=0.1, subgroup_padding=0
+                *factors, group_padding=0.1, subgroup_padding=0
             ),
             height=400,
             sizing_mode="stretch_width",
             tools="xpan,xwheel_zoom,box_select,save,reset",
         )
-        self._fig.add_tools(hover)
-        self._fig.vbar_stack(
-            self.groups,
+        fig.add_tools(hover)
+        fig.vbar_stack(
+            groups,
             source=source,
             x="x",
-            color=self.color,
-            legend_label=self.groups,
+            color=color,
+            legend_label=groups,
             width=1,
             line_color="black",
             line_alpha=0.7,
@@ -174,26 +193,26 @@ class VBar(View):
             fill_alpha=0.5,
         )
 
-        self._fig.add_layout(self._fig.legend[0], "right")
-        self._fig.legend[0].label_text_font_size = "12pt"
+        fig.add_layout(fig.legend[0], "right")
+        fig.legend[0].label_text_font_size = "12pt"
 
-        self._fig.axis.major_tick_line_color = None
-        self._fig.axis.minor_tick_line_color = None
-        self._fig.xaxis.group_label_orientation = 1.0
-        self._fig.xaxis.subgroup_label_orientation = 1.0
-        self._fig.xaxis.group_text_font_size = "14pt"
-        self._fig.xaxis.major_label_orientation = 1.0
-        self._fig.xaxis.major_label_text_font_size = "0pt"
-        self._fig.yaxis.major_label_text_font_size = "12pt"
-        self._fig.yaxis.axis_label_text_font_size = "14pt"
-        self._fig.axis.axis_line_color = None
-        self._fig.grid.grid_line_color = None
-        self._fig.outline_line_color = "black"
-        self._fig.xaxis.separator_line_width = 2.0
-        self._fig.xaxis.separator_line_color = "grey"
-        self._fig.xaxis.separator_line_alpha = 0.5
+        fig.axis.major_tick_line_color = None
+        fig.axis.minor_tick_line_color = None
+        fig.xaxis.group_label_orientation = 1.0
+        fig.xaxis.subgroup_label_orientation = 1.0
+        fig.xaxis.group_text_font_size = "14pt"
+        fig.xaxis.major_label_orientation = 1.0
+        fig.xaxis.major_label_text_font_size = "0pt"
+        fig.yaxis.major_label_text_font_size = "12pt"
+        fig.yaxis.axis_label_text_font_size = "14pt"
+        fig.axis.axis_line_color = None
+        fig.grid.grid_line_color = None
+        fig.outline_line_color = "black"
+        fig.xaxis.separator_line_width = 2.0
+        fig.xaxis.separator_line_color = "grey"
+        fig.xaxis.separator_line_alpha = 0.5
 
-        return self._fig
+        return fig
 
 
 class GNNPage(View):
@@ -201,19 +220,19 @@ class GNNPage(View):
     title = "GNN analysis"
     geomap = param.ClassSelector(class_=GeoMap)
     vbar = param.ClassSelector(class_=VBar)
+    gnnhaplotype = param.ClassSelector(class_=GNNHaplotype)
 
     def __init__(self, **params):
         super().__init__(**params)
         self.geomap = GeoMap(datastore=self.datastore)
         self.vbar = VBar(datastore=self.datastore)
+        self.gnnhaplotype = GNNHaplotype(datastore=self.datastore)
 
     def __panel__(self):
-        return pn.Column(self.geomap, self.vbar)
+        return pn.Column(self.geomap, self.vbar, self.gnnhaplotype)
 
     def sidebar(self):
         return pn.Column(
-            pn.pane.Markdown("## GNN"),
-            self.geomap.param.tiles_selector,
-            self.geomap.param.height,
-            self.geomap.param.width,
+            self.geomap.sidebar,
+            self.gnnhaplotype.sidebar,
         )
