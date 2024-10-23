@@ -30,8 +30,7 @@ def test_datastore_preprocess(tsbm):
 
 
 def test_individuals_table(individuals_table):
-    data = individuals_table.table
-    print(individuals_table.loc(5))
+    print(individuals_table.table.loc(5))
 
 
 def test_datastore(ds):

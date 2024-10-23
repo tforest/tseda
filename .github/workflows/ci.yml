@@ -1,0 +1,21 @@
+name: ci
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        py: ["3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: eifinger/setup-rye@v3
+      - run: rye pin $
+      - run: |
+          rye sync
+          [[ -n $(git diff --stat requirements.lock) ]] && exit 1
+      - run: rye fmt --check
+      - run: rye lint src
+      - run: rye run check
+      - run: rye run test

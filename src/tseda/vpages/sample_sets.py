@@ -1,25 +1,22 @@
 import panel as pn
+import param
+
+from tseda.datastore import SampleSetsTable
 
 from .core import View
-
-pn.extension("tabulator")
 
 
 class SampleSetsPage(View):
     key = "sample_sets"
     title = "Sample Sets"
+    data = param.ClassSelector(class_=SampleSetsTable)
+
+    def __init__(self, **params):
+        super().__init__(**params)
+        self.data = self.datastore.sample_sets_table
 
     def __panel__(self):
-        data = self.datastore.sample_sets_table.data
-        table = pn.widgets.Tabulator(
-            data,
-            layout="fit_columns",
-            selectable=True,
-            page_size=100,
-            pagination="remote",
-            margin=10,
-        )
-        return table
+        return pn.Column(self.data)
 
     def sidebar(self):
-        return pn.Column(self.datastore.sample_sets_table.sidebar)
+        return pn.Column(self.data.sidebar)

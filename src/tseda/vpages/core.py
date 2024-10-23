@@ -13,7 +13,6 @@ class View(Viewer):
 
     def __init__(self, **params):
         super().__init__(**params)
-        print(id(self.datastore))
 
     def sidebar(self):
         return pn.Column(pn.pane.Markdown(f"# {self.title}"))

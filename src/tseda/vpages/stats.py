@@ -194,7 +194,7 @@ class MultiwayStats(View):
                 mode=self.mode,
             )
         elif self.statistic == "divergence":
-            return tsm.ts.divergence(
+            data = tsm.ts.divergence(
                 sample_sets,
                 windows=windows,
                 indexes=indexes_list,

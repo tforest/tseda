@@ -46,7 +46,7 @@ packages = ["src/tseda"]
 managed = true
 dev-dependencies = [
     "jupyter~=1.0.0",
-    "pyright~=1.1.379",
+    "pyright~=1.1.386",
     "pytest~=8.3.2",
     "stdpopsim~=0.2.0",
     "geodatasets~=2024.7.0",
@@ -70,10 +70,12 @@ select = [
   "N",    # naming
   "T100", # breakpoints (probably don't want these in prod!)
 ]
+ignore = ["N806"]
 
 [tool.ruff.lint.isort]
 # so it knows to group first-party stuff last
 known-first-party = ["tseda"]
+
 
 
 [tool.pyright]
@@ -89,7 +91,7 @@ reportAssignmentType = false
 
 [tool.rye.scripts]
 fmt = "rye fmt"
-lint = "rye lint --fix"
+lint = "rye lint src --fix"
 check = "pyright"
 test = "rye test"
 all = { chain = ["fmt", "lint", "check", "test"] }

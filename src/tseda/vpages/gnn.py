@@ -227,12 +227,20 @@ class GNNPage(View):
         self.geomap = GeoMap(datastore=self.datastore)
         self.vbar = VBar(datastore=self.datastore)
         self.gnnhaplotype = GNNHaplotype(datastore=self.datastore)
+        self.sample_sets = self.datastore.sample_sets_table
 
     def __panel__(self):
-        return pn.Column(self.geomap, self.vbar, self.gnnhaplotype)
+        return pn.Column(
+            pn.Row(
+                self.geomap,
+            ),
+            self.vbar,
+            self.gnnhaplotype,
+        )
 
     def sidebar(self):
         return pn.Column(
             self.geomap.sidebar,
             self.gnnhaplotype.sidebar,
+            self.sample_sets.sidebar_table,
         )

@@ -9,6 +9,3 @@ class OverviewPage(View):
 
     def __panel__(self):
         return pn.Column(pn.pane.HTML(self.datastore.tsm.ts))
-
-    # def sidebar(self):
-    #     return pn.Column(pn.pane.Markdown("# Overview"))

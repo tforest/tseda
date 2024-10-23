@@ -1,7 +1,9 @@
 import daiquiri
+import holoviews as hv
 import pandas as pd
 import panel as pn
 import param
+from holoviews.plotting.util import process_cmap
 from panel.viewable import Viewer
 from tsbrowse import model
 
@@ -11,6 +13,17 @@ from tseda.model import Individual, SampleSet
 from .gnn import windowed_genealogical_nearest_neighbours
 
 logger = daiquiri.getLogger("tseda")
+
+
+CMAP = {
+    cm.name: cm
+    for cm in hv.plotting.util.list_cmaps(
+        records=True, category="Categorical", reverse=False
+    )
+    if cm.name.startswith("glasbey")
+}
+colormap = "glasbey_dark"
+COLORS = process_cmap(CMAP[colormap].name, provider=CMAP[colormap].provider)
 
 
 def make_individuals_table(tsm):
@@ -51,18 +64,18 @@ class IndividualsTable(Viewer):
         "longitude",
         "latitude",
     ]
-    individuals_editors = {k: None for k in columns}
-    individuals_editors["sample_set_id"] = {
+    editors = {k: None for k in columns}
+    editors["sample_set_id"] = {
         "type": "list",
         "values": [],
         "valueLookup": True,
     }
-    individuals_editors["selected"] = {
+    editors["selected"] = {
         "type": "list",
         "values": [False, True],
         "valuesLookup": True,
     }
-    individuals_formatters = {"selected": {"type": "tickCross"}}
+    formatters = {"selected": {"type": "tickCross"}}
 
     table = param.DataFrame()
 
@@ -172,8 +185,8 @@ class IndividualsTable(Viewer):
             layout="fit_columns",
             selectable=True,
             page_size=self.page_size,
-            formatters=self.individuals_formatters,
-            editors=self.individuals_editors,
+            formatters=self.formatters,
+            editors=self.editors,
             margin=10,
             text_align={"selected": "center"},
         )
@@ -185,7 +198,7 @@ class IndividualsTable(Viewer):
             self.param.toggle,
             self.param.population_from,
             self.param.sample_set_to,
-            collapsed=True,
+            collapsed=False,
             title="Individuals table options",
             header_background=config.SIDEBAR_BACKGROUND,
             active_header_background=config.SIDEBAR_BACKGROUND,
@@ -194,6 +207,27 @@ class IndividualsTable(Viewer):
 
 
 class SampleSetsTable(Viewer):
+    default_columns = ["name", "color", "immutable_id"]
+    editors = {k: None for k in default_columns}
+    editors["color"] = {
+        "type": "list",
+        "values": COLORS,
+        "valueLookup": True,
+    }
+    editors["name"] = {"type": "input"}
+    formatters = {
+        "color": {"type": "color"},
+        "immutable_id": {"type": "tickCross"},
+    }
+
+    create_sample_set_textinput = param.String(
+        doc="New sample set name. Press Enter (⏎) to create.",
+        default="",
+        label="New sample set name",
+    )
+
+    page_size = param.Selector(objects=[10, 20, 50, 100], default=20)
+
     table = param.DataFrame()
 
     def __init__(self, **params):
@@ -201,15 +235,65 @@ class SampleSetsTable(Viewer):
         self.table.set_index(["id"], inplace=True)
         self.data = self.param.table.rx()
 
+    @property
+    def tooltip(self):
+        return pn.widgets.TooltipIcon(
+            value=(
+                "The name and color of each sample set are editable. In the "
+                "color column, select a color from the dropdown list. In the "
+                "individuals table, you can assign individuals to sample sets."
+            ),
+        )
+
+    @pn.depends("page_size", "create_sample_set_textinput")  # , "columns")
     def __panel__(self):
-        return pn.Column(
+        if self.create_sample_set_textinput:
+            i = max(self.param.table.rx.value.index) + 1
+            self.param.table.rx.value.loc[i] = [
+                self.create_sample_set_textinput,
+                COLORS[0],
+                False,
+            ]
+            self.create_sample_set_textinput = ""
+        table = pn.widgets.Tabulator(
             self.data,
+            layout="fit_columns",
+            selectable=True,
+            page_size=100,
+            pagination="remote",
+            margin=10,
+            formatters=self.formatters,
+            editors=self.editors,
+        )
+        return pn.Column(self.tooltip, table)
+
+    def sidebar_table(self):
+        table = pn.widgets.Tabulator(
+            self.data,
+            layout="fit_columns",
+            selectable=True,
+            page_size=100,
+            pagination="remote",
+            margin=10,
+            formatters=self.formatters,
+            editors=self.editors,
+            hidden_columns=["id", "immutable_id"],
+        )
+        return pn.Card(
+            pn.Column(self.tooltip, table),
+            title="Sample sets table quick view",
+            collapsed=True,
+            header_background=config.SIDEBAR_BACKGROUND,
+            active_header_background=config.SIDEBAR_BACKGROUND,
+            styles=config.VCARD_STYLE,
         )
 
     def sidebar(self):
         return pn.Card(
+            self.param.page_size,
+            self.param.create_sample_set_textinput,
             title="Sample sets table options",
-            collapsed=True,
+            collapsed=False,
             header_background=config.SIDEBAR_BACKGROUND,
             active_header_background=config.SIDEBAR_BACKGROUND,
             styles=config.VCARD_STYLE,
