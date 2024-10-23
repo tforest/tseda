@@ -4,7 +4,7 @@ from tseda import datastore
 from tseda.vpages import gnn
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture
 def ds(tsbm):
     individuals_table, sample_sets_table = datastore.preprocess(tsbm)
     return datastore.DataStore(
@@ -14,12 +14,12 @@ def ds(tsbm):
     )
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture
 def vbar(ds):
     return gnn.VBar(datastore=ds)
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture
 def hapgnn(ds):
     return gnn.GNNHaplotype(datastore=ds)
 

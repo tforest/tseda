@@ -166,7 +166,7 @@ class VBar(View):
 
         if len(self.sort_order) > 0:
             sort_order = (
-                ["sample_set_id"] + self.sort_order + ["sample_id", "id"]
+                ["sample_set_id"] + self.sort_order + ["sample_id", "id"]  # pyright: ignore[reportOperatorIssue]
             )
             df.sort_values(sort_order, axis=0, inplace=True)
             factors = df["x"].values
@@ -212,7 +212,7 @@ class VBar(View):
         fig.xaxis.separator_line_color = "grey"
         fig.xaxis.separator_line_alpha = 0.5
 
-        return fig
+        return pn.panel(fig)
 
 
 class GNNPage(View):

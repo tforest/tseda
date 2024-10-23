@@ -64,7 +64,7 @@ class IndividualsTable(Viewer):
         "longitude",
         "latitude",
     ]
-    editors = {k: None for k in columns}
+    editors = {k: None for k in columns}  # noqa
     editors["sample_set_id"] = {
         "type": "list",
         "values": [],
@@ -172,12 +172,15 @@ class IndividualsTable(Viewer):
             self.toggle = None
         if self.sample_set_to is not None:
             if self.population_from is not None:
-                self.table.loc[
-                    self.table["population"] == self.population_from,
-                    "sample_set_id",
-                ] = self.sample_set_to
+                try:
+                    self.table.loc[
+                        self.table["population"] == self.population_from,  # pyright: ignore[reportIndexIssue]
+                        "sample_set_id",
+                    ] = self.sample_set_to
+                except IndexError:
+                    logger.error("No such population %i", self.population_from)
             else:
-                print("Nothing happening")
+                logger.info("No population defined")
         data = self.data[self.columns]
         table = pn.widgets.Tabulator(
             data,
@@ -222,7 +225,7 @@ class SampleSetsTable(Viewer):
 
     create_sample_set_textinput = param.String(
         doc="New sample set name. Press Enter (⏎) to create.",
-        default="",
+        default=None,
         label="New sample set name",
     )
 
@@ -247,14 +250,14 @@ class SampleSetsTable(Viewer):
 
     @pn.depends("page_size", "create_sample_set_textinput")  # , "columns")
     def __panel__(self):
-        if self.create_sample_set_textinput:
+        if self.create_sample_set_textinput is not None:
             i = max(self.param.table.rx.value.index) + 1
             self.param.table.rx.value.loc[i] = [
                 self.create_sample_set_textinput,
                 COLORS[0],
                 False,
             ]
-            self.create_sample_set_textinput = ""
+            self.create_sample_set_textinput = None
         table = pn.widgets.Tabulator(
             self.data,
             layout="fit_columns",

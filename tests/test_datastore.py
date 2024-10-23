@@ -4,7 +4,7 @@ import pytest
 from tseda import datastore
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture
 def ds(tsbm):
     individuals_table, sample_sets_table = datastore.preprocess(tsbm)
     return datastore.DataStore(
@@ -14,7 +14,7 @@ def ds(tsbm):
     )
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture
 def individuals_table(tsbm):
     data, _ = datastore.preprocess(tsbm)
     return data
@@ -30,7 +30,7 @@ def test_datastore_preprocess(tsbm):
 
 
 def test_individuals_table(individuals_table):
-    print(individuals_table.table.loc(5))
+    print(individuals_table.loc(5))
 
 
 def test_datastore(ds):

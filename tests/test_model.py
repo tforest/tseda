@@ -68,8 +68,8 @@ def test_toggle_individual(tsm):
     assert tsm.samples[tsm.individuals[0].samples[1]].selected
 
 
-def test_gnn(tsmhs):
-    gnn = tsmhs.gnn()
+def test_gnn(tsmh):
+    gnn = tsmh.gnn()
     assert gnn is not None
     assert gnn.shape == (36, 3)
     assert sorted(gnn.index.names) == sorted(
@@ -113,9 +113,9 @@ def test_get_individuals(tsm):
 
 def test_sample_sets_view(tsm):
     assert tsm.sample_sets_view().index.name == "id"
-    assert tsm.sample_sets_view().shape == (6, 2)
+    assert tsm.sample_sets_view().shape == (6, 3)
     tsm.create_sample_set("test")
-    assert tsm.sample_sets_view().shape == (7, 2)
+    assert tsm.sample_sets_view().shape == (7, 3)
 
 
 def test_make_sample_sets(tsm):

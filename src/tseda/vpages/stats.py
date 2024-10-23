@@ -99,7 +99,7 @@ class OnewayStats(View):
         }
         kdims = [hv.Dimension("ss", label="Sample set")]
         holomap = hv.HoloMap(data_dict, kdims=kdims)
-        return holomap.overlay("ss").opts(legend_position="right")
+        return pn.panel(holomap.overlay("ss").opts(legend_position="right"))
 
     def sidebar(self):
         return pn.Card(
@@ -231,7 +231,9 @@ class MultiwayStats(View):
         }
         kdims = [hv.Dimension("sspair", label="Sample set combination")]
         holomap = hv.HoloMap(data_dict, kdims=kdims)
-        return holomap.overlay("sspair").opts(legend_position="right")
+        return pn.panel(
+            holomap.overlay("sspair").opts(legend_position="right")
+        )
 
     def sidebar(self):
         return pn.Card(

@@ -23,7 +23,7 @@ dependencies = [
     "tsbrowse @ git+https://github.com/tskit-dev/tsbrowse@2faab76ad3a1f4bb51e6a39ce1c244dc1ac8209b",
 ]
 readme = "README.md"
-requires-python = ">= 3.11"
+requires-python = ">= 3.12"
 dynamic = ["version"]
 
 [build-system]
@@ -68,7 +68,7 @@ select = [
   "F",    # important pyflakes lints
   "I",    # import sorting
   "N",    # naming
-  "T100", # breakpoints (probably don't want these in prod!)
+  "T100", # breakpoints
 ]
 ignore = ["N806"]
 
@@ -76,18 +76,17 @@ ignore = ["N806"]
 # so it knows to group first-party stuff last
 known-first-party = ["tseda"]
 
-
-
 [tool.pyright]
-venvPath = "."          # rye installs the venv in the current dir
-venv = ".venv"          #       in a folder called `.venv`
+venvPath = "."
+venv = ".venv"
 include = ["src"]
-pythonVersion = "3.12"  # if library, specify the _lowest_ you support
+pythonVersion = "3.12"  # _lowest_ supported version
 reportMissingTypeStubs = false
 reportAttributeAccessIssue = false
 reportCallIssue = false
 reportOptionalMemberAccess = false
 reportAssignmentType = false
+reportArgumentType = false
 
 [tool.rye.scripts]
 fmt = "rye fmt"

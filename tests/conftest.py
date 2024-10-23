@@ -9,37 +9,37 @@ from tseda import model
 dirname = os.path.abspath(os.path.dirname(__file__))
 
 
-@fixture(scope="module")
+@fixture
 def treesfile():
     return os.path.join(dirname, "data/test.trees")
 
 
-@fixture(scope="module")
+@fixture
 def tszipfile():
     return os.path.join(dirname, "data/test.trees.tsz")
 
 
-@fixture(scope="module")
+@fixture
 def tsbrowsefile():
     return os.path.join(dirname, "data/test.trees.tsbrowse")
 
 
-@fixture(scope="module")
+@fixture
 def ts(treesfile):
     return tskit.load(treesfile)
 
 
-@fixture(scope="module")
+@fixture
 def tsbm(tsbrowsefile):
     return tsb_model.TSModel(tsbrowsefile)
 
 
-@fixture(scope="module")
-def tsm(ts):
-    return model.TSEdaModel(ts)
+@fixture
+def tsm(tsbrowsefile):
+    return model.TSEdaModel(tsbrowsefile)
 
 
-@fixture(scope="module")
+@fixture
 def tsmh(tsm):
     """Remove outgroup individuals from model to include only Homo
     Sapiens individuals"""
