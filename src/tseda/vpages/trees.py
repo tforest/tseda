@@ -1,3 +1,10 @@
+"""Module to plot local trees
+
+TODO:
+
+- fix bounds of position / treeid parameters
+"""
+
 import ast
 
 import holoviews as hv

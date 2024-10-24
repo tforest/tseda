@@ -1,7 +1,7 @@
 import pytest
 
 from tseda import datastore
-from tseda.vpages import gnn
+from tseda.vpages import ignn
 
 
 @pytest.fixture
@@ -16,12 +16,12 @@ def ds(tsbm):
 
 @pytest.fixture
 def vbar(ds):
-    return gnn.VBar(datastore=ds)
+    return ignn.VBar(datastore=ds)
 
 
 @pytest.fixture
 def hapgnn(ds):
-    return gnn.GNNHaplotype(datastore=ds)
+    return ignn.GNNHaplotype(datastore=ds)
 
 
 def test_gnn(vbar):

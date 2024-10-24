@@ -1,9 +1,10 @@
 from . import (
-    gnn,
+    ignn,
     individuals,
     overview,
     sample_sets,
     stats,
+    structure,
     trees,
 )
 
@@ -11,7 +12,8 @@ PAGES = [
     overview.OverviewPage,
     sample_sets.SampleSetsPage,
     individuals.IndividualsPage,
-    gnn.GNNPage,
+    structure.StructurePage,
+    ignn.IGNNPage,
     stats.StatsPage,
     trees.TreesPage,
 ]

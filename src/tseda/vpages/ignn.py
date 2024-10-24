@@ -1,3 +1,20 @@
+"""Genealogical Nearest Neighbors (GNN) analysis.
+
+Draw GNN plots for individuals and haplotypes. The GNN plot shows the
+GNN proportions in each sample set for each individual or haplotype.
+The GNN proportions are calculated using the genealogical nearest
+neighbors method.
+
+Individuals are grouped and colored by sample set. The groupings and
+colors can be modified in the sample set editor. Hovering over the bars
+in the plot shows the GNN proportions of each sample set for a given
+sample.
+
+TODO:
+
+- linked brushing between the map and the GNN plot
+"""
+
 import holoviews as hv
 import hvplot.pandas  # noqa
 import pandas as pd
@@ -224,9 +241,9 @@ class VBar(View):
         return pn.panel(fig)
 
 
-class GNNPage(View):
-    key = "GNN"
-    title = "GNN analysis"
+class IGNNPage(View):
+    key = "iGNN"
+    title = "iGNN"
     geomap = param.ClassSelector(class_=GeoMap)
     vbar = param.ClassSelector(class_=VBar)
     gnnhaplotype = param.ClassSelector(class_=GNNHaplotype)

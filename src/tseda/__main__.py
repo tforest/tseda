@@ -52,9 +52,9 @@ def cli():
     is_flag=True,
     help="Do not filter the output log (advanced debugging only)",
 )
-def serve(path, port, show, log_level, no_log_filter):
+def serve2(path, port, show, log_level, no_log_filter):
     """
-    Run the tseda server.
+    Run the tseda server, obsolete version.
     """
     setup_logging(log_level, no_log_filter)
 
@@ -104,9 +104,9 @@ def preprocess(tszip_path, output):
     is_flag=True,
     help="Do not filter the output log (advanced debugging only)",
 )
-def serve2(path, port, show, log_level, no_log_filter):
+def serve(path, port, show, log_level, no_log_filter):
     """
-    Run the tseda datastore server.
+    Run the tseda datastore server, version based on View base class.
     """
     setup_logging(log_level, no_log_filter)
 

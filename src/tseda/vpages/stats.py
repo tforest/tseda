@@ -1,3 +1,13 @@
+"""Population genetic statistics.
+
+TODO:
+- add more stats
+- add generic stats class and let oneway and multiway inherit from it
+- add xwheel zoom and pan
+- catch error / alert when using mode="branch" on uncalibrated trees
+- box plots
+"""
+
 import ast
 
 import holoviews as hv

@@ -1,3 +1,17 @@
+"""Module for creating a map of the world with sample locations
+
+Generate a hvplot map of the world with sample locations based on a
+GeoPandas representation of the individuals data. The map is
+interactive and can be drawn using different XYZ tiles.
+
+TODO:
+
+- Add linked brushing between the map and other panel objects /
+  widgets
+- Fix issue where map is rendered small and repeated tiles
+
+"""
+
 import geopandas
 import hvplot.pandas  # noqa
 import panel as pn

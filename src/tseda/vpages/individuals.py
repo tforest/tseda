@@ -1,3 +1,14 @@
+"""Individuals editor page.
+
+Panel showing a simple individuals editor page. The page consists of
+two main components: a map showing the distribution of individuals
+and a table showing the individuals.
+
+The individuals table allows the user to toggle individuals for
+inclusion/exclusion, and reassign individuals to new sample set
+combinations.
+"""
+
 import panel as pn
 import param
 

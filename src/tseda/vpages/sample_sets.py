@@ -1,3 +1,18 @@
+"""Sample sets editor page.
+
+Panel showing a simple sample set editor page. The page consists of
+an editable table showing the sample sets.
+
+The sample sets table allows the user to edit the name and color of
+each sample set. In addition, new sample sets can be added that allows
+the user to reassign individuals to different sample sets in the
+individuals table.
+
+TODO:
+
+- change from/to params to param.NumericTuple?
+"""
+
 import panel as pn
 import param
 

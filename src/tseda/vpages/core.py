@@ -1,3 +1,9 @@
+"""Core vpages module.
+
+Provides View helper class for panel plots and helper functions common
+to pages.
+"""
+
 import numpy as np
 import panel as pn
 import param
