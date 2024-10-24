@@ -193,16 +193,6 @@ class Sample(tskit.Node):
         self.selected = False
 
 
-# TODO: if reactivity possible with this setup would prefer to use
-# classes that encapsulate the data and methods
-class IndividualsTable:
-    pass
-
-
-class SampleSetsTable:
-    pass
-
-
 # TODO: add relevant methods to caching. Cache id should be calculated
 # with respect to the selected sample sets
 class TSEdaModel(TSModel):
