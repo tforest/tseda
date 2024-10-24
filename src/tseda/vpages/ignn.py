@@ -110,8 +110,13 @@ class GNNHaplotype(View):
 
     @pn.depends("individual_id", "window_size")
     def __panel__(self, **params):
+        inds = self.datastore.individuals_table.data.rx.value
+        nodes = inds.loc[self.individual_id].nodes
         return pn.Column(
+            pn.pane.Markdown(f"## Individual id {self.individual_id}"),
+            pn.pane.Markdown(f"### Haplotype 0 (sample id {nodes[0]})"),
             self.plot(0),
+            pn.pane.Markdown(f"### Haplotype 1 (sample id {nodes[1]})"),
             self.plot(1),
         )
 
@@ -240,6 +245,16 @@ class VBar(View):
 
         return pn.panel(fig)
 
+    def sidebar(self):
+        return pn.Card(
+            self.param.sort_order,
+            collapsed=True,
+            title="GNN VBar options",
+            header_background=config.SIDEBAR_BACKGROUND,
+            active_header_background=config.SIDEBAR_BACKGROUND,
+            styles=config.VCARD_STYLE,
+        )
+
 
 class IGNNPage(View):
     key = "iGNN"
@@ -268,5 +283,6 @@ class IGNNPage(View):
         return pn.Column(
             self.geomap.sidebar,
             self.gnnhaplotype.sidebar,
+            self.vbar.sidebar,
             self.sample_sets.sidebar_table,
         )
