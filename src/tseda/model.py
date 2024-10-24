@@ -27,6 +27,8 @@ import tskit
 from bokeh.palettes import Set3
 from tsbrowse.model import TSModel
 
+from tseda import config
+
 from .gnn import windowed_genealogical_nearest_neighbours
 
 logger = daiquiri.getLogger("tseda")
@@ -93,7 +95,7 @@ class SampleSet:
     population: dataclasses.InitVar[tskit.Population | None] = None
     immutable_id: bool = False
 
-    colormap = palette()
+    colormap = config.COLORS
 
     def __post_init__(self, population):
         if self.color is None:

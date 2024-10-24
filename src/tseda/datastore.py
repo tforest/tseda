@@ -1,9 +1,7 @@
 import daiquiri
-import holoviews as hv
 import pandas as pd
 import panel as pn
 import param
-from holoviews.plotting.util import process_cmap
 from panel.viewable import Viewer
 from tsbrowse import model
 
@@ -13,17 +11,6 @@ from tseda.model import Individual, SampleSet
 from .gnn import windowed_genealogical_nearest_neighbours
 
 logger = daiquiri.getLogger("tseda")
-
-
-CMAP = {
-    cm.name: cm
-    for cm in hv.plotting.util.list_cmaps(
-        records=True, category="Categorical", reverse=False
-    )
-    if cm.name.startswith("glasbey")
-}
-colormap = "glasbey_dark"
-COLORS = process_cmap(CMAP[colormap].name, provider=CMAP[colormap].provider)
 
 
 def make_individuals_table(tsm):
@@ -214,7 +201,7 @@ class SampleSetsTable(Viewer):
     editors = {k: None for k in default_columns}
     editors["color"] = {
         "type": "list",
-        "values": COLORS,
+        "values": config.COLORS,
         "valueLookup": True,
     }
     editors["name"] = {"type": "input"}
@@ -254,7 +241,7 @@ class SampleSetsTable(Viewer):
             i = max(self.param.table.rx.value.index) + 1
             self.param.table.rx.value.loc[i] = [
                 self.create_sample_set_textinput,
-                COLORS[0],
+                config.COLORS[0],
                 False,
             ]
             self.create_sample_set_textinput = None

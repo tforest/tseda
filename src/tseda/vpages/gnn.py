@@ -16,7 +16,7 @@ from .core import View, make_windows
 from .map import GeoMap
 
 hv.extension("bokeh")
-pn.extension(sizing_mode="stretch_width")
+pn.extension(sizing_mode="stretch_both")
 
 
 class GNNHaplotype(View):
@@ -61,10 +61,18 @@ class GNNHaplotype(View):
             min_width=800,
             min_height=300,
             responsive=True,
-            tools=["xpan", "xwheel_zoom", "box_select", "save", "reset"],
+            tools=[
+                "pan",
+                "xpan",
+                "xwheel_zoom",
+                "box_select",
+                "save",
+                "reset",
+            ],
         )
         p.opts(
             default_tools=[
+                "pan",
                 "xpan",
                 "xwheel_zoom",
                 "box_select",
@@ -72,6 +80,7 @@ class GNNHaplotype(View):
                 "reset",
             ],
             active_tools=[
+                "pan",
                 "xpan",
                 "xwheel_zoom",
                 "box_select",

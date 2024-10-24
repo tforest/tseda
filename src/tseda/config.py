@@ -1,3 +1,6 @@
+import holoviews as hv
+from holoviews.plotting.util import process_cmap
+
 # Global plot settings
 PLOT_WIDTH = 1000
 PLOT_HEIGHT = 600
@@ -12,3 +15,14 @@ VCARD_STYLE = {
 
 # Global color map
 CMAP = "viridis"
+CMAP_GLASBEY = {
+    cm.name: cm
+    for cm in hv.plotting.util.list_cmaps(
+        records=True, category="Categorical", reverse=False
+    )
+    if cm.name.startswith("glasbey")
+}
+colormap = "glasbey_hv"
+COLORS = process_cmap(
+    CMAP_GLASBEY[colormap].name, provider=CMAP_GLASBEY[colormap].provider
+)

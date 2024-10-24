@@ -22,7 +22,6 @@ DEFAULT_PARAMS = {
     "site": "tseda",
 }
 
-pn.extension(sizing_mode="stretch_width")
 pn.extension("tabulator")
 
 hv.extension("bokeh")
