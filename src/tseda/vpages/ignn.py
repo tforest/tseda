@@ -111,6 +111,8 @@ class GNNHaplotype(View):
     @pn.depends("individual_id", "window_size")
     def __panel__(self, **params):
         inds = self.datastore.individuals_table.data.rx.value
+        if self.individual_id is None:
+            return pn.pane.Markdown("")
         nodes = inds.loc[self.individual_id].nodes
         return pn.Column(
             pn.pane.Markdown(f"## Individual id {self.individual_id}"),
