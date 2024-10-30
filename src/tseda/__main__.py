@@ -11,7 +11,7 @@ from . import config  # noqa
 from . import model  # noqa
 from . import pages  # noqa
 from . import datastore  # noqa
-from .views import IndividualsTable  # noqa
+from .datastore import IndividualsTable  # noqa
 from tsbrowse import preprocess as preprocess_  # noqa
 from tsbrowse.model import TSModel  # noqa
 
