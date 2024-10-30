@@ -27,6 +27,8 @@ import tskit
 from bokeh.palettes import Set3
 from tsbrowse.model import TSModel
 
+from tseda import config
+
 from .gnn import windowed_genealogical_nearest_neighbours
 
 logger = daiquiri.getLogger("tseda")
@@ -47,13 +49,19 @@ def decode_metadata(obj):
     if not hasattr(obj, "metadata"):
         return None
     if isinstance(obj.metadata, bytes):
-        return json.loads(obj.metadata.decode())
+        try:
+            ret = json.loads(obj.metadata.decode())
+        except json.JSONDecodeError:
+            ret = None
+        return ret
     return obj.metadata
 
 
 def parse_metadata(obj, regex):
     """Retrieve metadata value pairs based on key regex"""
     md = decode_metadata(obj)
+    if md is None:
+        return
     key = list(filter(lambda x: regex.match(x), md.keys()))
     if len(key) >= 1:
         return md.get(key[0])
@@ -85,8 +93,9 @@ class SampleSet:
     name: str = None
     color: str = None
     population: dataclasses.InitVar[tskit.Population | None] = None
+    immutable_id: bool = False
 
-    colormap = palette()
+    colormap = config.COLORS
 
     def __post_init__(self, population):
         if self.color is None:

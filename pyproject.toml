@@ -5,7 +5,7 @@ authors = [
     { name = "Per Unneberg", email = "per.unneberg@scilifelab.se" }
 ]
 dependencies = [
-    "panel~=1.4.5",
+    "panel~=1.5.2",
     "tskit~=0.5.8",
     "tszip~=0.2.5",
     "click~=8.1.7",
@@ -14,16 +14,16 @@ dependencies = [
     "numba~=0.60.0",
     "diskcache~=5.6.3",
     "appdirs~=1.4.4",
-    "geoviews~=1.12.0",
+    "geoviews~=1.13.0",
     "cartopy~=0.23.0",
     "geopandas~=1.0.1",
     "dask[dataframe]~=2024.8.1",
-    "hvplot~=0.10.0",
+    "hvplot~=0.11.1",
     "xyzservices~=2024.6.0",
-    "tsbrowse @ git+https://github.com/tskit-dev/tsbrowse",
+    "tsbrowse @ git+https://github.com/tskit-dev/tsbrowse@2faab76ad3a1f4bb51e6a39ce1c244dc1ac8209b",
 ]
 readme = "README.md"
-requires-python = ">= 3.11"
+requires-python = ">= 3.12"
 dynamic = ["version"]
 
 [build-system]
@@ -46,7 +46,7 @@ packages = ["src/tseda"]
 managed = true
 dev-dependencies = [
     "jupyter~=1.0.0",
-    "pyright~=1.1.379",
+    "pyright~=1.1.386",
     "pytest~=8.3.2",
     "stdpopsim~=0.2.0",
     "geodatasets~=2024.7.0",
@@ -68,28 +68,29 @@ select = [
   "F",    # important pyflakes lints
   "I",    # import sorting
   "N",    # naming
-  "T100", # breakpoints (probably don't want these in prod!)
+  "T100", # breakpoints
 ]
+ignore = ["N806"]
 
 [tool.ruff.lint.isort]
 # so it knows to group first-party stuff last
 known-first-party = ["tseda"]
 
-
 [tool.pyright]
-venvPath = "."          # rye installs the venv in the current dir
-venv = ".venv"          #       in a folder called `.venv`
+venvPath = "."
+venv = ".venv"
 include = ["src"]
-pythonVersion = "3.12"  # if library, specify the _lowest_ you support
+pythonVersion = "3.12"  # _lowest_ supported version
 reportMissingTypeStubs = false
 reportAttributeAccessIssue = false
 reportCallIssue = false
 reportOptionalMemberAccess = false
 reportAssignmentType = false
+reportArgumentType = false
 
 [tool.rye.scripts]
 fmt = "rye fmt"
-lint = "rye lint --fix"
+lint = "rye lint src --fix"
 check = "pyright"
 test = "rye test"
 all = { chain = ["fmt", "lint", "check", "test"] }

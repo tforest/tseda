@@ -2,6 +2,7 @@ import os
 
 import tskit
 from pytest import fixture
+from tsbrowse import model as tsb_model
 
 from tseda import model
 
@@ -14,13 +15,28 @@ def treesfile():
 
 
 @fixture
+def tszipfile():
+    return os.path.join(dirname, "data/test.trees.tsz")
+
+
+@fixture
+def tsbrowsefile():
+    return os.path.join(dirname, "data/test.trees.tsbrowse")
+
+
+@fixture
 def ts(treesfile):
     return tskit.load(treesfile)
 
 
 @fixture
-def tsm(ts):
-    return model.TSEdaModel(ts)
+def tsbm(tsbrowsefile):
+    return tsb_model.TSModel(tsbrowsefile)
+
+
+@fixture
+def tsm(tsbrowsefile):
+    return model.TSEdaModel(tsbrowsefile)
 
 
 @fixture

@@ -11,7 +11,6 @@
 
 -e file:.
 appdirs==1.4.4
-    # via tsbrowse
     # via tseda
 asciitree==0.3.3
     # via zarr
@@ -20,7 +19,7 @@ attrs==24.2.0
     # via referencing
 bleach==6.1.0
     # via panel
-bokeh==3.4.3
+bokeh==3.5.2
     # via geoviews
     # via holoviews
     # via hvplot
@@ -61,7 +60,6 @@ dask-expr==1.1.11
 datashader==0.16.3
     # via tsbrowse
 diskcache==5.6.3
-    # via tsbrowse
     # via tseda
 fasteners==0.19
     # via zarr
@@ -71,7 +69,7 @@ fsspec==2024.6.1
     # via dask
 geopandas==1.0.1
     # via tseda
-geoviews==1.12.0
+geoviews==1.13.0
     # via tseda
 holoviews==1.19.1
     # via geoviews
@@ -79,7 +77,7 @@ holoviews==1.19.1
     # via tseda
 humanize==4.10.0
     # via tszip
-hvplot==0.10.0
+hvplot==0.11.1
     # via tsbrowse
     # via tseda
 idna==3.7
@@ -151,6 +149,7 @@ packaging==24.1
     # via holoviews
     # via hvplot
     # via matplotlib
+    # via panel
     # via pyogrio
     # via xarray
 pandas==2.2.2
@@ -163,7 +162,7 @@ pandas==2.2.2
     # via hvplot
     # via panel
     # via xarray
-panel==1.4.5
+panel==1.5.2
     # via geoviews
     # via holoviews
     # via hvplot
@@ -238,7 +237,7 @@ tornado==6.4.1
     # via bokeh
 tqdm==4.66.5
     # via panel
-tsbrowse @ git+https://github.com/tskit-dev/tsbrowse@f16f902510ee4410f0ea75c992bf3aab484f2abb
+tsbrowse @ git+https://github.com/tskit-dev/tsbrowse@2faab76ad3a1f4bb51e6a39ce1c244dc1ac8209b
     # via tseda
 tskit==0.5.8
     # via tsbrowse
@@ -262,7 +261,6 @@ xarray==2024.7.0
 xyzservices==2024.6.0
     # via bokeh
     # via geoviews
-    # via panel
     # via tseda
 zarr==2.18.2
     # via tszip

@@ -95,7 +95,7 @@ def windowed_genealogical_nearest_neighbours(  # noqa: C901
                         break
                     p = parent[p]
                 if p != tskit.NULL:
-                    scale = span / (total - delta)
+                    scale = span / (total - delta)  # pyright: ignore[reportPossiblyUnboundVariable]
                     time_index = np.searchsorted(time_windows, time[p]) - 1
                     if 0 <= time_index < num_time_windows:
                         for k in range(len(reference_sets)):
@@ -126,7 +126,7 @@ def windowed_genealogical_nearest_neighbours(  # noqa: C901
         reshaped_norm = norm.reshape((1, num_time_windows, len(focal), 1))
 
     with np.errstate(invalid="ignore", divide="ignore"):
-        A /= reshaped_norm
+        A /= reshaped_norm  # pyright: ignore[reportPossiblyUnboundVariable]
     A[np.all(A == 0, axis=3)] = np.nan
 
     # Remove dimension for windows and/or time_windows if parameter is None

@@ -88,7 +88,7 @@ class IndividualsTable(param.Parameterized):
         self._table = self.tsm.get_individuals(astype="df", deselected=True)[
             self.columns
         ]
-        self.individuals_editors["sample_set_id"]["values"] = (
+        self.individuals_editors["sample_set_id"]["values"] = (  # pyright: ignore[reportOptionalSubscript]
             self.tsm.sample_sets_view().index.tolist()
         )
 
@@ -155,7 +155,7 @@ class SampleSetTable(param.Parameterized):
 
     create_sample_set_textinput = param.String(
         doc="New sample set name. Press Enter (⏎) to create.",
-        default="",
+        default=None,
         label="New sample set name",
     )
 
@@ -198,9 +198,9 @@ class SampleSetTable(param.Parameterized):
 
     @param.depends("create_sample_set_textinput", "page_size")
     def panel(self, *args, **kwargs):
-        if self.create_sample_set_textinput:
+        if self.create_sample_set_textinput is not None:
             self.tsm.create_sample_set(self.create_sample_set_textinput)
-            self.create_sample_set_textinput = ""
+            self.create_sample_set_textinput = None
         return pn.Column(self.tooltip, self.table)
 
 

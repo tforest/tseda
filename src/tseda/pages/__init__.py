@@ -11,10 +11,10 @@ from . import (
 PAGES = [
     overview.OverviewPage,
     sample_sets.SampleSetsPage,
-    structure.StructurePage,
+    # structure.StructurePage,
     stats.StatsPage,
-    gnn.GNNPage,
-    trees.TreesPage,
+    # gnn.GNNPage,
+    # trees.TreesPage,
 ]
 
 PAGES_MAP = {page.key: page for page in PAGES}

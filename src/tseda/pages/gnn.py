@@ -99,13 +99,7 @@ class VBar(param.Parameterized):
         so we need to implement it using low-level bokeh API."""
         hover = HoverTool()
         hover.tooltips = list([("name", "@name")])
-        hover.tooltips.extend(
-            list(
-                map(
-                    lambda x: (x, f"@{x}"), self.levels
-                )
-            )
-        )
+        hover.tooltips.extend(list(map(lambda x: (x, f"@{x}"), self.levels)))
         hover.tooltips.extend(
             list(
                 map(
@@ -118,7 +112,7 @@ class VBar(param.Parameterized):
         data = self.data
         if len(self.sort_order) > 0:
             sort_order = (
-                ["sample_set_id"] + self.sort_order + ["sample_id", "id"]
+                ["sample_set_id"] + self.sort_order + ["sample_id", "id"]  # pyright: ignore[reportOperatorIssue]
             )
             data.sort_values(sort_order, axis=0, inplace=True)
             self._factors = data["x"].values
