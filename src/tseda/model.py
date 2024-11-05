@@ -93,7 +93,7 @@ class SampleSet:
     name: str = None
     color: str = None
     population: dataclasses.InitVar[tskit.Population | None] = None
-    immutable_id: bool = False
+    predefined: bool = False
 
     colormap = config.COLORS
 
