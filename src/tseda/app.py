@@ -5,6 +5,7 @@ import holoviews as hv
 import panel as pn
 import param
 from holoviews import opts
+from panel.viewable import Viewer
 
 from tseda import config, datastore, pages, vpages
 
@@ -84,8 +85,7 @@ class App:
         return template
 
 
-# class DataStoreApp(Viewer):
-class DataStoreApp(param.Parameterized):
+class DataStoreApp(Viewer):
     datastore = param.ClassSelector(class_=datastore.DataStore)
 
     title = param.String()

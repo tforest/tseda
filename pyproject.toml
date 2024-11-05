@@ -5,7 +5,7 @@ authors = [
     { name = "Per Unneberg", email = "per.unneberg@scilifelab.se" }
 ]
 dependencies = [
-    "panel~=1.5.2",
+    "panel~=1.5.3",
     "tskit~=0.5.8",
     "tszip~=0.2.5",
     "click~=8.1.7",
@@ -52,6 +52,7 @@ dev-dependencies = [
     "geodatasets~=2024.7.0",
     "pip~=24.2",
     "hatch-vcs~=0.4.0",
+    "watchfiles~=0.24.0",
 ]
 
 [project.scripts]

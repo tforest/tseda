@@ -162,7 +162,7 @@ pandas==2.2.2
     # via hvplot
     # via panel
     # via xarray
-panel==1.5.2
+panel==1.5.3
     # via geoviews
     # via holoviews
     # via hvplot
