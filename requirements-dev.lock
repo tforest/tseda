@@ -401,7 +401,7 @@ pyproj==3.6.1
     # via cartopy
     # via geopandas
     # via geoviews
-pyright==1.1.386
+pyright==1.1.388
 pyshp==2.3.1
     # via cartopy
 pyslim==1.0.4

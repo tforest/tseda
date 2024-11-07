@@ -114,14 +114,6 @@ class DataStoreApp(Viewer):
             else pn.state.curdoc.unhold()
         )
 
-    def servable(self):
-        if pn.state.served:
-            return self._template.servable()
-        return self
-
-    def show(self, selected_page):
-        yield self.pages[selected_page]
-
     @param.depends("views")
     def view(self):
         page_titles = list(self.pages.keys())

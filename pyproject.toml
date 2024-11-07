@@ -46,7 +46,7 @@ packages = ["src/tseda"]
 managed = true
 dev-dependencies = [
     "jupyter~=1.0.0",
-    "pyright~=1.1.386",
+    "pyright~=1.1.388",
     "pytest~=8.3.2",
     "stdpopsim~=0.2.0",
     "geodatasets~=2024.7.0",
@@ -97,4 +97,4 @@ test = "rye test"
 all = { chain = ["fmt", "lint", "check", "test"] }
 
 [tool.pytest.ini_options]
-addopts = "--doctest-modules"
+addopts = "--doctest-modules --ignore src/tseda/main.py"
