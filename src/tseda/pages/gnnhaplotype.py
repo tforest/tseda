@@ -21,7 +21,6 @@ import panel as pn
 import param
 
 hv.extension("bokeh")
-pn.extension(width_policy="max")
 
 
 def make_windows(window_size, sequence_length):

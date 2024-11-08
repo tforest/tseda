@@ -24,7 +24,7 @@ def make_individuals_table(tsm):
 def make_sample_sets_table(tsm):
     result = []
     for ts_pop in tsm.ts.populations():
-        ss = SampleSet(id=ts_pop.id, population=ts_pop, immutable_id=True)
+        ss = SampleSet(id=ts_pop.id, population=ts_pop, predefined=True)
         result.append(ss)
     return SampleSetsTable(table=pd.DataFrame(result))
 
@@ -197,17 +197,17 @@ class IndividualsTable(Viewer):
 
 
 class SampleSetsTable(Viewer):
-    default_columns = ["name", "color", "immutable_id"]
+    default_columns = ["name", "color", "predefined"]
     editors = {k: None for k in default_columns}
     editors["color"] = {
         "type": "list",
         "values": config.COLORS,
         "valueLookup": True,
     }
-    editors["name"] = {"type": "input"}
+    editors["name"] = {"type": "input", "validator": "unique", "search": True}
     formatters = {
         "color": {"type": "color"},
-        "immutable_id": {"type": "tickCross"},
+        "predefined": {"type": "tickCross"},
     }
 
     create_sample_set_textinput = param.String(
@@ -247,7 +247,7 @@ class SampleSetsTable(Viewer):
             self.create_sample_set_textinput = None
         table = pn.widgets.Tabulator(
             self.data,
-            layout="fit_columns",
+            layout="fit_data_table",
             selectable=True,
             page_size=100,
             pagination="remote",
@@ -260,14 +260,14 @@ class SampleSetsTable(Viewer):
     def sidebar_table(self):
         table = pn.widgets.Tabulator(
             self.data,
-            layout="fit_columns",
+            layout="fit_data_table",
             selectable=True,
             page_size=100,
             pagination="remote",
             margin=10,
             formatters=self.formatters,
             editors=self.editors,
-            hidden_columns=["id", "immutable_id"],
+            hidden_columns=["id"],
         )
         return pn.Card(
             pn.Column(self.tooltip, table),

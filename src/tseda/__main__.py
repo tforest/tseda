@@ -97,6 +97,9 @@ def preprocess(tszip_path, output):
     default=True,
     help="Launch a web-browser showing the app",
 )
+@click.option(
+    "--admin", default=False, is_flag=True, help="Add bokeh admin panel"
+)
 @click.option("--log-level", default="INFO", help="Logging level")
 @click.option(
     "--no-log-filter",
@@ -104,7 +107,7 @@ def preprocess(tszip_path, output):
     is_flag=True,
     help="Do not filter the output log (advanced debugging only)",
 )
-def serve(path, port, show, log_level, no_log_filter):
+def serve(path, port, show, log_level, no_log_filter, admin):
     """
     Run the tseda datastore server, version based on View base class.
     """
@@ -123,7 +126,7 @@ def serve(path, port, show, log_level, no_log_filter):
         title="TSEda Datastore App",
         views=[IndividualsTable],
     )
-    pn.serve(app_.view(), port=port, show=show, verbose=False)
+    pn.serve(app_.view(), port=port, show=show, verbose=False, admin=admin)
 
 
 if __name__ == "__main__":

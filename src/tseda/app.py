@@ -5,6 +5,7 @@ import holoviews as hv
 import panel as pn
 import param
 from holoviews import opts
+from panel.viewable import Viewer
 
 from tseda import config, datastore, pages, vpages
 
@@ -84,8 +85,7 @@ class App:
         return template
 
 
-# class DataStoreApp(Viewer):
-class DataStoreApp(param.Parameterized):
+class DataStoreApp(Viewer):
     datastore = param.ClassSelector(class_=datastore.DataStore)
 
     title = param.String()
@@ -113,14 +113,6 @@ class DataStoreApp(param.Parameterized):
             if updating
             else pn.state.curdoc.unhold()
         )
-
-    def servable(self):
-        if pn.state.served:
-            return self._template.servable()
-        return self
-
-    def show(self, selected_page):
-        yield self.pages[selected_page]
 
     @param.depends("views")
     def view(self):
