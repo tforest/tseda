@@ -7,14 +7,14 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        py: ["3.12", "3.13"]
+        py: ["3.12"]
     steps:
       - uses: actions/checkout@v4
       - uses: eifinger/setup-rye@v3
       - run: rye pin ${{ matrix.py }}
       - run: |
           rye sync
-          # [[ -n $(git diff --stat requirements.lock) ]] && exit 1
+          [[ -n $(git diff --stat requirements.lock) ]] && exit 1
       - run: rye fmt --check
       - run: rye lint src
       - run: rye run check
