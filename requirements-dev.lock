@@ -115,6 +115,8 @@ geopandas==1.0.1
     # via tseda
 geoviews==1.13.0
     # via tseda
+greenlet==3.1.1
+    # via playwright
 h11==0.14.0
     # via httpcore
 hatch-vcs==0.4.0
@@ -365,6 +367,8 @@ pip==24.2
 platformdirs==4.2.2
     # via jupyter-core
     # via pooch
+playwright==1.48.0
+    # via pytest-playwright
 pluggy==1.5.0
     # via hatchling
     # via pytest
@@ -388,6 +392,8 @@ pycparser==2.22
     # via cffi
 pyct==0.5.0
     # via datashader
+pyee==12.0.0
+    # via playwright
 pygments==2.18.0
     # via ipython
     # via jupyter-console
@@ -407,6 +413,11 @@ pyshp==2.3.1
 pyslim==1.0.4
     # via stdpopsim
 pytest==8.3.2
+    # via pytest-base-url
+    # via pytest-playwright
+pytest-base-url==2.1.0
+    # via pytest-playwright
+pytest-playwright==0.5.2
 python-dateutil==2.9.0.post0
     # via arrow
     # via jupyter-client
@@ -415,6 +426,8 @@ python-dateutil==2.9.0.post0
 python-json-logger==2.0.7
     # via daiquiri
     # via jupyter-events
+python-slugify==8.0.4
+    # via pytest-playwright
 pytz==2024.1
     # via pandas
 pyviz-comms==3.0.3
@@ -443,6 +456,7 @@ requests==2.32.3
     # via jupyterlab-server
     # via panel
     # via pooch
+    # via pytest-base-url
 rfc3339-validator==0.1.4
     # via jsonschema
     # via jupyter-events
@@ -487,6 +501,8 @@ svgwrite==1.4.3
 terminado==0.18.1
     # via jupyter-server
     # via jupyter-server-terminals
+text-unidecode==1.3
+    # via python-slugify
 tinycss2==1.3.0
     # via nbconvert
 toolz==0.12.1
@@ -536,6 +552,7 @@ types-python-dateutil==2.9.0.20240821
     # via arrow
 typing-extensions==4.12.2
     # via panel
+    # via pyee
     # via pyright
 tzdata==2024.1
     # via pandas

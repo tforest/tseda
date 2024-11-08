@@ -5,23 +5,13 @@ from tseda import datastore
 
 
 @pytest.fixture
-def ds(tsbm):
-    individuals_table, sample_sets_table = datastore.preprocess(tsbm)
-    return datastore.DataStore(
-        tsm=tsbm,
-        individuals_table=individuals_table,
-        sample_sets_table=sample_sets_table,
-    )
-
-
-@pytest.fixture
-def individuals_table(tsbm):
-    data, _ = datastore.preprocess(tsbm)
+def individuals_table(tsm):
+    data, _ = datastore.preprocess(tsm)
     return data
 
 
-def test_datastore_preprocess(tsbm):
-    individuals_table, sample_sets_table = datastore.preprocess(tsbm)
+def test_datastore_preprocess(tsm):
+    individuals_table, sample_sets_table = datastore.preprocess(tsm)
     assert individuals_table is not None
     assert sample_sets_table is not None
     samples, sample_sets = individuals_table.sample_sets()

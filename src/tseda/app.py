@@ -1,3 +1,10 @@
+"""Main application for tseda.
+
+Provides the DataStoreApp class that is the main application for
+tseda. The DataStoreApp subclasses the Viewer class from panel and
+renders a panel.FastListTemplate object.
+"""
+
 import time
 
 import daiquiri
@@ -7,7 +14,7 @@ import param
 from holoviews import opts
 from panel.viewable import Viewer
 
-from tseda import config, datastore, pages, vpages
+from tseda import config, datastore, vpages
 
 logger = daiquiri.getLogger("tseda")
 
@@ -41,56 +48,14 @@ hv.opts.defaults(
 )
 
 
-class App:
-    def __init__(self, tsm):
-        self.tsm = tsm
-        t = time.time()
-        logger.info("Initialising pages")
-        self.pages = {page.title: page(tsm) for page in pages.PAGES}
-        self.spinner = pn.indicators.LoadingSpinner(
-            value=True, width=50, height=50
-        )
-        logger.info(f"Initialised pages in {time.time() - t:.2f}s")
-
-    def view(self):
-        page_titles = list(self.pages.keys())
-        header_selector = pn.widgets.RadioButtonGroup(
-            options=page_titles,
-            value=page_titles[0],
-            name="Select Page",
-            button_type="success",
-        )
-
-        @pn.depends(header_selector.param.value)
-        def get_content(selected_page):
-            yield self.spinner
-            yield self.pages[selected_page].content
-
-        @pn.depends(header_selector.param.value)
-        def get_sidebar(selected_page):
-            yield self.spinner
-            yield self.pages[selected_page].sidebar
-
-        template = pn.template.FastListTemplate(
-            title=self.tsm.name[:15] + "..."
-            if len(self.tsm.name) > 15
-            else self.tsm.name,
-            header=[header_selector],
-            sidebar=get_sidebar,
-            main=get_content,
-            raw_css=[RAW_CSS],
-            **DEFAULT_PARAMS,
-        )
-
-        return template
-
-
 class DataStoreApp(Viewer):
+    """Main application class for tseda visualization app."""
+
     datastore = param.ClassSelector(class_=datastore.DataStore)
 
-    title = param.String()
+    title = param.String(doc="Application title")
 
-    views = param.List()
+    views = param.List(doc="What views to show on startup.")
 
     def __init__(self, **params):
         super().__init__(**params)
@@ -116,6 +81,10 @@ class DataStoreApp(Viewer):
 
     @param.depends("views")
     def view(self):
+        """Main application view that renders a radio button group on
+        top with links to pages. Each page consists of a main content
+        page with plots and sidebars that provide user options for
+        configuring plots and outputs."""
         page_titles = list(self.pages.keys())
         header_selector = pn.widgets.RadioButtonGroup(
             options=page_titles,

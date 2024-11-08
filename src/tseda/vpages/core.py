@@ -32,6 +32,7 @@ def make_windows(window_size, sequence_length):
     return windows
 
 
+# NB: currently unused
 def make_sample_sets(inds):
     sample_sets = {}
     samples = []

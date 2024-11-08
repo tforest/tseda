@@ -15,7 +15,13 @@ jobs:
       - run: |
           rye sync
           # [[ -n $(git diff --stat requirements.lock) ]] && exit 1
+      - run: rye run python -m playwright install --with-deps
       - run: rye fmt --check $( find src/tseda -name "*.py" | grep -v _version.py )
       - run: rye lint src
       - run: rye run check
-      - run: rye run test
+      - run: rye run test -- --tracing=retain-on-failure
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-traces
+          path: test-results/

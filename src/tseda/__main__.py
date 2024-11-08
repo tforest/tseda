@@ -38,34 +38,6 @@ def cli():
 
 
 @cli.command()
-@click.argument("path", type=click.Path(exists=True, dir_okay=False))
-@click.option("--port", default=8080, help="Port to serve on")
-@click.option(
-    "--show/--no-show",
-    default=True,
-    help="Launch a web-browser showing the app",
-)
-@click.option("--log-level", default="INFO", help="Logging level")
-@click.option(
-    "--no-log-filter",
-    default=False,
-    is_flag=True,
-    help="Do not filter the output log (advanced debugging only)",
-)
-def serve2(path, port, show, log_level, no_log_filter):
-    """
-    Run the tseda server, obsolete version.
-    """
-    setup_logging(log_level, no_log_filter)
-
-    tsm = model.TSEdaModel(path)
-
-    logger.info("Starting panel server")
-    app_ = app.App(tsm)
-    pn.serve(app_.view(), port=port, show=show, verbose=False)
-
-
-@cli.command()
 @click.argument("tszip_path", type=click.Path(exists=True, dir_okay=False))
 @click.option(
     "--output",
