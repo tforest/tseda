@@ -94,7 +94,7 @@ reportArgumentType = false
 fmt = "rye fmt"
 lint = "rye lint src --fix"
 check = "pyright"
-test = "rye test"
+test = "rye test --tracing=retain-on-failure"
 all = { chain = ["fmt", "lint", "check", "test"] }
 
 [tool.pytest.ini_options]
