@@ -53,6 +53,7 @@ dev-dependencies = [
     "pip~=24.2",
     "hatch-vcs~=0.4.0",
     "watchfiles~=0.24.0",
+    "pytest-playwright~=0.5.2",
 ]
 
 [project.scripts]

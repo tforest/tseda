@@ -1,12 +1,32 @@
 import os
+import panel as pn
 
 import tskit
 from pytest import fixture
 from tsbrowse import model as tsb_model
 
-from tseda import model
+from tseda import model, datastore
 
 dirname = os.path.abspath(os.path.dirname(__file__))
+
+PORT = [6000]
+
+
+@fixture
+def port():
+    PORT[0] += 1
+    return PORT[0]
+
+
+@fixture(autouse=True)
+def server_cleanup():
+    """
+    Clean up server state after each test.
+    """
+    try:
+        yield
+    finally:
+        pn.state.reset()
 
 
 @fixture
@@ -25,25 +45,25 @@ def tsbrowsefile():
 
 
 @fixture
+def tsedafile():
+    return os.path.join(dirname, "data/test.trees.tseda")
+
+
+@fixture
 def ts(treesfile):
     return tskit.load(treesfile)
 
 
 @fixture
-def tsbm(tsbrowsefile):
+def tsm(tsbrowsefile):
     return tsb_model.TSModel(tsbrowsefile)
 
 
 @fixture
-def tsm(tsbrowsefile):
-    return model.TSEdaModel(tsbrowsefile)
-
-
-@fixture
-def tsmh(tsm):
-    """Remove outgroup individuals from model to include only Homo
-    Sapiens individuals"""
-    tsm.toggle_individual(18)
-    tsm.toggle_individual(19)
-    tsm.toggle_individual(20)
-    return tsm
+def ds(tsm):
+    individuals_table, sample_sets_table = datastore.preprocess(tsm)
+    return datastore.DataStore(
+        tsm=tsm,
+        individuals_table=individuals_table,
+        sample_sets_table=sample_sets_table,
+    )
