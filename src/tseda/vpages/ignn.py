@@ -143,7 +143,7 @@ class VBar(View):
         doc=(
             "Change sort order within sample sets. Default is "
             "to sort by sample index. Provide a list of strings "
-            "where items correspond to sample set names."
+            "where items correspond to sample set names, e.g. `[\"sampleset\"]`."
         ),
     )
 
