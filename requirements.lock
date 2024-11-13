@@ -239,7 +239,7 @@ tqdm==4.66.5
     # via panel
 tsbrowse @ git+https://github.com/tskit-dev/tsbrowse@2faab76ad3a1f4bb51e6a39ce1c244dc1ac8209b
     # via tseda
-tskit==0.5.8
+tskit==0.6.0
     # via tsbrowse
     # via tseda
     # via tszip
