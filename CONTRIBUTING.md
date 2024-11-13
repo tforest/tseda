@@ -90,3 +90,101 @@ For interactive development, you can serve the app in development mode
 with `panel serve`:
 
     rye run panel serve src/tseda --dev --show --args tests/data/test.trees
+
+## Adding a new application page
+
+Adding a new application page boils down to adding a new module to
+`vpages` and registering that module in `vpages.__init__`.
+
+Assuming your new page is called `MyAnalysis`, start by adding a file
+named file `myanalysis.py` to `vpages`. At the very minimum, the file
+should contain a class called `MyAnalysisPage` with the following
+template:
+
+```python
+import panel as pn
+
+from .core import View
+
+
+class MyAnalysisPage(View):
+    key = "myanalysis"
+    title = "My Analysis"
+
+    def __panel__(self):
+        return pn.Column()
+```
+
+In `vpages.__init__.py` add `myanalysis` to the first `import`
+statement, and append `myanalysis.MyAnalysisPage` to the `PAGES` list.
+This barebones example should produce a new tab in the application.
+
+## Adding a plot to the application page
+
+To add a plot, you should add classes that consume the datastore
+object and generate views of the data. The following example shows how
+to add a plot of nucleotide diversity.
+
+First we create a new `View`-derived class `NucDivPlot`. The
+conversion of data requires some additional imports. The class defines
+a `param` object for window size, which will show up as an input box
+widget in the `sidebar()` function. The `__panel__()` function sets up
+the actual plot.
+
+```python
+import numpy as np
+import pandas as pd
+import hvplot.pandas
+import param
+
+from .core import make_windows
+from tseda import config
+
+class NucDivPlot(View):
+    window_size = param.Integer(
+        default=10000, bounds=(1, None), doc="Size of window"
+    )
+
+    @param.depends("window_size")
+	def __panel__(self):
+        windows = make_windows(self.window_size, self.datastore.tsm.ts.sequence_length)
+		data = pd.DataFrame(self.datastore.tsm.ts.diversity(windows=windows))
+        data.columns = ["pi"]
+        return pn.panel(data.hvplot.line(y="pi"))
+
+	def sidebar(self):
+	    return pn.Card(
+			self.param.window_size,
+			collapsed=True,
+			title="Nucleotide diversity plotting options",
+            header_background=config.SIDEBAR_BACKGROUND,
+            active_header_background=config.SIDEBAR_BACKGROUND,
+            styles=config.VCARD_STYLE,
+        )
+
+```
+
+Then we modify the `MyAnalysisPage` class as follows:
+
+```python
+
+class MyAnalysisPage(View):
+    key = "myanalysis"
+    title = "My Analysis"
+	nucdiv = param.ClassSelector(class_=NucDivPlot)
+	
+	def __init__(self, **kwargs):
+	    super().__init__(**kwargs)
+		self.nucdiv = NucDivPlot(datastore=self.datastore)
+
+    def __panel__(self):
+        return pn.Column(self.nucdiv)
+		
+	def sidebar(self):
+		return pn.Column(self.nucdiv.sidebar)
+```
+
+Reload the app and hopefully you will see an added plot and sidebar.
+
+For a more detailed example, see one of the actual modules, e.g.,
+`tseda.vpages.stats`.
