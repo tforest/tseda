@@ -9,7 +9,7 @@ import panel as pn  # noqa
 from . import app  # noqa
 from . import config  # noqa
 from . import model  # noqa
-from . import vpages  # noqa, no module named pages but one named vpages
+from . import vpages  # noqa
 from . import datastore  # noqa
 from .datastore import IndividualsTable  # noqa
 from tsbrowse import preprocess as preprocess_  # noqa
