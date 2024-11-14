@@ -24,12 +24,24 @@ to produce the output `data.trees.tseda`. To launch the web app run
 
 ## Installation
 
-Tseda is currently in development. To install the latest dev version
+tseda is currently in development. To install the latest dev version
 from github, run
 
 ```
 python -m pip install git+https://github.com/tforest/tseda
 ```
+
+## Features (WIP)
+
+- sample set editor to customize sample set definitions, names and
+  colors
+- summary statistics (Fst, genealogical nearest neighbours (GNN))
+  compared and averaged over sample sets
+- genealogical nearest neighbour (GNN) analyses of samples
+- plots of common summary statistics over sequence length (diversity,
+  Tajimas_D, divergence, Fst)
+- marginal tree plots
+- pairwise coalescence plots
 
 ## Tests
 
