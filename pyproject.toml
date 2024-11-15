@@ -6,7 +6,7 @@ authors = [
 ]
 dependencies = [
     "panel~=1.5.3",
-    "tskit~=0.5.8",
+    "tskit~=0.6.0",
     "tszip~=0.2.5",
     "click~=8.1.7",
     "daiquiri~=3.2.5.1",

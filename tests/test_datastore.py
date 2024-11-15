@@ -20,7 +20,19 @@ def test_datastore_preprocess(tsm):
 
 
 def test_individuals_table(individuals_table):
-    print(individuals_table.loc(5))
+    ind = individuals_table.loc(5)
+    assert ind is not None
+    assert ind.sample_set_id == 1
+    assert ind.population == 1
+    assert ind["name"] == "tsk_6"
+    assert ind.name == 5
+    assert individuals_table.sample2ind[ind.nodes[0]] == 5
+    assert individuals_table.sample2ind[ind.nodes[1]] == 5
+    _, ss = individuals_table.sample_sets()
+    assert len(ss) == 6
+    assert len(ss[0]) == 12
+    samples = list(individuals_table.samples())
+    assert len(samples) == 42
 
 
 def test_datastore(ds):

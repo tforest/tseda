@@ -47,7 +47,7 @@ class Tree(View):
         lambda x: x.prev_tree(), doc="Previous tree", label="Previous tree"
     )
 
-    symbol_size = param.Number(default=5, bounds=(0, None), doc="Symbol size")
+    symbol_size = param.Number(default=8, bounds=(0, None), doc="Symbol size")
 
     def next_tree(self):
         self.position = None
@@ -61,11 +61,13 @@ class Tree(View):
     def default_css(self):
         """Default css styles for tree nodes"""
         styles = []
-        for (
-            ssid,
-            ss,
-        ) in self.datastore.sample_sets_table.data.rx.value.iterrows():
-            s = f".node.p{ssid} > .sym " + "{" + f"fill: {ss.color} " + "}"
+        sample_sets = self.datastore.sample_sets_table.data.rx.value
+        individuals = self.datastore.individuals_table.data.rx.value
+        sample2ind = self.datastore.individuals_table.sample2ind
+        for n in self.datastore.individuals_table.samples():
+            ssid = individuals.loc[sample2ind[n]].sample_set_id
+            ss = sample_sets.loc[ssid]
+            s = f".node.n{n} > .sym " + "{" + f"fill: {ss.color} " + "}"
             styles.append(s)
         css_string = " ".join(styles)
         return css_string
@@ -126,6 +128,7 @@ class TreesPage(View):
     def __init__(self, **params):
         super().__init__(**params)
         self.data = Tree(datastore=self.datastore)
+        self.sample_sets = self.datastore.sample_sets_table
 
     def __panel__(self):
         return pn.Column(
@@ -135,4 +138,5 @@ class TreesPage(View):
     def sidebar(self):
         return pn.Column(
             self.data.sidebar,
+            self.sample_sets.sidebar_table,
         )

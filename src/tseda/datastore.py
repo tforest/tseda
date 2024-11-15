@@ -41,7 +41,7 @@ def preprocess(tsm):
 
 class IndividualsTable(Viewer):
     """Class to hold and view individuals and perform calculations to
-    change filter."""
+    change filters."""
 
     columns = [
         "name",
@@ -145,6 +145,12 @@ class IndividualsTable(Viewer):
             for node in ind.nodes:
                 d[node] = index
         return d
+
+    def samples(self):
+        """Return all samples"""
+        for _, ind in self.data.rx.value.iterrows():
+            for node in ind.nodes:
+                yield node
 
     def loc(self, i):
         """Return individual by index"""
