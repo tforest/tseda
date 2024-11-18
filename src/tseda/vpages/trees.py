@@ -147,7 +147,7 @@ class Tree(View):
             ),
             self.warning_pane,
         )
-
+ 
 
 class TreesPage(View):
     key = "trees"
