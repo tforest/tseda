@@ -26,11 +26,18 @@ def eval_options(options):
 
 class Tree(View):
     tree_index = param.Integer(
-        default=0, bounds=(0, None), doc="Get tree by zero-based index"
+        default=0, allow_None= True, bounds=(0, None), doc="Get tree by zero-based index"
     )
     position = param.Integer(
-        default=None, bounds=(0, None), doc="Get tree at genome position (bp)"
+        default=None, doc="Get tree at genome position (bp)"
     )
+
+    warning_pane = pn.pane.Alert(
+            "The position entered is out of bounds.", 
+            alert_type="warning", 
+            visible = False
+        )
+
     width = param.Integer(default=750, doc="Width of the tree plot")
     height = param.Integer(default=520, doc="Height of the tree plot")
     options = param.String(
@@ -71,6 +78,18 @@ class Tree(View):
             styles.append(s)
         css_string = " ".join(styles)
         return css_string
+
+    @param.depends('position', watch=True)
+    def check_position(self):
+        if self.position is not None and int(self.position) < 0:
+            self.warning_pane.visible=True
+            raise ValueError
+        max_position = self.datastore.tsm.ts.sequence_length
+        if self.position is not None and int(self.position) > max_position:
+            self.warning_pane.visible=True
+            raise ValueError
+        else:
+            self.warning_pane.visible=False
 
     @param.depends(
         "width", "height", "position", "options", "symbol_size", "tree_index"
@@ -117,6 +136,7 @@ class Tree(View):
                 active_header_background=config.SIDEBAR_BACKGROUND,
                 styles=config.VCARD_STYLE,
             ),
+            self.warning_pane
         )
 
 
