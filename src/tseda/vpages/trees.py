@@ -26,14 +26,14 @@ def eval_options(options):
 
 class Tree(View):
     tree_index = param.Integer(
-        default=0, allow_None= True, bounds=(0, None), doc="Get tree by zero-based index"
+        default=0, allow_None= True, doc="Get tree by zero-based index"
     )
     position = param.Integer(
         default=None, doc="Get tree at genome position (bp)"
     )
 
     warning_pane = pn.pane.Alert(
-            "The position entered is out of bounds.", 
+            "The input for position or tree index is out of bounds.", 
             alert_type="warning", 
             visible = False
         )
@@ -79,13 +79,12 @@ class Tree(View):
         css_string = " ".join(styles)
         return css_string
 
-    @param.depends('position', watch=True)
-    def check_position(self):
-        if self.position is not None and int(self.position) < 0:
+    @param.depends('position','tree_index', watch=True)
+    def check_inputs(self):
+        if self.position is not None and (int(self.position) < 0 or int(self.position) > self.datastore.tsm.ts.sequence_length):
             self.warning_pane.visible=True
             raise ValueError
-        max_position = self.datastore.tsm.ts.sequence_length
-        if self.position is not None and int(self.position) > max_position:
+        if self.tree_index is not None and int(self.tree_index) < 0 or int(self.tree_index) > self.datastore.tsm.ts.num_trees:
             self.warning_pane.visible=True
             raise ValueError
         else:
