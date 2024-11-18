@@ -26,17 +26,15 @@ def eval_options(options):
 
 class Tree(View):
     tree_index = param.Integer(
-        default=0, allow_None= True, doc="Get tree by zero-based index"
+        default=0, allow_None=True, doc="Get tree by zero-based index"
     )
-    position = param.Integer(
-        default=None, doc="Get tree at genome position (bp)"
-    )
+    position = param.Integer(default=None, doc="Get tree at genome position (bp)")
 
     warning_pane = pn.pane.Alert(
-            "The input for position or tree index is out of bounds.", 
-            alert_type="warning", 
-            visible = False
-        )
+        "The input for position or tree index is out of bounds.",
+        alert_type="warning",
+        visible=False,
+    )
 
     width = param.Integer(default=750, doc="Width of the tree plot")
     height = param.Integer(default=520, doc="Height of the tree plot")
@@ -47,9 +45,7 @@ class Tree(View):
             "Must be a valid dictionary string."
         ),
     )
-    next = param.Action(
-        lambda x: x.next_tree(), doc="Next tree", label="Next tree"
-    )
+    next = param.Action(lambda x: x.next_tree(), doc="Next tree", label="Next tree")
     prev = param.Action(
         lambda x: x.prev_tree(), doc="Previous tree", label="Previous tree"
     )
@@ -58,11 +54,15 @@ class Tree(View):
 
     def next_tree(self):
         self.position = None
-        self.tree_index += 1  # pyright: ignore[reportOperatorIssue]
+        self.tree_index = min(
+            self.datastore.tsm.ts.num_trees - 1, int(self.tree_index) + 1
+        )  # pyright: ignore[reportOperatorIssue]
 
     def prev_tree(self):
         self.position = None
-        self.tree_index = max(0, self.tree_index - 1)  # pyright: ignore[reportOperatorIssue]
+        self.tree_index = max(
+            0, int(self.tree_index) - 1
+        )  # pyright: ignore[reportOperatorIssue]
 
     @property
     def default_css(self):
@@ -79,16 +79,23 @@ class Tree(View):
         css_string = " ".join(styles)
         return css_string
 
-    @param.depends('position','tree_index', watch=True)
+    @param.depends("position", "tree_index", watch=True)
     def check_inputs(self):
-        if self.position is not None and (int(self.position) < 0 or int(self.position) > self.datastore.tsm.ts.sequence_length):
-            self.warning_pane.visible=True
+        if self.position is not None and (
+            int(self.position) < 0
+            or int(self.position) > self.datastore.tsm.ts.sequence_length
+        ):
+            self.warning_pane.visible = True
             raise ValueError
-        if self.tree_index is not None and int(self.tree_index) < 0 or int(self.tree_index) > self.datastore.tsm.ts.num_trees:
-            self.warning_pane.visible=True
+        if (
+            self.tree_index is not None
+            and int(self.tree_index) < 0
+            or int(self.tree_index) > self.datastore.tsm.ts.num_trees
+        ):
+            self.warning_pane.visible = True
             raise ValueError
         else:
-            self.warning_pane.visible=False
+            self.warning_pane.visible = False
 
     @param.depends(
         "width", "height", "position", "options", "symbol_size", "tree_index"
@@ -135,7 +142,7 @@ class Tree(View):
                 active_header_background=config.SIDEBAR_BACKGROUND,
                 styles=config.VCARD_STYLE,
             ),
-            self.warning_pane
+            self.warning_pane,
         )
 
 
