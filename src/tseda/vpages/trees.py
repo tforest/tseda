@@ -28,7 +28,9 @@ class Tree(View):
     tree_index = param.Integer(
         default=0, allow_None=True, doc="Get tree by zero-based index"
     )
-    position = param.Integer(default=None, doc="Get tree at genome position (bp)")
+    position = param.Integer(
+        default=None, doc="Get tree at genome position (bp)"
+    )
 
     warning_pane = pn.pane.Alert(
         "The input for position or tree index is out of bounds.",
@@ -45,7 +47,9 @@ class Tree(View):
             "Must be a valid dictionary string."
         ),
     )
-    next = param.Action(lambda x: x.next_tree(), doc="Next tree", label="Next tree")
+    next = param.Action(
+        lambda x: x.next_tree(), doc="Next tree", label="Next tree"
+    )
     prev = param.Action(
         lambda x: x.prev_tree(), doc="Previous tree", label="Previous tree"
     )
@@ -60,9 +64,7 @@ class Tree(View):
 
     def prev_tree(self):
         self.position = None
-        self.tree_index = max(
-            0, int(self.tree_index) - 1
-        )  # pyright: ignore[reportOperatorIssue]
+        self.tree_index = max(0, int(self.tree_index) - 1)  # pyright: ignore[reportOperatorIssue]
 
     @property
     def default_css(self):
