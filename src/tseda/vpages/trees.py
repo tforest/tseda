@@ -80,13 +80,13 @@ class Tree(View):
         if self.position is not None:
             tree = self.datastore.tsm.ts.at(self.position)
             self.tree_index = tree.index
-            position = self.position
         else:
             tree = self.datastore.tsm.ts.at_index(self.tree_index)
-            position = int(np.mean(tree.get_interval()))
+        position1 = int(tree.get_interval()[0]) 
+        position2 = int(tree.get_interval()[1])
         return pn.Column(
             pn.pane.Markdown(
-                f"## Tree index {self.tree_index} (position {position})"
+                f"## Tree index {self.tree_index} (position {position1} - {position2})"
             ),
             pn.pane.HTML(
                 tree.draw_svg(
