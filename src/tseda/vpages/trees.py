@@ -31,8 +31,8 @@ class Tree(View):
     position = param.Integer(
         default=None, bounds=(1, None), doc="Get tree at genome position (bp)"
     )
-    width = param.Integer(default=800, doc="Width of the tree plot")
-    height = param.Integer(default=800, doc="Height of the tree plot")
+    width = param.Integer(default=500, doc="Width of the tree plot")
+    height = param.Integer(default=500, doc="Height of the tree plot")
     options = param.String(
         default="{'y_axis': 'time', 'node_labels': {}}",
         doc=(
