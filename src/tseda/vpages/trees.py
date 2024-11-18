@@ -29,7 +29,7 @@ class Tree(View):
         default=0, bounds=(0, None), doc="Get tree by zero-based index"
     )
     position = param.Integer(
-        default=None, bounds=(1, None), doc="Get tree at genome position (bp)"
+        default=None, bounds=(0, None), doc="Get tree at genome position (bp)"
     )
     width = param.Integer(default=750, doc="Width of the tree plot")
     height = param.Integer(default=520, doc="Height of the tree plot")
@@ -82,8 +82,8 @@ class Tree(View):
             self.tree_index = tree.index
         else:
             tree = self.datastore.tsm.ts.at_index(self.tree_index)
-        position1 = int(tree.get_interval()[0]) 
-        position2 = int(tree.get_interval()[1])
+        position1 = int(tree.get_interval()[0])
+        position2 = int(tree.get_interval()[1]) - 1
         return pn.Column(
             pn.pane.Markdown(
                 f"## Tree index {self.tree_index} (position {position1} - {position2})"
