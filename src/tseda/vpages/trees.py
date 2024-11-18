@@ -60,11 +60,13 @@ class Tree(View):
         self.position = None
         self.tree_index = min(
             self.datastore.tsm.ts.num_trees - 1, int(self.tree_index) + 1
-        )  # pyright: ignore[reportOperatorIssue]
+        )
+        # pyright: ignore[reportOperatorIssue]
 
     def prev_tree(self):
         self.position = None
-        self.tree_index = max(0, int(self.tree_index) - 1)  # pyright: ignore[reportOperatorIssue]
+        self.tree_index = max(0, int(self.tree_index) - 1)
+        # pyright: ignore[reportOperatorIssue]
 
     @property
     def default_css(self):
