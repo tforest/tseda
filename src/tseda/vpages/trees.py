@@ -8,7 +8,6 @@ TODO:
 import ast
 
 import holoviews as hv
-import numpy as np
 import panel as pn
 import param
 
@@ -111,11 +110,11 @@ class Tree(View):
             self.tree_index = tree.index
         else:
             tree = self.datastore.tsm.ts.at_index(self.tree_index)
-        position1 = int(tree.get_interval()[0])
-        position2 = int(tree.get_interval()[1]) - 1
+        pos1 = int(tree.get_interval()[0])
+        pos2 = int(tree.get_interval()[1]) - 1
         return pn.Column(
             pn.pane.Markdown(
-                f"## Tree index {self.tree_index} (position {position1} - {position2})"
+                f"## Tree index {self.tree_index} (position {pos1} - {pos2})"
             ),
             pn.pane.HTML(
                 tree.draw_svg(
