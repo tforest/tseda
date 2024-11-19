@@ -71,8 +71,11 @@ class IndividualsTable(Viewer):
         default=100,
         doc="Number of rows per page to display",
     )
-    toggle = param.Integer(
-        default=None, bounds=(0, None), doc="Toggle sample set by index"
+    sample_select = pn.widgets.MultiSelect(
+        name='Select sample sets',
+        description="Select samples based on the sample set ID. To select multiple sample sets, use Shift or Ctrl.",
+        options=[],
+        value=[]
     )
     population_from = param.Integer(
         default=None,
@@ -96,6 +99,12 @@ class IndividualsTable(Viewer):
         super().__init__(**params)
         self.table.set_index(["id"], inplace=True)
         self.data = self.param.table.rx()
+        # TODO:
+        # get sample sets returns the sample sets, must be better way to dget the sample set ids?
+        # check if this works when changing sample sets
+        self.sample_select.options = ["None"] + list(range(len(self.get_sample_sets()))) # TOD: better way of getting sample sets
+        print(type(self.sample_select.options), self.sample_select.options)
+
 
     @property
     def tooltip(self):
@@ -156,13 +165,14 @@ class IndividualsTable(Viewer):
         """Return individual by index"""
         return self.data.rx.value.loc[i]
 
-    @pn.depends("page_size", "toggle", "sample_set_to")
+    @pn.depends("page_size", "sample_select.value", "sample_set_to")
     def __panel__(self):
-        if self.toggle is not None:
-            self.data.rx.value.loc[
-                self.toggle == self.data.rx.value.sample_set_id, "selected"
-            ] = not self.data.rx.value.loc[self.toggle, "selected"]
-            self.toggle = None
+        self.data.rx.value['selected'] = False
+        if self.sample_select.value:
+            for sample_set_id in self.sample_select.value:
+                self.data.rx.value.loc[
+                    self.data.rx.value.sample_set_id == sample_set_id, 'selected'
+                ] = True
         if self.sample_set_to is not None:
             if self.population_from is not None:
                 try:
@@ -191,7 +201,7 @@ class IndividualsTable(Viewer):
     def sidebar(self):
         return pn.Card(
             self.param.page_size,
-            self.param.toggle,
+            self.sample_select,
             self.param.population_from,
             self.param.sample_set_to,
             collapsed=False,

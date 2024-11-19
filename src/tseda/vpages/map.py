@@ -61,7 +61,7 @@ class GeoMap(View):
             geo=True,
             tiles=self.tiles,
             tiles_opts={"alpha": 0.5},
-            height=self.height,
+            #height=self.height,
             size=100,
             color=color,
             tools=["wheel_zoom", "box_select", "tap", "pan", "reset"],
