@@ -72,10 +72,10 @@ class IndividualsTable(Viewer):
         doc="Number of rows per page to display",
     )
     sample_select = pn.widgets.MultiChoice(
-        name='Select sample sets',
+        name="Select sample sets",
         description="Select samples based on the sample set ID.",
         options=[],
-        value=[]
+        value=[],
     )
     population_from = param.Integer(
         default=None,
@@ -118,11 +118,11 @@ class IndividualsTable(Viewer):
                 "displayed in the GeoMap plots."
             ),
         )
-    
-    def sample_indices(self): #TODO: make sure this updates
+
+    def sample_indices(self):  # TODO: make sure this updates
         """Return indices of sample groups."""
-        return self.data.rx.value['sample_set_id'].unique().tolist()
-    
+        return self.data.rx.value["sample_set_id"].unique().tolist()
+
     def sample_sets(self):
         sample_sets = {}
         samples = []
@@ -166,11 +166,12 @@ class IndividualsTable(Viewer):
 
     @pn.depends("page_size", "sample_select.value", "sample_set_to")
     def __panel__(self):
-        self.data.rx.value['selected'] = False
+        self.data.rx.value["selected"] = False
         if self.sample_select.value:
             for sample_set_id in self.sample_select.value:
                 self.data.rx.value.loc[
-                    self.data.rx.value.sample_set_id == sample_set_id, 'selected'
+                    self.data.rx.value.sample_set_id == sample_set_id,
+                    "selected",
                 ] = True
         if self.sample_set_to is not None:
             if self.population_from is not None:
@@ -207,6 +208,7 @@ class IndividualsTable(Viewer):
             active_header_background=config.SIDEBAR_BACKGROUND,
             styles=config.VCARD_STYLE,
         )
+
     def modification_sidebar(self):
         return pn.Card(
             self.param.population_from,
