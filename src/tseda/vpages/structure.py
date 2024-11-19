@@ -51,9 +51,7 @@ class GNN(View):
         # Z-score normalization here!
         return pn.Column(
             pn.pane.Markdown("## GNN cluster plot\n"),
-            mean_gnn.hvplot.heatmap(
-                cmap=cc.bgy,
-            ),
+            mean_gnn.hvplot.heatmap(cmap=cc.bgy, height=300, responsive=True),
             pn.pane.Markdown("FIXME: dendrogram and Z-score\n"),
         )
 
@@ -74,9 +72,7 @@ class Fst(View):
         )
         return pn.Column(
             pn.pane.Markdown("## Fst\n"),
-            df.hvplot.heatmap(
-                cmap=cc.bgy,
-            ),
+            df.hvplot.heatmap(cmap=cc.bgy, height=300, responsive=True),
         )
 
 
@@ -94,7 +90,7 @@ class StructurePage(View):
         self.fst = Fst(datastore=self.datastore)
 
     def __panel__(self):
-        return pn.Row(
+        return pn.Column(
             self.gnn,
             self.fst,
         )
