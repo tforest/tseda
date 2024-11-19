@@ -24,7 +24,7 @@ def eval_options(options):
 
 
 class Tree(View):
-    searchBy = pn.widgets.ToggleGroup(
+    search_by = pn.widgets.ToggleGroup(
         name="Search By",
         options=["Position", "Tree Index"],
         behavior="radio",
@@ -139,7 +139,7 @@ class Tree(View):
 
     def update_sidebar(self):
         """Dynamically update the sidebar based on searchBy value."""
-        if self.searchBy.value == "Tree Index":
+        if self.search_by.value == "Tree Index":
             self.position = None
             fields = [self.param.tree_index]
         else:
@@ -147,7 +147,7 @@ class Tree(View):
 
         sidebar_content = pn.Column(
             pn.Card(
-                self.searchBy,
+                self.search_by,
                 *fields,
                 self.param.width,
                 self.param.height,
