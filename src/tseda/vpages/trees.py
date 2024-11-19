@@ -17,7 +17,6 @@ from .core import View
 
 hv.extension("bokeh")
 
-
 def eval_options(options):
     """Evaluate options parameter."""
     return ast.literal_eval(options)
@@ -25,7 +24,7 @@ def eval_options(options):
 
 class Tree(View):
     searchBy = pn.widgets.ToggleGroup(
-        name="searchBy", options=["Position", "Tree Index"], behavior="radio"
+        name="Search By", options=["Position", "Tree Index"], behavior="radio", button_type="primary"
     )
 
     tree_index = param.Integer(
@@ -136,7 +135,6 @@ class Tree(View):
 
     def update_sidebar(self):
         """Dynamically update the sidebar based on searchBy value."""
-        print(self.searchBy.value)
         if self.searchBy.value == "Tree Index":
             self.position = None
             fields = [self.param.tree_index]
