@@ -73,7 +73,7 @@ class GeoMap(View):
     def sidebar(self):
         return pn.Card(
             self.param.tiles_selector,
-            collapsed=False,  # TODO: Should make it based on what the user is interacting with
+            collapsed=False,
             title="Map options",
             header_background=config.SIDEBAR_BACKGROUND,
             active_header_background=config.SIDEBAR_BACKGROUND,
