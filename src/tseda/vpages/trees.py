@@ -31,9 +31,7 @@ class Tree(View):
         button_type="primary",
     )
 
-    tree_index = param.Integer(
-        default=0, allow_None=True, doc="Get tree by zero-based index"
-    )
+    tree_index = param.Integer(default=0, doc="Get tree by zero-based index")
     position = param.Integer(
         default=None, doc="Get tree at genome position (bp)"
     )
