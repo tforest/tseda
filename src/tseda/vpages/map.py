@@ -61,22 +61,18 @@ class GeoMap(View):
             geo=True,
             tiles=self.tiles,
             tiles_opts={"alpha": 0.5},
-            width=self.width,
-            height=self.height,
             size=100,
             color=color,
             tools=["wheel_zoom", "box_select", "tap", "pan", "reset"],
             fill_alpha=0.5,
             line_color="black",
-            # responsive=True,
+            responsive=True,
         )
 
     def sidebar(self):
         return pn.Card(
             self.param.tiles_selector,
-            self.param.height,
-            self.param.width,
-            collapsed=True,
+            collapsed=False, # TODO: Should make it based on what the user is interacting with
             title="Map options",
             header_background=config.SIDEBAR_BACKGROUND,
             active_header_background=config.SIDEBAR_BACKGROUND,
