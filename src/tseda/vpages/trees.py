@@ -162,7 +162,7 @@ class Tree(View):
         )
         return sidebar_content
 
-    @param.depends("searchBy.value", watch=True)
+    @param.depends("search_by.value", watch=True)
     def sidebar(self):
         return self.update_sidebar()
 
