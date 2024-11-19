@@ -184,7 +184,7 @@ class IndividualsTable(Viewer):
             formatters=self.formatters,
             editors=self.editors,
             margin=10,
-            text_align={"selected": "center"},
+            text_align={col: "left" for col in self.columns},
         )
         return pn.Column(self.tooltip, table)
 
