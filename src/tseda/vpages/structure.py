@@ -94,7 +94,7 @@ class StructurePage(View):
         self.fst = Fst(datastore=self.datastore)
 
     def __panel__(self):
-        return pn.Row(
+        return pn.Column(
             self.gnn,
             self.fst,
         )
