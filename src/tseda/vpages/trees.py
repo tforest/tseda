@@ -24,6 +24,10 @@ def eval_options(options):
 
 
 class Tree(View):
+    searchBy = pn.widgets.ToggleGroup(
+        name="searchBy", options=["Position", "Tree Index"], behavior="radio"
+    )
+
     tree_index = param.Integer(
         default=0, allow_None=True, doc="Get tree by zero-based index"
     )
@@ -130,23 +134,35 @@ class Tree(View):
             ),
         )
 
-    def sidebar(self):
-        return pn.Column(
+    def update_sidebar(self):
+        """Dynamically update the sidebar based on searchBy value."""
+        print(self.searchBy.value)
+        if self.searchBy.value == "Tree Index":
+            self.position = None
+            fields = [self.param.tree_index]
+        else:
+            fields = [self.param.position]
+
+        sidebar_content = pn.Column(
             pn.Card(
-                self.param.position,
-                self.param.tree_index,
+                self.searchBy,
+                *fields,
                 self.param.width,
                 self.param.height,
                 self.param.options,
                 self.param.symbol_size,
-                collapsed=True,
+                collapsed=False,
                 title="Tree plotting options",
                 header_background=config.SIDEBAR_BACKGROUND,
                 active_header_background=config.SIDEBAR_BACKGROUND,
                 styles=config.VCARD_STYLE,
-            ),
-            self.warning_pane,
+            )
         )
+        return sidebar_content
+
+    @param.depends("searchBy.value", watch=True)
+    def sidebar(self):
+        return self.update_sidebar()
 
 
 class TreesPage(View):
