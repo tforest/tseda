@@ -71,9 +71,9 @@ class IndividualsTable(Viewer):
         default=100,
         doc="Number of rows per page to display",
     )
-    sample_select = pn.widgets.MultiSelect(
+    sample_select = pn.widgets.MultiChoice(
         name='Select sample sets',
-        description="Select samples based on the sample set ID. To select multiple sample sets, use Shift or Ctrl.",
+        description="Select samples based on the sample set ID.",
         options=[],
         value=[]
     )
@@ -99,12 +99,7 @@ class IndividualsTable(Viewer):
         super().__init__(**params)
         self.table.set_index(["id"], inplace=True)
         self.data = self.param.table.rx()
-        # TODO:
-        # get sample sets returns the sample sets, must be better way to dget the sample set ids?
-        # check if this works when changing sample sets
-        self.sample_select.options = ["None"] + list(range(len(self.get_sample_sets()))) # TOD: better way of getting sample sets
-        print(type(self.sample_select.options), self.sample_select.options)
-
+        self.sample_select.options = ["None"] + self.sample_indices()
 
     @property
     def tooltip(self):
@@ -123,7 +118,11 @@ class IndividualsTable(Viewer):
                 "displayed in the GeoMap plots."
             ),
         )
-
+    
+    def sample_indices(self): #TODO: make sure this updates
+        """Return indices of sample groups."""
+        return self.data.rx.value['sample_set_id'].unique().tolist()
+    
     def sample_sets(self):
         sample_sets = {}
         samples = []
@@ -198,14 +197,22 @@ class IndividualsTable(Viewer):
         )
         return pn.Column(self.tooltip, table)
 
-    def sidebar(self):
+    def options_sidebar(self):
         return pn.Card(
             self.param.page_size,
             self.sample_select,
+            collapsed=False,
+            title="Individuals table options",
+            header_background=config.SIDEBAR_BACKGROUND,
+            active_header_background=config.SIDEBAR_BACKGROUND,
+            styles=config.VCARD_STYLE,
+        )
+    def modification_sidebar(self):
+        return pn.Card(
             self.param.population_from,
             self.param.sample_set_to,
             collapsed=False,
-            title="Individuals table options",
+            title="Data modification",
             header_background=config.SIDEBAR_BACKGROUND,
             active_header_background=config.SIDEBAR_BACKGROUND,
             styles=config.VCARD_STYLE,
