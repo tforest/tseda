@@ -250,16 +250,6 @@ class SampleSetsTable(Viewer):
 
     @pn.depends("page_size", "create_sample_set_textinput")  # , "columns")
     def __panel__(self):
-        config.COLORS = [
-            "#2fa1da",
-            "#fb4f2f",
-            "#e4ae38",
-            "#6d904f",
-            "#8a8a8a",
-            "#16bdcf",
-            "#9367bc",
-            "#d62628",
-        ]
         if self.create_sample_set_textinput is not None:
             previous_names = [
                 self.table.name[i] for i in range(len(self.table))
@@ -278,10 +268,7 @@ class SampleSetsTable(Viewer):
                 if len(unused_colors) != 0:
                     colors = unused_colors
                 else:
-                    print("here")
                     colors = config.COLORS
-                print(colors)
-                print(colors[random.randint(0, len(colors) - 1)])
                 self.warning_pane.visible = False
                 i = max(self.param.table.rx.value.index) + 1
                 self.param.table.rx.value.loc[i] = [
