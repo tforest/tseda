@@ -28,6 +28,8 @@ RAW_CSS = """
     """
 DEFAULT_PARAMS = {
     "site": "tseda",
+    "theme_toggle": False,
+
 }
 
 pn.extension("tabulator")
