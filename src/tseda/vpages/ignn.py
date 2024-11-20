@@ -284,7 +284,7 @@ class IGNNPage(View):
     def sidebar(self):
         return pn.Column(
             self.geomap.sidebar,
-            self.gnnhaplotype.sidebar,
             self.vbar.sidebar,
+            self.gnnhaplotype.sidebar,
             self.sample_sets.sidebar_table,
         )
