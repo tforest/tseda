@@ -74,8 +74,8 @@ class GNNHaplotype(View):
             y=populations,
             color=colormap,
             legend="right",
+            sizing_mode="stretch_width",
             fill_alpha=0.5,
-            min_width=800,
             min_height=300,
             responsive=True,
             tools=[
