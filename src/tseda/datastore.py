@@ -1,8 +1,8 @@
+import random
 import daiquiri
 import pandas as pd
 import panel as pn
 import param
-import random
 from panel.viewable import Viewer
 from tsbrowse import model
 
