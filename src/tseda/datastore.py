@@ -53,8 +53,7 @@ class IndividualsTable(Viewer):
     ]
     editors = {k: None for k in columns}  # noqa
     editors["sample_set_id"] = {
-        "type": "list",
-        "values": [],
+        "type": "number",
         "valueLookup": True,
     }
     editors["selected"] = {
@@ -78,28 +77,24 @@ class IndividualsTable(Viewer):
         value=[],
     )
     population_from = param.Integer(
+        label="Population ID",
         default=None,
         bounds=(0, None),
-        doc=(
-            "Batch reassign individual from this `population` "
-            "to the index given in the `sample_set_to` parameter"
-        ),
+        doc=("Reassign individuals with this population ID."),
     )
     sample_set_to = param.Integer(
+        label="New sample ID",
         default=None,
         bounds=(0, None),
-        doc=(
-            "Batch reassign individuals in the index given in "
-            "the `sample_set_from` parameter to this sample set. "
-            "Update will only take place when both fields are set."
-        ),
+        doc=("Reassign individuals to this sample ID."),
     )
+    mod_update_button = pn.widgets.Button(name="Update")
 
     def __init__(self, **params):
         super().__init__(**params)
         self.table.set_index(["id"], inplace=True)
         self.data = self.param.table.rx()
-        self.sample_select.options = ["None"] + self.sample_indices()
+        self.sample_select.options = self.sample_indices()
 
     @property
     def tooltip(self):
@@ -164,7 +159,30 @@ class IndividualsTable(Viewer):
         """Return individual by index"""
         return self.data.rx.value.loc[i]
 
-    @pn.depends("page_size", "sample_select.value", "sample_set_to")
+    def create_filters(self):
+        filters = {}
+        for column in self.columns:
+            filters[column] = {
+                "type": "input",
+                "func": "like",
+                "placeholder": f"Enter {column.lower()}",
+            }
+        return filters
+
+    def update_data(self, event):
+        if self.sample_set_to is not None:
+            if self.population_from is not None:
+                try:
+                    self.table.loc[
+                        self.table["population"] == self.population_from,  # pyright: ignore[reportIndexIssue]
+                        "sample_set_id",
+                    ] = self.sample_set_to
+                except IndexError:
+                    logger.error("No such population %i", self.population_from)
+            else:
+                logger.info("No population defined")
+
+    @pn.depends("page_size", "sample_select.value", "mod_update_button.value")
     def __panel__(self):
         self.data.rx.value["selected"] = False
         if self.sample_select.value:
@@ -185,6 +203,11 @@ class IndividualsTable(Viewer):
             else:
                 logger.info("No population defined")
         data = self.data[self.columns]
+
+        # TODO: create them indivudually
+        # ranges not possible
+        filters = self.create_filters()
+
         table = pn.widgets.Tabulator(
             data,
             pagination="remote",
@@ -195,6 +218,7 @@ class IndividualsTable(Viewer):
             editors=self.editors,
             margin=10,
             text_align={col: "left" for col in self.columns},
+            header_filters=filters,
         )
         return pn.Column(self.tooltip, table)
 
@@ -209,10 +233,17 @@ class IndividualsTable(Viewer):
             styles=config.VCARD_STYLE,
         )
 
+    modification_header = pn.pane.Markdown(
+        "#### Batch reassign indivuduals:"
+    )  # , sizing_mode='stretch_width')
+
     def modification_sidebar(self):
         return pn.Card(
-            self.param.population_from,
-            self.param.sample_set_to,
+            pn.Column(
+                self.modification_header,
+                pn.Row(self.param.population_from, self.param.sample_set_to),
+                self.mod_update_button,
+            ),
             collapsed=False,
             title="Data modification",
             header_background=config.SIDEBAR_BACKGROUND,
