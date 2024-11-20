@@ -211,7 +211,7 @@ class VBar(View):
             if self.sort_order == "Ascending":
                 df.sort_values(sort_by, axis=0, inplace=True)
             else:
-                df.sort_values(sort_by, ascending=False, axis=0, inplace=True)
+                df.sort_values(sort_by, ascending=[True, False, False, False], axis=0, inplace=True)
             factors = df["x"].values
         source = ColumnDataSource(df)
         fig = figure(
