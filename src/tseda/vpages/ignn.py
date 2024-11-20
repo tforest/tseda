@@ -145,6 +145,12 @@ class VBar(View):
         label="Sort by",
     )
 
+    sort_order = param.Selector(
+        doc="Select the sorting order.",
+        objects=["Ascending", "Descending"],
+        default="Ascending",
+    )
+
     # TODO: move to DataStore class?
     def gnn(self):
         inds = self.datastore.individuals_table.data.rx.value
@@ -168,7 +174,7 @@ class VBar(View):
         df.set_index(["sample_set_id", "sample_id", "id"], inplace=True)
         return df
 
-    @pn.depends("sorting")
+    @pn.depends("sorting", "sort_order")
     def __panel__(self):
         df = self.gnn()
         sample_sets = self.datastore.sample_sets_table.data.rx.value
@@ -199,10 +205,13 @@ class VBar(View):
         )
 
         if self.sorting is not None and self.sorting != "":
-            sort_order = (
+            sort_by = (
                 ["sample_set_id"] + [self.sorting] + ["sample_id", "id"]  # pyright: ignore[reportOperatorIssue]
             )
-            df.sort_values(sort_order, axis=0, inplace=True)
+            if self.sort_order == "Ascending":
+                df.sort_values(sort_by, axis=0, inplace=True)
+            else:
+                df.sort_values(sort_by, ascending=False, axis=0, inplace=True)
             factors = df["x"].values
         source = ColumnDataSource(df)
         fig = figure(
@@ -251,6 +260,7 @@ class VBar(View):
     def sidebar(self):
         return pn.Card(
             self.param.sorting,
+            self.param.sort_order,
             collapsed=True,
             title="GNN VBar options",
             header_background=config.SIDEBAR_BACKGROUND,
