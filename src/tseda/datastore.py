@@ -1,3 +1,5 @@
+import random
+
 import daiquiri
 import pandas as pd
 import panel as pn
@@ -222,6 +224,12 @@ class SampleSetsTable(Viewer):
         label="New sample set name",
     )
 
+    warning_pane = pn.pane.Alert(
+        "This sample set name already exists, pick a unique name.",
+        alert_type="warning",
+        visible=False,
+    )
+
     page_size = param.Selector(objects=[10, 20, 50, 100], default=20)
 
     table = param.DataFrame()
@@ -244,18 +252,37 @@ class SampleSetsTable(Viewer):
     @pn.depends("page_size", "create_sample_set_textinput")  # , "columns")
     def __panel__(self):
         if self.create_sample_set_textinput is not None:
-            i = max(self.param.table.rx.value.index) + 1
-            self.param.table.rx.value.loc[i] = [
-                self.create_sample_set_textinput,
-                config.COLORS[0],
-                False,
+            previous_names = [
+                self.table.name[i] for i in range(len(self.table))
             ]
-            self.create_sample_set_textinput = None
+            if self.create_sample_set_textinput in previous_names:
+                self.warning_pane.visible = True
+            else:
+                previous_colors = [
+                    self.table.color[i] for i in range(len(self.table))
+                ]
+                unused_colors = [
+                    color
+                    for color in config.COLORS
+                    if color not in previous_colors
+                ]
+                if len(unused_colors) != 0:
+                    colors = unused_colors
+                else:
+                    colors = config.COLORS
+                self.warning_pane.visible = False
+                i = max(self.param.table.rx.value.index) + 1
+                self.param.table.rx.value.loc[i] = [
+                    self.create_sample_set_textinput,
+                    colors[random.randint(0, len(colors) - 1)],
+                    False,
+                ]
+                self.create_sample_set_textinput = None
         table = pn.widgets.Tabulator(
             self.data,
             layout="fit_data_table",
             selectable=True,
-            page_size=100,
+            page_size=self.page_size,
             pagination="remote",
             margin=10,
             formatters=self.formatters,
@@ -268,7 +295,7 @@ class SampleSetsTable(Viewer):
             self.data,
             layout="fit_data_table",
             selectable=True,
-            page_size=100,
+            page_size=10,
             pagination="remote",
             margin=10,
             formatters=self.formatters,
@@ -285,14 +312,17 @@ class SampleSetsTable(Viewer):
         )
 
     def sidebar(self):
-        return pn.Card(
-            self.param.page_size,
-            self.param.create_sample_set_textinput,
-            title="Sample sets table options",
-            collapsed=False,
-            header_background=config.SIDEBAR_BACKGROUND,
-            active_header_background=config.SIDEBAR_BACKGROUND,
-            styles=config.VCARD_STYLE,
+        return pn.Column(
+            pn.Card(
+                self.param.page_size,
+                self.param.create_sample_set_textinput,
+                title="Sample sets table options",
+                collapsed=False,
+                header_background=config.SIDEBAR_BACKGROUND,
+                active_header_background=config.SIDEBAR_BACKGROUND,
+                styles=config.VCARD_STYLE,
+            ),
+            self.warning_pane,
         )
 
     @property
