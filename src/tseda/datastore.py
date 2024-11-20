@@ -74,7 +74,7 @@ class IndividualsTable(Viewer):
         name="Select sample sets",
         description="Select samples based on the sample set ID.",
         options=[],
-        value=[],
+        value=[0, 1],
     )
     population_from = param.Integer(
         label="Population ID",
