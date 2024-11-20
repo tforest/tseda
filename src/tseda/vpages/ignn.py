@@ -137,20 +137,21 @@ class GNNHaplotype(View):
 class VBar(View):
     """Make VBar plot of GNN output."""
 
-    sort_order = param.List(
-        default=[],
-        item_type=str,
-        doc=(
-            "Change sort order within sample sets. Default is "
-            "to sort by sample index. Provide a list of strings "
-            'where items correspond to sample set names, e.g. `["sampleset"]`.'
-        ),
+    sorting = param.Selector(
+        doc="Select what population to base the sort order on. Default is "
+        "to sort by sample index",
+        allow_None=True,
+        default=None,
+        label="Sort by",
     )
 
     # TODO: move to DataStore class?
     def gnn(self):
         inds = self.datastore.individuals_table.data.rx.value
         samples, sample_sets = self.datastore.individuals_table.sample_sets()
+        self.param.sorting.objects = [""] + list(
+            self.datastore.sample_sets_table.names.values()
+        )
         gnn = self.datastore.tsm.ts.genealogical_nearest_neighbours(
             samples, sample_sets=list(sample_sets.values())
         )
@@ -167,7 +168,7 @@ class VBar(View):
         df.set_index(["sample_set_id", "sample_id", "id"], inplace=True)
         return df
 
-    @pn.depends("sort_order")
+    @pn.depends("sorting")
     def __panel__(self):
         df = self.gnn()
         sample_sets = self.datastore.sample_sets_table.data.rx.value
@@ -197,9 +198,9 @@ class VBar(View):
             )
         )
 
-        if len(self.sort_order) > 0:
+        if self.sorting is not None and self.sorting != "":
             sort_order = (
-                ["sample_set_id"] + self.sort_order + ["sample_id", "id"]  # pyright: ignore[reportOperatorIssue]
+                ["sample_set_id"] + [self.sorting] + ["sample_id", "id"]  # pyright: ignore[reportOperatorIssue]
             )
             df.sort_values(sort_order, axis=0, inplace=True)
             factors = df["x"].values
@@ -249,7 +250,7 @@ class VBar(View):
 
     def sidebar(self):
         return pn.Card(
-            self.param.sort_order,
+            self.param.sorting,
             collapsed=True,
             title="GNN VBar options",
             header_background=config.SIDEBAR_BACKGROUND,
