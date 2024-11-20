@@ -238,7 +238,7 @@ class IndividualsTable(Viewer):
 
     modification_header = pn.pane.Markdown(
         "#### Batch reassign indivuduals:"
-    )  # , sizing_mode='stretch_width')
+    )  
 
     def modification_sidebar(self):
         return pn.Card(
