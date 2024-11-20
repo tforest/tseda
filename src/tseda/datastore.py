@@ -222,6 +222,12 @@ class SampleSetsTable(Viewer):
         label="New sample set name",
     )
 
+    warning_pane = pn.pane.Alert(
+        "This sample set name already exists, pick a unique name.",
+        alert_type="warning",
+        visible=False,
+    )
+
     page_size = param.Selector(objects=[10, 20, 50, 100], default=20)
 
     table = param.DataFrame()
@@ -244,13 +250,20 @@ class SampleSetsTable(Viewer):
     @pn.depends("page_size", "create_sample_set_textinput")  # , "columns")
     def __panel__(self):
         if self.create_sample_set_textinput is not None:
-            i = max(self.param.table.rx.value.index) + 1
-            self.param.table.rx.value.loc[i] = [
-                self.create_sample_set_textinput,
-                config.COLORS[0],
-                False,
+            previous_names = [
+                self.table.name[i] for i in range(len(self.table.name))
             ]
-            self.create_sample_set_textinput = None
+            if self.create_sample_set_textinput in previous_names:
+                self.warning_pane.visible = True
+            else:
+                self.warning_pane.visible = False
+                i = max(self.param.table.rx.value.index) + 1
+                self.param.table.rx.value.loc[i] = [
+                    self.create_sample_set_textinput,
+                    config.COLORS[0],
+                    False,
+                ]
+                self.create_sample_set_textinput = None
         table = pn.widgets.Tabulator(
             self.data,
             layout="fit_data_table",
@@ -285,14 +298,17 @@ class SampleSetsTable(Viewer):
         )
 
     def sidebar(self):
-        return pn.Card(
-            self.param.page_size,
-            self.param.create_sample_set_textinput,
-            title="Sample sets table options",
-            collapsed=False,
-            header_background=config.SIDEBAR_BACKGROUND,
-            active_header_background=config.SIDEBAR_BACKGROUND,
-            styles=config.VCARD_STYLE,
+        return pn.Column(
+            pn.Card(
+                self.param.page_size,
+                self.param.create_sample_set_textinput,
+                title="Sample sets table options",
+                collapsed=False,
+                header_background=config.SIDEBAR_BACKGROUND,
+                active_header_background=config.SIDEBAR_BACKGROUND,
+                styles=config.VCARD_STYLE,
+            ),
+            self.warning_pane,
         )
 
     @property
