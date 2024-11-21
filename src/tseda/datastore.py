@@ -67,7 +67,7 @@ class IndividualsTable(Viewer):
 
     page_size = param.Selector(
         objects=[10, 20, 50, 100, 200, 500],
-        default=100,
+        default=20,
         doc="Number of rows per page to display",
     )
     sample_select = pn.widgets.MultiChoice(
@@ -90,11 +90,31 @@ class IndividualsTable(Viewer):
     )
     mod_update_button = pn.widgets.Button(name="Update")
 
+    filters = {
+        "name": {"type": "input", "func": "like", "placeholder": "Enter name"},
+        "population": {
+            "type": "input",
+            "func": "like",
+            "placeholder": "Enter ID",
+        },
+        "sample_set_id": {
+            "type": "input",
+            "func": "like",
+            "placeholder": "Enter ID",
+        },
+        "selected": {
+            "type": "tickCross",
+            "tristate": True,
+            "indeterminateValue": None,
+            "placeholder": "Enter True/False",
+        },
+    }
+
     def __init__(self, **params):
         super().__init__(**params)
         self.table.set_index(["id"], inplace=True)
         self.data = self.param.table.rx()
-        self.sample_select.options = self.sample_indices()
+        self.sample_select.options = self.sample_set_indices()
 
     @property
     def tooltip(self):
@@ -114,9 +134,9 @@ class IndividualsTable(Viewer):
             ),
         )
 
-    def sample_indices(self):  # TODO: make sure this updates
+    def sample_set_indices(self):
         """Return indices of sample groups."""
-        return self.data.rx.value["sample_set_id"].unique().tolist()
+        return sorted(self.data.rx.value["sample_set_id"].unique().tolist())
 
     def sample_sets(self):
         sample_sets = {}
@@ -159,29 +179,6 @@ class IndividualsTable(Viewer):
         """Return individual by index"""
         return self.data.rx.value.loc[i]
 
-    def create_filters(self):
-        filters = {}
-        for column in self.columns:
-            filters[column] = {
-                "type": "input",
-                "func": "like",
-                "placeholder": f"Enter {column.lower()}",
-            }
-        return filters
-
-    def update_data(self, event):
-        if self.sample_set_to is not None:
-            if self.population_from is not None:
-                try:
-                    self.table.loc[
-                        self.table["population"] == self.population_from,  # pyright: ignore[reportIndexIssue]
-                        "sample_set_id",
-                    ] = self.sample_set_to
-                except IndexError:
-                    logger.error("No such population %i", self.population_from)
-            else:
-                logger.info("No population defined")
-
     @pn.depends("page_size", "sample_select.value", "mod_update_button.value")
     def __panel__(self):
         self.data.rx.value["selected"] = False
@@ -207,10 +204,6 @@ class IndividualsTable(Viewer):
                 logger.info("No population defined")
         data = self.data[self.columns]
 
-        # TODO: create them indivudually
-        # ranges not possible
-        filters = self.create_filters()
-
         table = pn.widgets.Tabulator(
             data,
             pagination="remote",
@@ -221,7 +214,7 @@ class IndividualsTable(Viewer):
             editors=self.editors,
             margin=10,
             text_align={col: "left" for col in self.columns},
-            header_filters=filters,
+            header_filters=self.filters,
         )
         return pn.Column(self.tooltip, table)
 
