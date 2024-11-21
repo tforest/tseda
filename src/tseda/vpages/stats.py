@@ -50,6 +50,12 @@ class OnewayStats(View):
         default=10000, bounds=(1, None), doc="Size of window"
     )
 
+    warning_pane = pn.pane.Alert(
+        """Select at least 1 sample set to see this plot.
+        Sample sets are selected on the Individuals page""",
+        alert_type="warning",
+    )
+
     @property
     def tooltip(self):
         return pn.widgets.TooltipIcon(
@@ -68,6 +74,8 @@ class OnewayStats(View):
         sample_sets_list = (
             self.datastore.individuals_table.selected_sample_set_indices()
         )
+        if len(sample_sets_list) < 1:
+            return self.warning_pane
         sample_sets = self.datastore.individuals_table.get_sample_sets()
 
         if self.statistic == "Tajimas_D":
