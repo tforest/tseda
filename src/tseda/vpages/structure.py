@@ -29,7 +29,7 @@ class GNN(View):
     """Make aggregated GNN plot."""
 
     warning_pane = pn.pane.Alert(
-        """Please select at least 2 samples to visualize these graphs. 
+        """Please select at least 2 samples to visualize this graph. 
         Sample selection is done on the Individuals page.""",
         alert_type="warning",
     )
@@ -37,7 +37,9 @@ class GNN(View):
     def __panel__(self):
         samples, sample_sets = self.datastore.individuals_table.sample_sets()
         if len(sample_sets) <= 1:
-            return self.warning_pane
+            return pn.Column(
+                pn.pane.Markdown("## GNN cluster plot\n"), self.warning_pane
+            )
         else:
             sstable = self.datastore.sample_sets_table.data.rx.value
             inds = self.datastore.individuals_table.data.rx.value
@@ -71,10 +73,16 @@ class GNN(View):
 class Fst(View):
     """Make Fst plot."""
 
+    warning_pane = pn.pane.Alert(
+        """Please select at least 2 samples to visualize this graph. 
+        Sample selection is done on the Individuals page.""",
+        alert_type="warning",
+    )
+
     def __panel__(self):
         samples, sample_sets = self.datastore.individuals_table.sample_sets()
         if len(sample_sets) <= 1:
-            return pn.pane.Markdown("")
+            return pn.Column(pn.pane.Markdown("## Fst\n"), self.warning_pane)
         else:
             sstable = self.datastore.sample_sets_table.data.rx.value
             ts = self.datastore.tsm.ts
