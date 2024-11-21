@@ -157,7 +157,7 @@ class Tree(View):
                 active_header_background=config.SIDEBAR_BACKGROUND,
                 styles=config.VCARD_STYLE,
             ),
-            self.warning_pane
+            self.warning_pane,
         )
         return sidebar_content
 
