@@ -21,14 +21,17 @@ from .map import GeoMap
 class IndividualsPage(View):
     key = "individuals"
     title = "Individuals"
-    geomap = param.ClassSelector(class_=GeoMap)
     data = param.ClassSelector(class_=IndividualsTable)
+    geomap = param.ClassSelector(class_=GeoMap)
+    selection = pn.widgets.MultiChoice()
 
     def __init__(self, **params):
         super().__init__(**params)
-        self.geomap = GeoMap(datastore=self.datastore)
         self.data = self.datastore.individuals_table
+        self.selection = self.datastore.individuals_table.sample_select
+        self.geomap = GeoMap(datastore=self.datastore)
 
+    @pn.depends("selection.value")
     def __panel__(self):
         return pn.Column(self.geomap, self.data)
 
