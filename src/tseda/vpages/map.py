@@ -34,8 +34,6 @@ tiles_options = {
 
 
 class GeoMap(View):
-    height = param.Integer(default=400, doc="Height of the map")
-    width = param.Integer(default=1200, doc="Width of the map")
 
     tiles_selector = param.Selector(
         default="WorldPhysical",
@@ -44,7 +42,7 @@ class GeoMap(View):
     )
     tiles = tiles_options[tiles_selector.default]
 
-    @pn.depends("tiles_selector", "height", "width")
+    @pn.depends("tiles_selector")
     def __panel__(self):
         self.tiles = tiles_options[self.tiles_selector]
         df = self.datastore.individuals_table.data.rx.value
@@ -61,8 +59,8 @@ class GeoMap(View):
             geo=True,
             tiles=self.tiles,
             tiles_opts={"alpha": 0.5},
-            max_height=self.height,
-            min_height=self.height,
+            max_height=401,
+            min_height=400,
             size=100,
             color=color,
             tools=["wheel_zoom", "box_select", "tap", "pan", "reset"],
