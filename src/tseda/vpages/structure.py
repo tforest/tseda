@@ -29,7 +29,8 @@ class GNN(View):
     """Make aggregated GNN plot."""
 
     warning_pane = pn.pane.Alert(
-        "Please select at least 2 samples to be able to visualize these graphs. Sample selection is done on the Individuals page.",
+        """Please select at least 2 samples to be able to visualize these graphs. 
+        Sample selection is done on the Individuals page.""",
         alert_type="warning",
     )
 
