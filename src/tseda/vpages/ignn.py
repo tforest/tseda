@@ -74,8 +74,8 @@ class GNNHaplotype(View):
             y=populations,
             color=colormap,
             legend="right",
+            sizing_mode="stretch_width",
             fill_alpha=0.5,
-            min_width=800,
             min_height=300,
             responsive=True,
             tools=[
@@ -137,20 +137,27 @@ class GNNHaplotype(View):
 class VBar(View):
     """Make VBar plot of GNN output."""
 
-    sort_order = param.List(
-        default=[],
-        item_type=str,
-        doc=(
-            "Change sort order within sample sets. Default is "
-            "to sort by sample index. Provide a list of strings "
-            'where items correspond to sample set names, e.g. `["sampleset"]`.'
-        ),
+    sorting = param.Selector(
+        doc="Select what population to base the sort order on. Default is "
+        "to sort by sample index",
+        allow_None=True,
+        default=None,
+        label="Sort by",
+    )
+
+    sort_order = param.Selector(
+        doc="Select the sorting order.",
+        objects=["Ascending", "Descending"],
+        default="Ascending",
     )
 
     # TODO: move to DataStore class?
     def gnn(self):
         inds = self.datastore.individuals_table.data.rx.value
         samples, sample_sets = self.datastore.individuals_table.sample_sets()
+        self.param.sorting.objects = [""] + list(
+            self.datastore.sample_sets_table.names.values()
+        )
         gnn = self.datastore.tsm.ts.genealogical_nearest_neighbours(
             samples, sample_sets=list(sample_sets.values())
         )
@@ -167,7 +174,7 @@ class VBar(View):
         df.set_index(["sample_set_id", "sample_id", "id"], inplace=True)
         return df
 
-    @pn.depends("sort_order")
+    @pn.depends("sorting", "sort_order")
     def __panel__(self):
         df = self.gnn()
         sample_sets = self.datastore.sample_sets_table.data.rx.value
@@ -197,12 +204,24 @@ class VBar(View):
             )
         )
 
-        if len(self.sort_order) > 0:
-            sort_order = (
-                ["sample_set_id"] + self.sort_order + ["sample_id", "id"]  # pyright: ignore[reportOperatorIssue]
+        if self.sorting is not None and self.sorting != "":
+            sort_by = (
+                ["sample_set_id"] + [self.sorting] + ["sample_id", "id"]  # pyright: ignore[reportOperatorIssue]
             )
-            df.sort_values(sort_order, axis=0, inplace=True)
-            factors = df["x"].values
+            ascending = [True, False, False, False]
+        else:
+            sort_by = ["sample_set_id", "sample_id", "id"]
+            ascending = [True, False, False]
+        if self.sort_order == "Ascending":
+            df.sort_values(sort_by, axis=0, inplace=True)
+        else:
+            df.sort_values(
+                sort_by,
+                ascending=ascending,
+                axis=0,
+                inplace=True,
+            )
+        factors = df["x"].values
         source = ColumnDataSource(df)
         fig = figure(
             x_range=FactorRange(
@@ -249,6 +268,7 @@ class VBar(View):
 
     def sidebar(self):
         return pn.Card(
+            self.param.sorting,
             self.param.sort_order,
             collapsed=True,
             title="GNN VBar options",
@@ -284,7 +304,7 @@ class IGNNPage(View):
     def sidebar(self):
         return pn.Column(
             self.geomap.sidebar,
-            self.gnnhaplotype.sidebar,
             self.vbar.sidebar,
+            self.gnnhaplotype.sidebar,
             self.sample_sets.sidebar_table,
         )
