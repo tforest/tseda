@@ -49,10 +49,6 @@ class OnewayStats(View):
     window_size = param.Integer(
         default=10000, bounds=(1, None), doc="Size of window"
     )
-    sample_sets = param.String(
-        default="[0,1]",
-        doc="Comma-separated list of sample sets (0-indexed) to plot.",
-    )
 
     @property
     def tooltip(self):
@@ -63,19 +59,16 @@ class OnewayStats(View):
             )
         )
 
-    @param.depends("mode", "statistic", "window_size", "sample_sets")
+    @param.depends("mode", "statistic", "window_size")
     def __panel__(self):
         data = None
         windows = make_windows(
             self.window_size, self.datastore.tsm.ts.sequence_length
         )
-        sample_sets_list = eval_sample_sets(self.sample_sets)
-        try:
-            sample_sets = self.datastore.individuals_table.get_sample_sets(
-                sample_sets_list
-            )
-        except KeyError:
-            return pn.pane.Alert("Sample set error. Check sample set indexes.")
+        sample_sets_list = (
+            self.datastore.individuals_table.selected_sample_set_indices()
+        )
+        sample_sets = self.datastore.individuals_table.get_sample_sets()
 
         if self.statistic == "Tajimas_D":
             data = self.datastore.tsm.ts.Tajimas_D(
@@ -120,8 +113,7 @@ class OnewayStats(View):
             self.param.mode,
             self.param.statistic,
             self.param.window_size,
-            self.param.sample_sets,
-            collapsed=False,
+            collapsed=True,
             title="Oneway statistics plotting options",
             header_background=config.SIDEBAR_BACKGROUND,
             active_header_background=config.SIDEBAR_BACKGROUND,
