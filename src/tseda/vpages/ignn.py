@@ -208,16 +208,20 @@ class VBar(View):
             sort_by = (
                 ["sample_set_id"] + [self.sorting] + ["sample_id", "id"]  # pyright: ignore[reportOperatorIssue]
             )
-            if self.sort_order == "Ascending":
-                df.sort_values(sort_by, axis=0, inplace=True)
-            else:
-                df.sort_values(
-                    sort_by,
-                    ascending=[True, False, False, False],
-                    axis=0,
-                    inplace=True,
-                )
-            factors = df["x"].values
+            ascending = [True, False, False, False]
+        else:
+            sort_by = ["sample_set_id", "sample_id", "id"]
+            ascending = [True, False, False]
+        if self.sort_order == "Ascending":
+            df.sort_values(sort_by, axis=0, inplace=True)
+        else:
+            df.sort_values(
+                sort_by,
+                ascending=ascending,
+                axis=0,
+                inplace=True,
+            )
+        factors = df["x"].values
         source = ColumnDataSource(df)
         fig = figure(
             x_range=FactorRange(
