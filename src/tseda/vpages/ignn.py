@@ -48,9 +48,7 @@ class GNNHaplotype(View):
     def plot(self, haplotype=0):
         if self.individual_id is None:
             return
-        windows = make_windows(
-                1000, self.datastore.tsm.ts.sequence_length
-)
+        windows = make_windows(1000, self.datastore.tsm.ts.sequence_length)
         data = self.datastore.haplotype_gnn(
             self.individual_id, windows=windows
         )
