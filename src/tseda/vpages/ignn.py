@@ -44,19 +44,13 @@ class GNNHaplotype(View):
         bounds=(0, None),
         doc="Individual ID (0-indexed)",
     )
-    window_size = param.Integer(
-        default=10000, bounds=(1, None), doc="Size of window"
-    )
 
     def plot(self, haplotype=0):
         if self.individual_id is None:
             return
-        if self.window_size is not None:
-            windows = make_windows(
-                self.window_size, self.datastore.tsm.ts.sequence_length
-            )
-        else:
-            windows = None
+        windows = make_windows(
+                1000, self.datastore.tsm.ts.sequence_length
+)
         data = self.datastore.haplotype_gnn(
             self.individual_id, windows=windows
         )
@@ -109,7 +103,7 @@ class GNNHaplotype(View):
         )
         return p
 
-    @pn.depends("individual_id", "window_size")
+    @pn.depends("individual_id")
     def __panel__(self, **params):
         inds = self.datastore.individuals_table.data.rx.value
         if self.individual_id is None:
@@ -126,7 +120,6 @@ class GNNHaplotype(View):
     def sidebar(self):
         return pn.Card(
             self.param.individual_id,
-            self.param.window_size,
             collapsed=False,
             title="GNN haplotype options",
             header_background=config.SIDEBAR_BACKGROUND,
