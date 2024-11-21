@@ -126,7 +126,7 @@ class GNNHaplotype(View):
         return pn.Card(
             self.param.individual_id,
             self.param.window_size,
-            collapsed=True,
+            collapsed=False,
             title="GNN haplotype options",
             header_background=config.SIDEBAR_BACKGROUND,
             active_header_background=config.SIDEBAR_BACKGROUND,
@@ -270,7 +270,7 @@ class VBar(View):
         return pn.Card(
             self.param.sorting,
             self.param.sort_order,
-            collapsed=True,
+            collapsed=False,
             title="GNN VBar options",
             header_background=config.SIDEBAR_BACKGROUND,
             active_header_background=config.SIDEBAR_BACKGROUND,

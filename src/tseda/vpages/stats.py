@@ -121,7 +121,7 @@ class OnewayStats(View):
             self.param.statistic,
             self.param.window_size,
             self.param.sample_sets,
-            collapsed=True,
+            collapsed=False,
             title="Oneway statistics plotting options",
             header_background=config.SIDEBAR_BACKGROUND,
             active_header_background=config.SIDEBAR_BACKGROUND,
@@ -148,7 +148,7 @@ class MultiwayStats(View):
         doc="Comma-separated list of sample sets (0-indexed) to compare.",
     )
     indexes = param.String(
-        default="[(0,1), (0,2), (1,2)]",
+        default="[(0,1)]",
         doc=(
             "Comma-separated list of tuples of sample sets "
             "(0-indexed) indexes to compare."
@@ -258,7 +258,7 @@ class MultiwayStats(View):
             self.param.sample_sets,
             self.param.indexes,
             self.param.colormap,
-            collapsed=True,
+            collapsed=False,
             title="Multiway statistics plotting options",
             header_background=config.SIDEBAR_BACKGROUND,
             active_header_background=config.SIDEBAR_BACKGROUND,
