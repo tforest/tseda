@@ -105,6 +105,7 @@ class GNNHaplotype(View):
                 "reset",
             ],
             tools=["xpan", "xwheel_zoom", "box_select", "save", "reset"],
+            ylabel="Proportion",
         )
         return p
 
@@ -230,6 +231,7 @@ class VBar(View):
             height=400,
             sizing_mode="stretch_width",
             tools="xpan,xwheel_zoom,box_select,save,reset",
+            y_axis_label="Proportion",
         )
         fig.add_tools(hover)
         fig.vbar_stack(

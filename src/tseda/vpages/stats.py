@@ -144,7 +144,7 @@ class MultiwayStats(View):
         default=10000, bounds=(1, None), doc="Size of window"
     )
     sample_sets = param.String(
-        default="[0,1,2]",
+        default="[0,1]",
         doc="Comma-separated list of sample sets (0-indexed) to compare.",
     )
     indexes = param.String(
