@@ -44,6 +44,7 @@ class GNNHaplotype(View):
         bounds=(0, None),
         doc="Individual ID (0-indexed)",
     )
+
     window_size = param.Integer(
         default=10000, bounds=(1, None), doc="Size of window"
     )
@@ -105,6 +106,7 @@ class GNNHaplotype(View):
                 "reset",
             ],
             tools=["xpan", "xwheel_zoom", "box_select", "save", "reset"],
+            ylabel="Proportion",
         )
         return p
 
@@ -126,7 +128,7 @@ class GNNHaplotype(View):
         return pn.Card(
             self.param.individual_id,
             self.param.window_size,
-            collapsed=True,
+            collapsed=False,
             title="GNN haplotype options",
             header_background=config.SIDEBAR_BACKGROUND,
             active_header_background=config.SIDEBAR_BACKGROUND,
@@ -230,6 +232,7 @@ class VBar(View):
             height=400,
             sizing_mode="stretch_width",
             tools="xpan,xwheel_zoom,box_select,save,reset",
+            y_axis_label="Proportion",
         )
         fig.add_tools(hover)
         fig.vbar_stack(
@@ -270,7 +273,7 @@ class VBar(View):
         return pn.Card(
             self.param.sorting,
             self.param.sort_order,
-            collapsed=True,
+            collapsed=False,
             title="GNN VBar options",
             header_background=config.SIDEBAR_BACKGROUND,
             active_header_background=config.SIDEBAR_BACKGROUND,
