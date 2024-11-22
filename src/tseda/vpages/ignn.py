@@ -49,6 +49,13 @@ class GNNHaplotype(View):
         default=10000, bounds=(1, None), doc="Size of window"
     )
 
+    warning_pane = pn.pane.Alert(
+        """Please select at least 1 sample to visualize these graphs. 
+        Sample selection is done on the Individuals page.""",
+        alert_type="warning",
+        visible=False,
+    )
+
     def plot(self, haplotype=0):
         if self.individual_id is None:
             return
@@ -63,6 +70,11 @@ class GNNHaplotype(View):
         )
         df = data.loc[data.index.get_level_values("haplotype") == haplotype]
         df = df.droplevel(["haplotype", "end"])
+        if list(df.columns) == []:
+            self.warning_pane.visible = True
+            return pn.pane.Markdown("")
+        else:
+            self.warning_pane.visible = False
         populations = [str(x) for x in df.columns]
         colormap = [
             self.datastore.sample_sets_table.color_by_name[x]
@@ -118,6 +130,7 @@ class GNNHaplotype(View):
         nodes = inds.loc[self.individual_id].nodes
         return pn.Column(
             pn.pane.Markdown(f"## Individual id {self.individual_id}"),
+            self.warning_pane,
             pn.pane.Markdown(f"### Haplotype 0 (sample id {nodes[0]})"),
             self.plot(0),
             pn.pane.Markdown(f"### Haplotype 1 (sample id {nodes[1]})"),
@@ -153,6 +166,12 @@ class VBar(View):
         default="Ascending",
     )
 
+    warning_pane = pn.pane.Alert(
+        """Please select at least 1 sample to visualize this graph. 
+        Sample selection is done on the Individuals page.""",
+        alert_type="warning",
+    )
+
     # TODO: move to DataStore class?
     def gnn(self):
         inds = self.datastore.individuals_table.data.rx.value
@@ -178,6 +197,9 @@ class VBar(View):
 
     @pn.depends("sorting", "sort_order")
     def __panel__(self):
+        samples, sample_sets = self.datastore.individuals_table.sample_sets()
+        if len(list(sample_sets.keys())) < 1:
+            return self.warning_pane
         df = self.gnn()
         sample_sets = self.datastore.sample_sets_table.data.rx.value
         inds = self.datastore.individuals_table.data.rx.value
