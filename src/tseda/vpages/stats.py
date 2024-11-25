@@ -51,7 +51,7 @@ class OnewayStats(View):
         default=10000, bounds=(1, None), doc="Size of window"
     )
 
-    warning_pane = pn.pane.Alert(
+    sample_select_warning = pn.pane.Alert(
         """Select at least 1 sample set to see this plot.
         Sample sets are selected on the Individuals page""",
         alert_type="warning",
@@ -81,7 +81,7 @@ class OnewayStats(View):
             self.datastore.individuals_table.selected_sample_set_indices()
         )
         if len(sample_sets_list) < 1:
-            return self.warning_pane
+            return self.sample_select_warning
         sample_sets = self.datastore.individuals_table.get_sample_sets()
 
         if self.statistic == "Tajimas_D":
@@ -127,7 +127,7 @@ class OnewayStats(View):
             self.param.mode,
             self.param.statistic,
             self.param.window_size,
-            collapsed=True,
+            collapsed=False,
             title="Oneway statistics plotting options",
             header_background=config.SIDEBAR_BACKGROUND,
             active_header_background=config.SIDEBAR_BACKGROUND,
@@ -150,16 +150,22 @@ class MultiwayStats(View):
     window_size = param.Integer(
         default=10000, bounds=(1, None), doc="Size of window"
     )
-    sample_sets = param.String(
-        default="[0,1,2]",
-        doc="Comma-separated list of sample sets (0-indexed) to compare.",
-    )
     indexes = param.String(
-        default="[(0,1), (0,2), (1,2)]",
+        default="[(0,1)]",
         doc=(
             "Comma-separated list of tuples of sample sets "
             "(0-indexed) indexes to compare."
         ),
+    )
+    sample_select_warning = pn.pane.Alert(
+        """Select at least 1 sample set to see this plot.
+        Sample sets are selected on the Individuals page""",
+        alert_type="warning",
+    )
+    index_warning = pn.pane.Alert(
+        """Please select only indexes belonging to your selected sample sets.
+        Sample sets are selected on the Individuals page.""",
+        alert_type="warning",
     )
     cmaps = {
         cm.name: cm
@@ -192,26 +198,28 @@ class MultiwayStats(View):
         "mode",
         "statistic",
         "window_size",
-        "sample_sets",
         "indexes",
         "colormap",
     )
     def __panel__(self):
         data = None
         tsm = self.datastore.tsm
-        sample_sets_list = []
         windows = []
         indexes_list = []
         colormap_list = []
         windows = make_windows(self.window_size, tsm.ts.sequence_length)
-        sample_sets_list = eval_sample_sets(self.sample_sets)
         indexes_list = eval_indexes(self.indexes)
-        try:
-            sample_sets = self.datastore.individuals_table.get_sample_sets(
-                sample_sets_list
-            )
-        except KeyError:
-            return pn.pane.Alert("Sample set error. Check sample set indexes.")
+
+        sample_sets_list = (
+            self.datastore.individuals_table.selected_sample_set_indices()
+        )
+        all_indexes = [indexes for tuple in indexes_list for indexes in tuple]
+        if len(sample_sets_list) < 1:
+            return self.sample_select_warning
+        for i in all_indexes:
+            if i not in sample_sets_list:
+                return self.index_warning
+        sample_sets = self.datastore.individuals_table.get_sample_sets()
         if self.statistic == "Fst":
             data = tsm.ts.Fst(
                 sample_sets,
@@ -267,7 +275,6 @@ class MultiwayStats(View):
             self.param.mode,
             self.param.statistic,
             self.param.window_size,
-            self.param.sample_sets,
             self.param.indexes,
             self.param.colormap,
             collapsed=False,
