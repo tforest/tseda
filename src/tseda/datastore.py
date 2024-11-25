@@ -76,7 +76,6 @@ class IndividualsTable(Viewer):
         name="Select sample sets",
         description="Select samples based on the sample set ID.",
         options=[],
-        value=[0, 1],
     )
     population_from = param.Integer(
         label="Population ID",
@@ -107,9 +106,8 @@ class IndividualsTable(Viewer):
         "selected": {
             "type": "tickCross",
             "tristate": True,
-            "indeterminateValue": None,
-            "placeholder": "Enter True/False",
-        },
+            "indeterminateValue": None
+                    }
     }
 
     def __init__(self, **params):
@@ -117,6 +115,7 @@ class IndividualsTable(Viewer):
         self.table.set_index(["id"], inplace=True)
         self.data = self.param.table.rx()
         self.sample_select.options = self.sample_set_indices()
+        self.sample_select.value = self.sample_set_indices()
 
     @property
     def tooltip(self):
@@ -183,16 +182,17 @@ class IndividualsTable(Viewer):
 
     @pn.depends("page_size", "sample_select.value", "mod_update_button.value")
     def __panel__(self):
-        self.data.rx.value["selected"] = False
-        if (
-            isinstance(self.sample_select.value, list)
-            and self.sample_select.value
-        ):
+        
+        if isinstance(self.sample_select.value, list):
+            self.data.rx.value["selected"] = False
+            print(self.sample_select.value)
             for sample_set_id in self.sample_select.value:
+                print(sample_set_id)
                 self.data.rx.value.loc[
                     self.data.rx.value.sample_set_id == sample_set_id,
                     "selected",
                 ] = True
+
         if self.sample_set_to is not None:
             if self.population_from is not None:
                 try:
