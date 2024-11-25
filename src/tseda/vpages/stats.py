@@ -37,9 +37,10 @@ def eval_indexes(indexes):
 
 class OnewayStats(View):
     mode = param.Selector(
-        objects=["branch", "site"],
+        objects=["site"],
         default="site",
-        doc="Select mode for statistics.",
+        doc="""Select mode (site or branch) for statistics. 
+        Branch mode is only available for calibrated data.""",
     )
     statistic = param.Selector(
         objects=["Tajimas_D", "diversity"],
@@ -64,6 +65,11 @@ class OnewayStats(View):
                 "in the sample set editor page."
             )
         )
+    
+    def __init__(self, **params):
+        super().__init__(**params)
+        if self.datastore.tsm.ts.time_units != "uncalibrated":
+            self.param.mode.objects = ["branch", "site"]
 
     @param.depends("mode", "statistic", "window_size")
     def __panel__(self):
@@ -131,9 +137,10 @@ class OnewayStats(View):
 
 class MultiwayStats(View):
     mode = param.Selector(
-        objects=["branch", "site"],
+        objects=["site"],
         default="site",
-        doc="Select mode for statistics.",
+        doc="""Select mode (site or branch) for statistics. 
+        Branch mode is only available for calibrated data.""",
     )
     statistic = param.Selector(
         objects=["Fst", "divergence"],
@@ -166,6 +173,11 @@ class MultiwayStats(View):
         default="glasbey_dark",
         doc="Holoviews colormap for sample set pairs",
     )
+
+    def __init__(self, **params):
+        super().__init__(**params)
+        if self.datastore.tsm.ts.time_units != "uncalibrated":
+            self.param.mode.objects = ["branch", "site"]
 
     @property
     def tooltip(self):
