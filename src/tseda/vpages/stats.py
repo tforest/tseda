@@ -65,7 +65,7 @@ class OnewayStats(View):
                 "in the sample set editor page."
             )
         )
-    
+
     def __init__(self, **params):
         super().__init__(**params)
         if self.datastore.tsm.ts.time_units != "uncalibrated":
