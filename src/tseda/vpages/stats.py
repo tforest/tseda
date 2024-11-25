@@ -213,7 +213,7 @@ class MultiwayStats(View):
         sample_sets_list = (
             self.datastore.individuals_table.selected_sample_set_indices()
         )
-        all_indexes = [indexes for tuple in indexes_list for indexes in tuple]
+        all_indexes = [indexes for pair in indexes_list for indexes in pair]
         if len(sample_sets_list) < 1:
             return self.sample_select_warning
         for i in all_indexes:
