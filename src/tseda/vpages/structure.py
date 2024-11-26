@@ -126,7 +126,8 @@ class StructurePage(View):
             ),
             pn.pane.Markdown(
                 """
-                This section provides an analysis of the **population structure** based on genomic data. 
+                This section provides an analysis of the **population 
+                structure** based on genomic data. 
                 You can explore two types of plots: 
                 **GNN cluster plot** and **FST plot**.
                              """,
