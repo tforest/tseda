@@ -161,7 +161,6 @@ class Tree(View):
         )
         return sidebar_content
 
-
     @param.depends("search_by.value", watch=True)
     def sidebar(self):
         return self.update_sidebar()
@@ -184,12 +183,18 @@ class TreesPage(View):
 
     def sidebar(self):
         return pn.Column(
-            pn.pane.HTML("<h2 style='margin: 0;'>Trees</h2>", sizing_mode="stretch_width"),
-            pn.pane.Markdown("""
+            pn.pane.HTML(
+                "<h2 style='margin: 0;'>Trees</h2>",
+                sizing_mode="stretch_width",
+            ),
+            pn.pane.Markdown(
+                """
             This section allows you to explore local genealogical trees. 
             
             Use the controls below to customize the plots and adjust parameters.
-            """, sizing_mode="stretch_width"),
+            """,
+                sizing_mode="stretch_width",
+            ),
             self.data.sidebar,
             self.sample_sets.sidebar_table,
         )

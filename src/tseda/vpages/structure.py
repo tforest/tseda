@@ -117,9 +117,15 @@ class StructurePage(View):
             self.gnn,
             self.fst,
         )
-    
+
     def sidebar(self):
         return pn.Column(
-            pn.pane.HTML("<h2 style='margin: 0;'>Structure</h2>", sizing_mode="stretch_width"),
-            pn.pane.Markdown("This section provides an analysis of the **population structure** based on genomic data. You can explore two types of plots: **GNN cluster plot** and **FST plot**.", sizing_mode="stretch_width"),
+            pn.pane.HTML(
+                "<h2 style='margin: 0;'>Structure</h2>",
+                sizing_mode="stretch_width",
+            ),
+            pn.pane.Markdown(
+                "This section provides an analysis of the **population structure** based on genomic data. You can explore two types of plots: **GNN cluster plot** and **FST plot**.",
+                sizing_mode="stretch_width",
+            ),
         )

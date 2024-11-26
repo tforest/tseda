@@ -309,12 +309,18 @@ class StatsPage(View):
 
     def sidebar(self):
         return pn.Column(
-            pn.pane.HTML("<h2 style='margin: 0;'>Statistics</h2>", sizing_mode="stretch_width"),
-            pn.pane.Markdown("""
+            pn.pane.HTML(
+                "<h2 style='margin: 0;'>Statistics</h2>",
+                sizing_mode="stretch_width",
+            ),
+            pn.pane.Markdown(
+                """
             This section provides **population genetic statistics** to analyze genetic variation and divergence among sample sets.
 
             Use the controls below to customize the plots and adjust parameters.
-            """, sizing_mode="stretch_width"),
+            """,
+                sizing_mode="stretch_width",
+            ),
             self.oneway.sidebar,
             self.multiway.sidebar,
         )

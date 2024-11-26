@@ -35,11 +35,17 @@ class SampleSetsPage(View):
 
     def sidebar(self):
         return pn.Column(
-            pn.pane.HTML("<h2 style='margin: 0;'>Sample Sets</h2>", sizing_mode="stretch_width"),
-            pn.pane.Markdown("""
+            pn.pane.HTML(
+                "<h2 style='margin: 0;'>Sample Sets</h2>",
+                sizing_mode="stretch_width",
+            ),
+            pn.pane.Markdown(
+                """
             This section allows you to manage and customize Sample Sets.
             
             Use the controls below to add new samples.
-            """, sizing_mode="stretch_width"),
-            self.data.sidebar
+            """,
+                sizing_mode="stretch_width",
+            ),
+            self.data.sidebar,
         )
