@@ -18,11 +18,6 @@ from .core import View
 hv.extension("bokeh")
 
 
-def eval_options(options):
-    """Evaluate options parameter."""
-    return ast.literal_eval(options)
-
-
 class Tree(View):
     search_by = pn.widgets.ToggleGroup(
         name="Search By",
@@ -44,13 +39,6 @@ class Tree(View):
 
     width = param.Integer(default=750, doc="Width of the tree plot")
     height = param.Integer(default=520, doc="Height of the tree plot")
-    options = param.String(
-        default="{'y_axis': 'time', 'node_labels': {}}",
-        doc=(
-            "Additional options for configuring tree plot. "
-            "Must be a valid dictionary string."
-        ),
-    )
     next = param.Action(
         lambda x: x.next_tree(), doc="Next tree", label="Next tree"
     )
@@ -58,6 +46,7 @@ class Tree(View):
         lambda x: x.prev_tree(), doc="Previous tree", label="Previous tree"
     )
 
+    y_axis = pn.widgets.Checkbox(name='Y-axis', value=True)
     symbol_size = param.Number(default=8, bounds=(0, None), doc="Symbol size")
 
     def next_tree(self):
@@ -105,11 +94,8 @@ class Tree(View):
         else:
             self.warning_pane.visible = False
 
-    @param.depends(
-        "width", "height", "position", "options", "symbol_size", "tree_index"
-    )
+    @param.depends("width", "height", "position", "symbol_size", "tree_index", "y_axis.value")
     def __panel__(self):
-        options = eval_options(self.options)
         if self.position is not None:
             tree = self.datastore.tsm.ts.at(self.position)
             self.tree_index = tree.index
@@ -125,8 +111,8 @@ class Tree(View):
                 tree.draw_svg(
                     size=(self.width, self.height),
                     symbol_size=self.symbol_size,
+                    y_axis=self.y_axis.value,
                     style=self.default_css,
-                    **options,
                 ),
             ),
             pn.Row(
@@ -149,8 +135,6 @@ class Tree(View):
                 *fields,
                 self.param.width,
                 self.param.height,
-                self.param.options,
-                self.param.symbol_size,
                 collapsed=False,
                 title="Tree plotting options",
                 header_background=config.SIDEBAR_BACKGROUND,
@@ -164,6 +148,21 @@ class Tree(View):
     @param.depends("search_by.value", watch=True)
     def sidebar(self):
         return self.update_sidebar()
+
+    def advanced_options(self):
+        sidebar_content = pn.Column(
+            pn.Card(
+                pn.pane.HTML("Include"),
+                self.y_axis,
+                self.param.symbol_size,
+                collapsed=True,
+                title="Advanced plotting options",
+                header_background=config.SIDEBAR_BACKGROUND,
+                active_header_background=config.SIDEBAR_BACKGROUND,
+                styles=config.VCARD_STYLE,
+            )
+        )
+        return sidebar_content
 
 
 class TreesPage(View):
@@ -184,5 +183,6 @@ class TreesPage(View):
     def sidebar(self):
         return pn.Column(
             self.data.sidebar,
+            self.data.advanced_options,
             self.sample_sets.sidebar_table,
         )
