@@ -336,7 +336,8 @@ class IGNNPage(View):
             This section provides interactive visualizations for 
             **Genealogical Nearest Neighbors (GNN)** analysis.
             
-            Use the controls below to customize the plots and adjust parameters.
+            Use the controls below to customize the plots and 
+            adjust parameters.
             """,
                 sizing_mode="stretch_width",
             ),

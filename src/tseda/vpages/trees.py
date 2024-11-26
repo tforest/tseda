@@ -191,7 +191,8 @@ class TreesPage(View):
                 """
             This section allows you to explore local genealogical trees. 
             
-            Use the controls below to customize the plots and adjust parameters.
+            Use the controls below to customize the plots and 
+            adjust parameters.
             """,
                 sizing_mode="stretch_width",
             ),

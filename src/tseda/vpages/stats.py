@@ -315,9 +315,12 @@ class StatsPage(View):
             ),
             pn.pane.Markdown(
                 """
-            This section provides **population genetic statistics** to analyze genetic variation and divergence among sample sets.
+            This section provides **population genetic statistics** 
+            to analyze genetic variation and divergence 
+            among sample sets.
 
-            Use the controls below to customize the plots and adjust parameters.
+            Use the controls below to customize the plots and 
+            adjust parameters.
             """,
                 sizing_mode="stretch_width",
             ),
