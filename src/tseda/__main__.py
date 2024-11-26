@@ -86,7 +86,6 @@ def serve(path, port, show, log_level, no_log_filter, admin):
 
     tsm = TSModel(path)
     individuals_table, sample_sets_table = datastore.preprocess(tsm)
-    individuals_table.data.rx.value["selected"] = False 
 
     logger.info("Starting panel server")
     app_ = app.DataStoreApp(

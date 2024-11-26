@@ -34,15 +34,15 @@ tiles_options = {
 
 
 class GeoMap(View):
-
     tiles_selector = param.Selector(
         default="WorldPhysical",
         objects=list(tiles_options.keys()),
         doc="Select XYZ tiles for map",
     )
     tiles = tiles_options[tiles_selector.default]
+    refresh_button = pn.widgets.Button(name="Refresh map")
 
-    @pn.depends("tiles_selector")
+    @pn.depends("refresh_button.value")
     def __panel__(self):
         self.tiles = tiles_options[self.tiles_selector]
         df = self.datastore.individuals_table.data.rx.value
@@ -54,13 +54,16 @@ class GeoMap(View):
         )
         color = color.loc[~gdf.geometry.is_empty.values]
         gdf = gdf[~gdf.geometry.is_empty]
+
         if gdf.empty:
             gdf = geopandas.GeoDataFrame(
-                df,
-                geometry= geopandas.points_from_xy([0.0], [0.0]),
-                )
-            
-            return gdf.hvplot( #TODO: should make these repeated param values defined in one place
+                pd.DataFrame(index=[0]),
+                geometry=geopandas.points_from_xy([0.0], [0.0]),
+            )
+
+            return gdf.hvplot(  # repeating parameters suboptimal
+                # but defining them in one place
+                # throws an error
                 geo=True,
                 tiles=self.tiles,
                 tiles_opts={"alpha": 0.5},
@@ -70,7 +73,6 @@ class GeoMap(View):
                 xlim=(-180, 180),
                 ylim=(-60, 70),
                 tools=["wheel_zoom", "box_select", "tap", "pan", "reset"],
-
                 hover_cols=None,
                 size=100,
                 color=None,
@@ -88,7 +90,6 @@ class GeoMap(View):
                 xlim=(-180, 180),
                 ylim=(-60, 70),
                 tools=["wheel_zoom", "box_select", "tap", "pan", "reset"],
-
                 hover_cols=["name", "population", "sample_set_id"],
                 size=100,
                 color=color,
@@ -99,6 +100,7 @@ class GeoMap(View):
     def sidebar(self):
         return pn.Card(
             self.param.tiles_selector,
+            self.refresh_button,
             collapsed=False,
             title="Map options",
             header_background=config.SIDEBAR_BACKGROUND,
