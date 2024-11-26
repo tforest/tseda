@@ -56,47 +56,39 @@ class GeoMap(View):
         color = color.loc[~gdf.geometry.is_empty.values]
         gdf = gdf[~gdf.geometry.is_empty]
 
+        kw = {
+            "geo": True,
+            "tiles": self.tiles,
+            "tiles_opts": {"alpha": 0.5},
+            "responsive": True,
+            "max_height": 200,
+            "min_height": 199,
+            "xlim": (-180, 180),
+            "ylim": (-60, 70),
+            "tools": ["wheel_zoom", "box_select", "tap", "pan", "reset"],
+        }
+
         if gdf.empty:
             gdf = geopandas.GeoDataFrame(
                 pd.DataFrame(index=[0]),
                 geometry=geopandas.points_from_xy([0.0], [0.0]),
             )
-
-            return gdf.hvplot(  # repeating parameters suboptimal
-                # but defining them in one place
-                # throws an error
-                geo=True,
-                tiles=self.tiles,
-                tiles_opts={"alpha": 0.5},
-                responsive=True,
-                max_height=200,
-                min_height=199,
-                xlim=(-180, 180),
-                ylim=(-60, 70),
-                tools=["wheel_zoom", "box_select", "tap", "pan", "reset"],
+            return gdf.hvplot(
+                **kw,
                 hover_cols=None,
                 size=100,
                 color=None,
                 fill_alpha=0.0,
                 line_color=None,
             )
-        else:
-            return gdf.hvplot(
-                geo=True,
-                tiles=self.tiles,
-                tiles_opts={"alpha": 0.5},
-                responsive=True,
-                max_height=200,
-                min_height=199,
-                xlim=(-180, 180),
-                ylim=(-60, 70),
-                tools=["wheel_zoom", "box_select", "tap", "pan", "reset"],
-                hover_cols=["name", "population", "sample_set_id"],
-                size=100,
-                color=color,
-                fill_alpha=0.5,
-                line_color="black",
-            )
+        return gdf.hvplot(
+            **kw,
+            hover_cols=["name", "population", "sample_set_id"],
+            size=100,
+            color=color,
+            fill_alpha=0.5,
+            line_color="black",
+        )
 
     def sidebar(self):
         return pn.Card(
