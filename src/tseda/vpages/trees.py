@@ -159,7 +159,9 @@ class Tree(View):
     def advanced_options(self):
         sidebar_content = pn.Column(
             pn.Card(
-                pn.pane.HTML("<b>See the <a href='https://tskit.dev/tskit/docs/stable/python-api.html#tskit.TreeSequence.draw_svg'>tskit documentation</a> for more information about these plotting options.<b>"),
+                pn.pane.HTML(
+                    "<b>See the <a href='https://tskit.dev/tskit/docs/stable/python-api.html#tskit.TreeSequence.draw_svg'>tskit documentation</a> for more information about these plotting options.<b>"
+                ),
                 pn.pane.HTML("Include"),
                 self.y_axis,
                 self.param.symbol_size,
