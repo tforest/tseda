@@ -101,12 +101,8 @@ class DataStoreApp(Viewer):
 
         @pn.depends(header_selector.param.value)
         def get_sidebar(selected_page):
-            pages_no_settings = ["Overview", "Structure"]
-            if selected_page in pages_no_settings:
-                yield None
-            else:
-                yield self.spinner
-                yield self.pages[selected_page].sidebar
+            yield self.spinner
+            yield self.pages[selected_page].sidebar
 
         self._template = pn.template.FastListTemplate(
             title=self.datastore.tsm.name[:75] + "..."

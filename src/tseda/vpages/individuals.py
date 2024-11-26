@@ -34,6 +34,12 @@ class IndividualsPage(View):
 
     def sidebar(self):
         return pn.Column(
+            pn.pane.HTML("<h2 style='margin: 0;'>Individuals</h2>", sizing_mode="stretch_width"),
+            pn.pane.Markdown("""
+            This section allows you to manage and explore individual samples in your dataset.
+            
+            Use the controls below to customize the plots and adjust parameters.
+            """, sizing_mode="stretch_width"),
             self.geomap.sidebar,
             self.data.options_sidebar,
             self.data.modification_sidebar,
