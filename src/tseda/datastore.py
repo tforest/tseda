@@ -84,10 +84,10 @@ class IndividualsTable(Viewer):
         doc=("Reassign individuals with this population ID."),
     )
     sample_set_to = param.Integer(
-        label="New sample ID",
+        label="New sample set ID",
         default=None,
         bounds=(0, None),
-        doc=("Reassign individuals to this sample ID."),
+        doc=("Reassign individuals to this sample set ID."),
     )
     mod_update_button = pn.widgets.Button(name="Update")
 
@@ -215,7 +215,7 @@ class IndividualsTable(Viewer):
             formatters=self.formatters,
             editors=self.editors,
             margin=10,
-            text_align={col: "left" for col in self.columns},
+            text_align={col: "right" for col in self.columns},
             header_filters=self.filters,
         )
         return pn.Column(self.tooltip, table)
