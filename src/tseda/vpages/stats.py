@@ -26,9 +26,10 @@ pn.extension(sizing_mode="stretch_width")
 
 
 # TODO: make sure this is safe
-def eval_sample_sets(sample_sets):
-    """Evaluate sample sets parameter."""
-    return ast.literal_eval(sample_sets)
+def eval_comparisons(comparisons):
+    """Evaluate comparisons parameter."""
+    evaluated = ast.literal_eval(str(comparisons).replace("-", ","))
+    return [tuple(map(int, item.split(","))) for item in evaluated]
 
 
 def eval_indexes(indexes):
@@ -151,14 +152,7 @@ class MultiwayStats(View):
     window_size = param.Integer(
         default=10000, bounds=(1, None), doc="Size of window"
     )
-    indexes = param.String(
-        default="[(0,1)]",
-        doc=(
-            "Comma-separated list of tuples of sample sets "
-            "(0-indexed) indexes to compare."
-        ),
-    )
-    multi_choice = pn.widgets.MultiChoice(
+    comparisons = pn.widgets.MultiChoice(
         name="Comparisons", description="Choose indexes to compare."
     )
 
@@ -195,22 +189,19 @@ class MultiwayStats(View):
         )
 
     @pn.depends(
-        "mode",
-        "statistic",
-        "window_size",
-        "indexes",
-        "colormap",
+        "mode", "statistic", "window_size", "colormap", "comparisons.value"
     )
     def set_multichoice_options(self):
         all_comparisons = list(
-            itertools.combinations(
+            f"{x}-{y}"
+            for x, y in itertools.combinations(
                 self.datastore.individuals_table.selected_sample_set_indices(),
                 2,
             )
         )
-        self.multi_choice.options = all_comparisons
-        if self.multi_choice.value == []:
-            self.multi_choice.value = [all_comparisons[0]]
+        self.comparisons.options = all_comparisons
+        if self.comparisons.value == []:
+            self.comparisons.value = [all_comparisons[0]]
 
     def __panel__(self):
         self.set_multichoice_options()
@@ -218,15 +209,13 @@ class MultiwayStats(View):
         data = None
         tsm = self.datastore.tsm
         windows = []
-        indexes_list = []
         colormap_list = []
         windows = make_windows(self.window_size, tsm.ts.sequence_length)
-        indexes_list = eval_indexes(self.indexes)
+        comparisons = eval_comparisons(self.comparisons.value)
 
         sample_sets_list = (
             self.datastore.individuals_table.selected_sample_set_indices()
         )
-        all_indexes = [indexes for pair in indexes_list for indexes in pair]
         if len(sample_sets_list) < 2:
             return self.sample_select_warning
         sample_sets = self.datastore.individuals_table.get_sample_sets()
@@ -234,14 +223,14 @@ class MultiwayStats(View):
             data = tsm.ts.Fst(
                 sample_sets,
                 windows=windows,
-                indexes=indexes_list,
+                indexes=comparisons,
                 mode=self.mode,
             )
         elif self.statistic == "divergence":
             data = tsm.ts.divergence(
                 sample_sets,
                 windows=windows,
-                indexes=indexes_list,
+                indexes=comparisons,
                 mode=self.mode,
             )
         else:
@@ -256,7 +245,7 @@ class MultiwayStats(View):
                         sample_sets_table.loc(j)["name"],
                     ]
                 )
-                for i, j in indexes_list
+                for i, j in comparisons
             ],
         )
         position = hv.Dimension(
@@ -285,8 +274,7 @@ class MultiwayStats(View):
             self.param.mode,
             self.param.statistic,
             self.param.window_size,
-            self.param.indexes,
-            self.multi_choice,
+            self.comparisons,
             self.param.colormap,
             collapsed=False,
             title="Multiway statistics plotting options",
