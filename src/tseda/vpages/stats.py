@@ -197,7 +197,7 @@ class MultiwayStats(View):
             )
         )
         self.comparisons.options = all_comparisons
-        if self.comparisons.value == []:
+        if self.comparisons.value == [] and all_comparisons != []:
             self.comparisons.value = [all_comparisons[0]]
 
     @pn.depends(
