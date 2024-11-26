@@ -46,7 +46,7 @@ class Tree(View):
         lambda x: x.prev_tree(), doc="Previous tree", label="Previous tree"
     )
 
-    y_axis = pn.widgets.Checkbox(name='Y-axis', value=True)
+    y_axis = pn.widgets.Checkbox(name="Y-axis", value=True)
     symbol_size = param.Number(default=8, bounds=(0, None), doc="Symbol size")
 
     def next_tree(self):
@@ -94,7 +94,14 @@ class Tree(View):
         else:
             self.warning_pane.visible = False
 
-    @param.depends("width", "height", "position", "symbol_size", "tree_index", "y_axis.value")
+    @param.depends(
+        "width",
+        "height",
+        "position",
+        "symbol_size",
+        "tree_index",
+        "y_axis.value",
+    )
     def __panel__(self):
         if self.position is not None:
             tree = self.datastore.tsm.ts.at(self.position)
