@@ -274,7 +274,7 @@ class MultiwayStats(View):
             self.param.mode,
             self.param.statistic,
             self.param.window_size,
-            # self.comparisons,
+            self.comparisons,
             self.param.colormap,
             collapsed=False,
             title="Multiway statistics plotting options",
