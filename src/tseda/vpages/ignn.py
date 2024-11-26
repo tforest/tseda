@@ -332,13 +332,13 @@ class IGNNPage(View):
                 "<h2 style='margin: 0;'>iGNN</h2>", sizing_mode="stretch_width"
             ),
             pn.pane.Markdown(
-                """
-            This section provides interactive visualizations for 
-            **Genealogical Nearest Neighbors (GNN)** analysis.
-            
-            Use the controls below to customize the plots and 
-            adjust parameters.
-            """,
+                (
+                    "This section provides interactive visualizations for "
+                    "**Genealogical Nearest Neighbors "
+                    "(GNN)** analysis.<br><br>"
+                    "Use the controls below to customize the plots and "
+                    "adjust parameters."
+                ),
                 sizing_mode="stretch_width",
             ),
             self.geomap.sidebar,

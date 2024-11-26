@@ -189,8 +189,8 @@ class TreesPage(View):
             ),
             pn.pane.Markdown(
                 (
-                    "This section allows you to explore local genealogical"
-                    "trees.<br>"
+                    "This section allows you to explore local genealogical "
+                    "trees.<br><br>"
                     "Use the controls below to customize the plots and adjust"
                     "parameters."
                 ),

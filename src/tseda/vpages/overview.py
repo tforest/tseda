@@ -17,11 +17,11 @@ class OverviewPage(View):
                 sizing_mode="stretch_width",
             ),
             pn.pane.Markdown(
-                """
-            Welcome to **tseda**! This is a tool that 
-            you can use to analyze your data bla bla bla 
-            come up with something good...
-            """,
+                (
+                    "Welcome to **tseda**! This is a tool that "
+                    "you can use to analyze your data bla bla "
+                    "come up with something good..."
+                ),
                 sizing_mode="stretch_width",
             ),
         )

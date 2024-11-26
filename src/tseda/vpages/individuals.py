@@ -39,13 +39,12 @@ class IndividualsPage(View):
                 sizing_mode="stretch_width",
             ),
             pn.pane.Markdown(
-                """
-            This section allows you to manage and explore 
-            individual samples in your dataset.
-            
-            Use the controls below to customize the plots and 
-            sadjust parameters.
-            """,
+                (
+                    "This section allows you to manage and explore "
+                    "individual samples in your dataset.<br><br>"
+                    "Use the controls below to customize the "
+                    "plots and adjust parameters."
+                ),
                 sizing_mode="stretch_width",
             ),
             self.geomap.sidebar,

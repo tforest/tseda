@@ -40,11 +40,11 @@ class SampleSetsPage(View):
                 sizing_mode="stretch_width",
             ),
             pn.pane.Markdown(
-                """
-            This section allows you to manage and customize Sample Sets.
-            
-            Use the controls below to add new samples.
-            """,
+                (
+                    "This section allows you to manage and "
+                    "customize Sample Sets.<br><br>"
+                    "Use the controls below to add new samples."
+                ),
                 sizing_mode="stretch_width",
             ),
             self.data.sidebar,
