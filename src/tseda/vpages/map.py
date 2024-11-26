@@ -14,6 +14,7 @@ TODO:
 
 import geopandas
 import hvplot.pandas  # noqa
+import pandas as pd
 import panel as pn
 import param
 import xyzservices.providers as xyz
