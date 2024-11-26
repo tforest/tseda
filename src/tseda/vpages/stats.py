@@ -188,9 +188,6 @@ class MultiwayStats(View):
             )
         )
 
-    @pn.depends(
-        "mode", "statistic", "window_size", "colormap", "comparisons.value"
-    )
     def set_multichoice_options(self):
         all_comparisons = list(
             f"{x}-{y}"
@@ -203,6 +200,9 @@ class MultiwayStats(View):
         if self.comparisons.value == []:
             self.comparisons.value = [all_comparisons[0]]
 
+    @pn.depends(
+        "mode", "statistic", "window_size", "colormap", "comparisons.value"
+    )
     def __panel__(self):
         self.set_multichoice_options()
 
