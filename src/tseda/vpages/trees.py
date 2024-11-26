@@ -18,6 +18,11 @@ from .core import View
 hv.extension("bokeh")
 
 
+def eval_options(options):
+    """Evaluate options parameter."""
+    return ast.literal_eval(options)
+
+
 class Tree(View):
     search_by = pn.widgets.ToggleGroup(
         name="Search By",
@@ -31,7 +36,7 @@ class Tree(View):
         default=None, doc="Get tree at genome position (bp)"
     )
 
-    warning_pane = pn.pane.Alert(
+    position_index_warning = pn.pane.Alert(
         "The input for position or tree index is out of bounds.",
         alert_type="warning",
         visible=False,
@@ -47,7 +52,21 @@ class Tree(View):
     )
 
     y_axis = pn.widgets.Checkbox(name="Y-axis", value=True)
+    node_labels = param.String(
+        default="{}",
+        doc=(
+            """Show custom labels for the nodes (specified by ID).
+            Any nodes not present will not have a label."""
+        ),
+    )
+
     symbol_size = param.Number(default=8, bounds=(0, None), doc="Symbol size")
+
+    advanced_warning = pn.pane.Alert(
+        "The inputs for the advanced options are not valid.",
+        alert_type="warning",
+        visible=False,
+    )
 
     def next_tree(self):
         self.position = None
@@ -82,17 +101,17 @@ class Tree(View):
             int(self.position) < 0
             or int(self.position) > self.datastore.tsm.ts.sequence_length
         ):
-            self.warning_pane.visible = True
+            self.position_index_warning.visible = True
             raise ValueError
         if (
             self.tree_index is not None
             and int(self.tree_index) < 0
             or int(self.tree_index) > self.datastore.tsm.ts.num_trees
         ):
-            self.warning_pane.visible = True
+            self.position_index_warning.visible = True
             raise ValueError
         else:
-            self.warning_pane.visible = False
+            self.position_index_warning.visible = False
 
     @param.depends(
         "width",
@@ -101,8 +120,10 @@ class Tree(View):
         "symbol_size",
         "tree_index",
         "y_axis.value",
+        "node_labels",
     )
     def __panel__(self):
+
         if self.position is not None:
             tree = self.datastore.tsm.ts.at(self.position)
             self.tree_index = tree.index
@@ -110,18 +131,29 @@ class Tree(View):
             tree = self.datastore.tsm.ts.at_index(self.tree_index)
         pos1 = int(tree.get_interval()[0])
         pos2 = int(tree.get_interval()[1]) - 1
+        try:
+            node_labels = eval_options(self.node_labels)
+            plot = tree.draw_svg(
+                size=(self.width, self.height),
+                symbol_size=self.symbol_size,
+                y_axis=self.y_axis.value,
+                node_labels=node_labels,
+                style=self.default_css,
+            )
+            self.advanced_warning.visible = False
+        except ValueError or SyntaxError or TypeError:
+            plot = tree.draw_svg(
+                size=(self.width, self.height),
+                y_axis=True,
+                node_labels={},
+                style=self.default_css,
+            )
+            self.advanced_warning.visible = True
         return pn.Column(
             pn.pane.Markdown(
                 f"## Tree index {self.tree_index} (position {pos1} - {pos2})"
             ),
-            pn.pane.HTML(
-                tree.draw_svg(
-                    size=(self.width, self.height),
-                    symbol_size=self.symbol_size,
-                    y_axis=self.y_axis.value,
-                    style=self.default_css,
-                ),
-            ),
+            pn.pane.HTML(plot),
             pn.Row(
                 self.param.prev,
                 self.param.next,
@@ -148,7 +180,7 @@ class Tree(View):
                 active_header_background=config.SIDEBAR_BACKGROUND,
                 styles=config.VCARD_STYLE,
             ),
-            self.warning_pane,
+            self.position_index_warning,
         )
         return sidebar_content
 
@@ -165,12 +197,14 @@ class Tree(View):
                 pn.pane.HTML("Include"),
                 self.y_axis,
                 self.param.symbol_size,
+                self.param.node_labels,
                 collapsed=True,
                 title="Advanced plotting options",
                 header_background=config.SIDEBAR_BACKGROUND,
                 active_header_background=config.SIDEBAR_BACKGROUND,
                 styles=config.VCARD_STYLE,
-            )
+            ),
+            self.advanced_warning,
         )
         return sidebar_content
 
