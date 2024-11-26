@@ -123,7 +123,6 @@ class Tree(View):
         "node_labels",
     )
     def __panel__(self):
-
         if self.position is not None:
             tree = self.datastore.tsm.ts.at(self.position)
             self.tree_index = tree.index
