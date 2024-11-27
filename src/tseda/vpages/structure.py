@@ -63,7 +63,7 @@ class GNN(View):
             # Z-score normalization here!
             return pn.Column(
                 pn.pane.HTML(
-                    "<h2 style='margin: 0;'>GNN cluster plot</h2>",
+                    "<h2 style='margin: 0;'> GNN cluster plot </h2>",
                     sizing_mode="stretch_width",
                 ),
                 mean_gnn.hvplot.heatmap(
