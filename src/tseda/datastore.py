@@ -107,7 +107,6 @@ class IndividualsTable(Viewer):
             "type": "tickCross",
             "tristate": True,
             "indeterminateValue": None,
-            "placeholder": "Enter True/False",
         },
     }
 
@@ -187,16 +186,14 @@ class IndividualsTable(Viewer):
 
     @pn.depends("page_size", "sample_select.value", "mod_update_button.value")
     def __panel__(self):
-        self.data.rx.value["selected"] = False
-        if (
-            isinstance(self.sample_select.value, list)
-            and self.sample_select.value
-        ):
+        if isinstance(self.sample_select.value, list):
+            self.data.rx.value["selected"] = False
             for sample_set_id in self.sample_select.value:
                 self.data.rx.value.loc[
                     self.data.rx.value.sample_set_id == sample_set_id,
                     "selected",
                 ] = True
+
         if self.sample_set_to is not None:
             if self.population_from is not None:
                 try:

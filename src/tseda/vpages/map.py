@@ -14,6 +14,7 @@ TODO:
 
 import geopandas
 import hvplot.pandas  # noqa
+import pandas as pd
 import panel as pn
 import param
 import xyzservices.providers as xyz
@@ -34,17 +35,15 @@ tiles_options = {
 
 
 class GeoMap(View):
-    height = param.Integer(default=400, doc="Height of the map")
-    width = param.Integer(default=1200, doc="Width of the map")
-
     tiles_selector = param.Selector(
         default="WorldPhysical",
         objects=list(tiles_options.keys()),
         doc="Select XYZ tiles for map",
     )
     tiles = tiles_options[tiles_selector.default]
+    refresh_button = pn.widgets.Button(name="Refresh map")
 
-    @pn.depends("tiles_selector", "height", "width")
+    @pn.depends("refresh_button.value")
     def __panel__(self):
         self.tiles = tiles_options[self.tiles_selector]
         df = self.datastore.individuals_table.data.rx.value
@@ -56,24 +55,45 @@ class GeoMap(View):
         )
         color = color.loc[~gdf.geometry.is_empty.values]
         gdf = gdf[~gdf.geometry.is_empty]
-        return gdf.hvplot.points(
+
+        kw = {
+            "geo": True,
+            "tiles": self.tiles,
+            "tiles_opts": {"alpha": 0.5},
+            "responsive": True,
+            "max_height": 200,
+            "min_height": 199,
+            "xlim": (-180, 180),
+            "ylim": (-60, 70),
+            "tools": ["wheel_zoom", "box_select", "tap", "pan", "reset"],
+        }
+
+        if gdf.empty:
+            gdf = geopandas.GeoDataFrame(
+                pd.DataFrame(index=[0]),
+                geometry=geopandas.points_from_xy([0.0], [0.0]),
+            )
+            return gdf.hvplot(
+                **kw,
+                hover_cols=None,
+                size=100,
+                color=None,
+                fill_alpha=0.0,
+                line_color=None,
+            )
+        return gdf.hvplot(
+            **kw,
             hover_cols=["name", "population", "sample_set_id"],
-            geo=True,
-            tiles=self.tiles,
-            tiles_opts={"alpha": 0.5},
-            max_height=self.height,
-            min_height=self.height,
             size=100,
             color=color,
-            tools=["wheel_zoom", "box_select", "tap", "pan", "reset"],
             fill_alpha=0.5,
             line_color="black",
-            responsive=True,
         )
 
     def sidebar(self):
         return pn.Card(
             self.param.tiles_selector,
+            self.refresh_button,
             collapsed=False,
             title="Map options",
             header_background=config.SIDEBAR_BACKGROUND,
