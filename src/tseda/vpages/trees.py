@@ -228,8 +228,10 @@ class Tree(View):
             pn.Card(
                 pn.pane.HTML(
                     """<b>See the <a 
-                    href='https://tskit.dev/tskit/docs/stable/python-api.html#tskit.TreeSequence.draw_svg'>
-                    tskit documentation</a> for more information about these plotting options.<b>"""
+                    href='https://tskit.dev/tskit/docs/stable/
+                    python-api.html#tskit.TreeSequence.draw_svg'>
+                    tskit documentation</a> for more information
+                    about these plotting options.<b>"""
                 ),
                 pn.pane.HTML("Include"),
                 self.x_axis,
