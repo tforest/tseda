@@ -52,11 +52,15 @@ class Tree(View):
     )
 
     y_axis = pn.widgets.Checkbox(name="Y-axis", value=True)
+    x_axis = pn.widgets.Checkbox(name="X-axis", value=False)
+    sites_mutations = pn.widgets.Checkbox(name="Sites and mutations", value=True)
     node_labels = param.String(
         default="{}",
         doc=(
             """Show custom labels for the nodes (specified by ID).
-            Any nodes not present will not have a label."""
+            Any nodes not present will not have a label.
+            Examle: {1: 'label1', 2: 'label2',...}"""
+
         ),
     )
 
@@ -120,6 +124,8 @@ class Tree(View):
         "symbol_size",
         "tree_index",
         "y_axis.value",
+        "x_axis.value",
+        "sites_mutations.value",
         "node_labels",
     )
     def __panel__(self):
@@ -130,12 +136,18 @@ class Tree(View):
             tree = self.datastore.tsm.ts.at_index(self.tree_index)
         pos1 = int(tree.get_interval()[0])
         pos2 = int(tree.get_interval()[1]) - 1
+        if self.sites_mutations.value == True:
+            omit_sites = False
+        else:
+            omit_sites = True
         try:
             node_labels = eval_options(self.node_labels)
             plot = tree.draw_svg(
                 size=(self.width, self.height),
                 symbol_size=self.symbol_size,
                 y_axis=self.y_axis.value,
+                x_axis = self.x_axis.value,
+                omit_sites = omit_sites,
                 node_labels=node_labels,
                 style=self.default_css,
             )
@@ -195,6 +207,8 @@ class Tree(View):
                 ),
                 pn.pane.HTML("Include"),
                 self.y_axis,
+                self.x_axis,
+                self.sites_mutations,
                 self.param.symbol_size,
                 self.param.node_labels,
                 collapsed=True,
