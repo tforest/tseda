@@ -52,15 +52,25 @@ class Tree(View):
     )
 
     y_axis = pn.widgets.Checkbox(name="Y-axis", value=True)
+    y_ticks = pn.widgets.Checkbox(name="Y-ticks", value=True)
     x_axis = pn.widgets.Checkbox(name="X-axis", value=False)
-    sites_mutations = pn.widgets.Checkbox(name="Sites and mutations", value=True)
+    sites_mutations = pn.widgets.Checkbox(
+        name="Sites and mutations", value=True
+    )
     node_labels = param.String(
         default="{}",
         doc=(
             """Show custom labels for the nodes (specified by ID).
             Any nodes not present will not have a label.
             Examle: {1: 'label1', 2: 'label2',...}"""
-
+        ),
+    )
+    more_options = param.String(
+        default="{}",
+        doc=(
+            """Add more options as specified by the documentation.
+            Must be a valid dictionary.
+            Examle: {'title': 'My Tree',...}"""
         ),
     )
 
@@ -117,6 +127,22 @@ class Tree(View):
         else:
             self.position_index_warning.visible = False
 
+    def handle_advanced(self):
+        if self.sites_mutations.value == True:
+            omit_sites = False
+        else:
+            omit_sites = True
+        if self.y_ticks.value == True:
+            y_ticks = None
+        else:
+            y_ticks = {}
+        if self.node_labels == "":
+            self.node_labels = "{}"
+        if self.more_options == "":
+            self.node_options = "{}"
+        return omit_sites, y_ticks
+    
+
     @param.depends(
         "width",
         "height",
@@ -124,9 +150,11 @@ class Tree(View):
         "symbol_size",
         "tree_index",
         "y_axis.value",
+        "y_ticks.value",
         "x_axis.value",
         "sites_mutations.value",
         "node_labels",
+        "more_options",
     )
     def __panel__(self):
         if self.position is not None:
@@ -136,23 +164,23 @@ class Tree(View):
             tree = self.datastore.tsm.ts.at_index(self.tree_index)
         pos1 = int(tree.get_interval()[0])
         pos2 = int(tree.get_interval()[1]) - 1
-        if self.sites_mutations.value == True:
-            omit_sites = False
-        else:
-            omit_sites = True
         try:
+            omit_sites, y_ticks = self.handle_advanced()
             node_labels = eval_options(self.node_labels)
+            more_options = eval_options(self.more_options)
             plot = tree.draw_svg(
                 size=(self.width, self.height),
                 symbol_size=self.symbol_size,
                 y_axis=self.y_axis.value,
-                x_axis = self.x_axis.value,
-                omit_sites = omit_sites,
+                x_axis=self.x_axis.value,
+                omit_sites=omit_sites,
                 node_labels=node_labels,
+                y_ticks=y_ticks,
                 style=self.default_css,
+                **more_options,
             )
             self.advanced_warning.visible = False
-        except ValueError or SyntaxError or TypeError:
+        except (ValueError, SyntaxError, TypeError) as e:
             plot = tree.draw_svg(
                 size=(self.width, self.height),
                 y_axis=True,
@@ -206,11 +234,13 @@ class Tree(View):
                     "<b>See the <a href='https://tskit.dev/tskit/docs/stable/python-api.html#tskit.TreeSequence.draw_svg'>tskit documentation</a> for more information about these plotting options.<b>"
                 ),
                 pn.pane.HTML("Include"),
-                self.y_axis,
                 self.x_axis,
+                self.y_axis,
+                self.y_ticks,
                 self.sites_mutations,
                 self.param.symbol_size,
                 self.param.node_labels,
+                self.param.more_options,
                 collapsed=True,
                 title="Advanced plotting options",
                 header_background=config.SIDEBAR_BACKGROUND,
