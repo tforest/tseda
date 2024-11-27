@@ -232,7 +232,7 @@ class IndividualsTable(Viewer):
             styles=config.VCARD_STYLE,
         )
 
-    modification_header = pn.pane.Markdown("#### Batch reassign indivuduals:")
+    modification_header = pn.pane.Markdown("#### Batch reassign individuals:")
 
     def modification_sidebar(self):
         return pn.Card(
@@ -353,7 +353,7 @@ class SampleSetsTable(Viewer):
             collapsed=True,
             header_background=config.SIDEBAR_BACKGROUND,
             active_header_background=config.SIDEBAR_BACKGROUND,
-            styles=config.VCARD_STYLE,
+            styles=config.VCARD_STYLE
         )
 
     def sidebar(self):
