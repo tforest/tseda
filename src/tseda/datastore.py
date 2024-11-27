@@ -232,7 +232,7 @@ class IndividualsTable(Viewer):
             styles=config.VCARD_STYLE,
         )
 
-    modification_header = pn.pane.Markdown("#### Batch reassign individuals:")
+    modification_header = pn.pane.HTML("<h4 style='margin: 0;'>Batch reassign individuals</h4>")
 
     def modification_sidebar(self):
         return pn.Card(
