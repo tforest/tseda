@@ -130,7 +130,7 @@ class Tree(View):
     def handle_advanced(self):
         if type(self.sites_mutations.value) == bool:
             omit_sites = not self.sites_mutations.value
-        else: 
+        else:
             omit_sites = False
         if self.y_ticks.value is True:
             y_ticks = None
