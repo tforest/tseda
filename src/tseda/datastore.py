@@ -136,10 +136,6 @@ class IndividualsTable(Viewer):
             ),
         )
 
-    def sample_set_indices(self):
-        """Return indices of sample groups."""
-        return sorted(self.data.rx.value["sample_set_id"].unique().tolist())
-
     def sample_sets(self):
         sample_sets = {}
         samples = []
@@ -160,6 +156,14 @@ class IndividualsTable(Viewer):
         if indexes:
             return [sample_sets[i] for i in indexes]
         return [sample_sets[i] for i in sample_sets]
+
+    def sample_set_indices(self):
+        """Return indices of sample groups."""
+        return sorted(self.data.rx.value["sample_set_id"].unique().tolist())
+
+    def selected_sample_set_indices(self):
+        samples, sample_sets = self.sample_sets()
+        return list(sample_sets.keys())
 
     @property
     def sample2ind(self):

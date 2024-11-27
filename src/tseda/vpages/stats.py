@@ -9,6 +9,7 @@ TODO:
 """
 
 import ast
+import itertools
 
 import holoviews as hv
 import pandas as pd
@@ -25,9 +26,10 @@ pn.extension(sizing_mode="stretch_width")
 
 
 # TODO: make sure this is safe
-def eval_sample_sets(sample_sets):
-    """Evaluate sample sets parameter."""
-    return ast.literal_eval(sample_sets)
+def eval_comparisons(comparisons):
+    """Evaluate comparisons parameter."""
+    evaluated = ast.literal_eval(str(comparisons).replace("-", ","))
+    return [tuple(map(int, item.split(","))) for item in evaluated]
 
 
 def eval_indexes(indexes):
@@ -37,9 +39,10 @@ def eval_indexes(indexes):
 
 class OnewayStats(View):
     mode = param.Selector(
-        objects=["branch", "site"],
+        objects=["site"],
         default="site",
-        doc="Select mode for statistics.",
+        doc="""Select mode (site or branch) for statistics. 
+        Branch mode is only available for calibrated data.""",
     )
     statistic = param.Selector(
         objects=["Tajimas_D", "diversity"],
@@ -49,9 +52,11 @@ class OnewayStats(View):
     window_size = param.Integer(
         default=10000, bounds=(1, None), doc="Size of window"
     )
-    sample_sets = param.String(
-        default="[0,1]",
-        doc="Comma-separated list of sample sets (0-indexed) to plot.",
+
+    sample_select_warning = pn.pane.Alert(
+        """Select at least 1 sample set to see this plot.
+        Sample sets are selected on the Individuals page""",
+        alert_type="warning",
     )
 
     @property
@@ -63,19 +68,23 @@ class OnewayStats(View):
             )
         )
 
-    @param.depends("mode", "statistic", "window_size", "sample_sets")
+    def __init__(self, **params):
+        super().__init__(**params)
+        if self.datastore.tsm.ts.time_units != "uncalibrated":
+            self.param.mode.objects = ["branch", "site"]
+
+    @param.depends("mode", "statistic", "window_size")
     def __panel__(self):
         data = None
         windows = make_windows(
             self.window_size, self.datastore.tsm.ts.sequence_length
         )
-        sample_sets_list = eval_sample_sets(self.sample_sets)
-        try:
-            sample_sets = self.datastore.individuals_table.get_sample_sets(
-                sample_sets_list
-            )
-        except KeyError:
-            return pn.pane.Alert("Sample set error. Check sample set indexes.")
+        sample_sets_list = (
+            self.datastore.individuals_table.selected_sample_set_indices()
+        )
+        if len(sample_sets_list) < 1:
+            return self.sample_select_warning
+        sample_sets = self.datastore.individuals_table.get_sample_sets()
 
         if self.statistic == "Tajimas_D":
             data = self.datastore.tsm.ts.Tajimas_D(
@@ -120,7 +129,6 @@ class OnewayStats(View):
             self.param.mode,
             self.param.statistic,
             self.param.window_size,
-            self.param.sample_sets,
             collapsed=False,
             title="Oneway statistics plotting options",
             header_background=config.SIDEBAR_BACKGROUND,
@@ -131,9 +139,10 @@ class OnewayStats(View):
 
 class MultiwayStats(View):
     mode = param.Selector(
-        objects=["branch", "site"],
+        objects=["site"],
         default="site",
-        doc="Select mode for statistics.",
+        doc="""Select mode (site or branch) for statistics. 
+        Branch mode is only available for calibrated data.""",
     )
     statistic = param.Selector(
         objects=["Fst", "divergence"],
@@ -143,16 +152,14 @@ class MultiwayStats(View):
     window_size = param.Integer(
         default=10000, bounds=(1, None), doc="Size of window"
     )
-    sample_sets = param.String(
-        default="[0,1,2]",
-        doc="Comma-separated list of sample sets (0-indexed) to compare.",
+    comparisons = pn.widgets.MultiChoice(
+        name="Comparisons", description="Choose indexes to compare."
     )
-    indexes = param.String(
-        default="[(0,1), (0,2), (1,2)]",
-        doc=(
-            "Comma-separated list of tuples of sample sets "
-            "(0-indexed) indexes to compare."
-        ),
+
+    sample_select_warning = pn.pane.Alert(
+        """Select at least 2 sample sets to see this plot.
+        Sample sets are selected on the Individuals page""",
+        alert_type="warning",
     )
     cmaps = {
         cm.name: cm
@@ -167,6 +174,11 @@ class MultiwayStats(View):
         doc="Holoviews colormap for sample set pairs",
     )
 
+    def __init__(self, **params):
+        super().__init__(**params)
+        if self.datastore.tsm.ts.time_units != "uncalibrated":
+            self.param.mode.objects = ["branch", "site"]
+
     @property
     def tooltip(self):
         return pn.widgets.TooltipIcon(
@@ -176,42 +188,49 @@ class MultiwayStats(View):
             )
         )
 
+    def set_multichoice_options(self):
+        all_comparisons = list(
+            f"{x}-{y}"
+            for x, y in itertools.combinations(
+                self.datastore.individuals_table.selected_sample_set_indices(),
+                2,
+            )
+        )
+        self.comparisons.options = all_comparisons
+        if self.comparisons.value == [] and all_comparisons != []:
+            self.comparisons.value = [all_comparisons[0]]
+
     @pn.depends(
-        "mode",
-        "statistic",
-        "window_size",
-        "sample_sets",
-        "indexes",
-        "colormap",
+        "mode", "statistic", "window_size", "colormap", "comparisons.value"
     )
     def __panel__(self):
+        self.set_multichoice_options()
+
         data = None
         tsm = self.datastore.tsm
-        sample_sets_list = []
         windows = []
-        indexes_list = []
         colormap_list = []
         windows = make_windows(self.window_size, tsm.ts.sequence_length)
-        sample_sets_list = eval_sample_sets(self.sample_sets)
-        indexes_list = eval_indexes(self.indexes)
-        try:
-            sample_sets = self.datastore.individuals_table.get_sample_sets(
-                sample_sets_list
-            )
-        except KeyError:
-            return pn.pane.Alert("Sample set error. Check sample set indexes.")
+        comparisons = eval_comparisons(self.comparisons.value)
+
+        sample_sets_list = (
+            self.datastore.individuals_table.selected_sample_set_indices()
+        )
+        if len(sample_sets_list) < 2:
+            return self.sample_select_warning
+        sample_sets = self.datastore.individuals_table.get_sample_sets()
         if self.statistic == "Fst":
             data = tsm.ts.Fst(
                 sample_sets,
                 windows=windows,
-                indexes=indexes_list,
+                indexes=comparisons,
                 mode=self.mode,
             )
         elif self.statistic == "divergence":
             data = tsm.ts.divergence(
                 sample_sets,
                 windows=windows,
-                indexes=indexes_list,
+                indexes=comparisons,
                 mode=self.mode,
             )
         else:
@@ -226,7 +245,7 @@ class MultiwayStats(View):
                         sample_sets_table.loc(j)["name"],
                     ]
                 )
-                for i, j in indexes_list
+                for i, j in comparisons
             ],
         )
         position = hv.Dimension(
@@ -255,8 +274,7 @@ class MultiwayStats(View):
             self.param.mode,
             self.param.statistic,
             self.param.window_size,
-            self.param.sample_sets,
-            self.param.indexes,
+            self.comparisons,
             self.param.colormap,
             collapsed=False,
             title="Multiway statistics plotting options",
