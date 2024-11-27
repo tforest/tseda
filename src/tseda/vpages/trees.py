@@ -128,11 +128,8 @@ class Tree(View):
             self.position_index_warning.visible = False
 
     def handle_advanced(self):
-        if self.sites_mutations.value == True:
-            omit_sites = False
-        else:
-            omit_sites = True
-        if self.y_ticks.value == True:
+        omit_sites = not self.sites_mutations.value
+        if self.y_ticks.value:
             y_ticks = None
         else:
             y_ticks = {}
@@ -179,7 +176,7 @@ class Tree(View):
                 **more_options,
             )
             self.advanced_warning.visible = False
-        except (ValueError, SyntaxError, TypeError) as e:
+        except (ValueError, SyntaxError, TypeError):
             plot = tree.draw_svg(
                 size=(self.width, self.height),
                 y_axis=True,
@@ -230,7 +227,9 @@ class Tree(View):
         sidebar_content = pn.Column(
             pn.Card(
                 pn.pane.HTML(
-                    "<b>See the <a href='https://tskit.dev/tskit/docs/stable/python-api.html#tskit.TreeSequence.draw_svg'>tskit documentation</a> for more information about these plotting options.<b>"
+                    """<b>See the <a 
+                    href='https://tskit.dev/tskit/docs/stable/python-api.html#tskit.TreeSequence.draw_svg'>
+                    tskit documentation</a> for more information about these plotting options.<b>"""
                 ),
                 pn.pane.HTML("Include"),
                 self.x_axis,
