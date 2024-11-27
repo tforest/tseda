@@ -147,8 +147,7 @@ class StructurePage(View):
                 (
                     "This section provides an analysis of the **population "
                     "structure** based on genomic data. "
-                    "You can explore two types of plots: "
-                    "**GNN cluster plot** and **FST plot**."
+                    "You can explore two types of plots"
                 ),
                 sizing_mode="stretch_width",
             ),
