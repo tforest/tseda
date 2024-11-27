@@ -128,10 +128,10 @@ class Tree(View):
             self.position_index_warning.visible = False
 
     def handle_advanced(self):
-        if type(self.sites_mutations.value) == bool:
+        if self.sites_mutations.value is True:
             omit_sites = not self.sites_mutations.value
         else:
-            omit_sites = False
+            omit_sites = True
         if self.y_ticks.value is True:
             y_ticks = None
         else:
