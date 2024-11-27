@@ -141,7 +141,6 @@ class Tree(View):
         if self.more_options == "":
             self.node_options = "{}"
         return omit_sites, y_ticks
-    
 
     @param.depends(
         "width",
