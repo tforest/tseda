@@ -64,12 +64,18 @@ class GNN(View):
             return pn.Column(
                 pn.pane.HTML(
                     "<h2 style='margin: 0;'>GNN cluster plot</h2>",
-                    sizing_mode="stretch_width"
+                    sizing_mode="stretch_width",
                 ),
                 mean_gnn.hvplot.heatmap(
                     cmap=cc.bgy, height=300, responsive=True
                 ),
-                pn.pane.Markdown("**GNN Cluster Plot** - This heatmap visualizes the genealogical relationships between individuals based on the proportions of their genealogical nearest neighbors (GNN)", sizing_mode="stretch_width"),
+                pn.pane.Markdown(
+                    "**GNN Cluster Plot** - This heatmap visualizes the "
+                    "genealogical relationships between individuals based on "
+                    "the proportions of their genealogical nearest neighbors "
+                    "(GNN).",
+                    sizing_mode="stretch_width",
+                ),
                 pn.pane.Markdown("FIXME: dendrogram and Z-score\n"),
             )
 
@@ -100,10 +106,15 @@ class Fst(View):
             return pn.Column(
                 pn.pane.HTML(
                     "<h2 style='margin: 0;'>Fst</h2>",
-                    sizing_mode="stretch_width"
+                    sizing_mode="stretch_width",
                 ),
                 df.hvplot.heatmap(cmap=cc.bgy, height=300, responsive=True),
-                pn.pane.Markdown("**Fst Plot** - Shows the fixation index (Fst) between different sample sets, allowing comparison of genetic diversity across populations.", sizing_mode="stretch_width")
+                pn.pane.Markdown(
+                    "**Fst Plot** - Shows the fixation index (Fst) between "
+                    "different sample sets, allowing comparison of genetic "
+                    "diversity across populations.",
+                    sizing_mode="stretch_width",
+                ),
             )
 
 

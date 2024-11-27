@@ -118,8 +118,10 @@ class Tree(View):
         pos1 = int(tree.get_interval()[0])
         pos2 = int(tree.get_interval()[1]) - 1
         return pn.Column(
-            pn.pane.Markdown(
-                f"## Tree index {self.tree_index} (position {pos1} - {pos2})"
+            pn.pane.HTML(
+                f"<h2>Tree index {self.tree_index}"
+                f" (position {pos1} - {pos2})</h2>",
+                sizing_mode="stretch_width",
             ),
             pn.pane.HTML(
                 tree.draw_svg(

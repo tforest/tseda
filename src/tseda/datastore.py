@@ -353,7 +353,7 @@ class SampleSetsTable(Viewer):
             collapsed=True,
             header_background=config.SIDEBAR_BACKGROUND,
             active_header_background=config.SIDEBAR_BACKGROUND,
-            styles=config.VCARD_STYLE
+            styles=config.VCARD_STYLE,
         )
 
     def sidebar(self):
