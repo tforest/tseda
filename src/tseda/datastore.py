@@ -264,9 +264,9 @@ class SampleSetsTable(Viewer):
     }
 
     create_sample_set_textinput = param.String(
-        doc="New sample set name. Press Enter (⏎) to create.",
+        doc="Enter name of new sample set. Press Enter (⏎) to create.",
         default=None,
-        label="New sample set name",
+        label="Create new sample set",
     )
 
     warning_pane = pn.pane.Alert(
