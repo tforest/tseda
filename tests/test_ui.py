@@ -35,7 +35,9 @@ def test_component(page, port, ds):
     expect(page.get_by_text("GNN cluster plot").nth(0)).to_be_visible()
 
     page.get_by_role("button", name="iGNN").click()
-    expect(page.get_by_text("Sample sets table quick view").nth(0)).to_be_visible()
+    expect(
+        page.get_by_text("Sample sets table quick view").nth(0)
+    ).to_be_visible()
 
     page.get_by_role("button", name="Statistics").click()
     expect(
