@@ -24,7 +24,7 @@ def test_component(page, port, ds):
     page.set_viewport_size({"width": 1920, "height": 1080})
 
     page.get_by_role("button", name="Sample Sets").click()
-    expect(page.get_by_text("New sample set name")).to_be_visible()
+    expect(page.get_by_text("Create new sample set")).to_be_visible()
     expect(page.get_by_text("predefined")).to_be_visible()
 
     page.get_by_role("button", name="Individuals").click()
