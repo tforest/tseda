@@ -70,7 +70,7 @@ class GNN(View):
                     cmap=cc.bgy, height=300, responsive=True
                 ),
                 pn.pane.Markdown(
-                    "**GNN Cluster Plot** - This heatmap visualizes the "
+                    " This heatmap visualizes the "
                     "genealogical relationships between individuals based on "
                     "the proportions of their genealogical nearest neighbors "
                     "(GNN).",
