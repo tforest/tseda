@@ -256,11 +256,9 @@ class IndividualsTable(Viewer):
 
     def modification_sidebar(self):
         return pn.Card(
-            pn.Column(
-                self.modification_header,
-                pn.Row(self.param.population_from, self.param.sample_set_to),
-                self.mod_update_button,
-            ),
+            self.modification_header,
+            pn.Row(self.param.population_from, self.param.sample_set_to),
+            self.mod_update_button,
             self.data_mod_warning,
             collapsed=False,
             title="Data modification",
