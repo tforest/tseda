@@ -199,10 +199,10 @@ class IndividualsTable(Viewer):
         if self.sample_set_to is not None and self.population_from is not None:
             population_ids = self.get_population_ids()
             if self.population_from not in population_ids:
-                # self.data_mod_warning.visible = True
+                self.data_mod_warning.visible = True
                 return False
             elif int(self.sample_set_to) < 0:
-                # self.data_mod_warning.visible = True
+                self.data_mod_warning.visible = True
                 return False
             else:
                 self.data_mod_warning.visible = False
