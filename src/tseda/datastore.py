@@ -271,6 +271,15 @@ class SampleSetsTable(Viewer):
         label="Create new sample set",
     )
 
+    remove_sample_set = pn.widgets.Select(
+        name="Remove sample set",
+        description="Remove a non-predefined sample set.",
+        value=None,
+        sizing_mode="stretch_width",
+    )
+
+    remove_button = pn.widgets.Button(name="Remove", align=("center", "end"))
+
     warning_pane = pn.pane.Alert(
         "This sample set name already exists, pick a unique name.",
         alert_type="warning",
@@ -363,13 +372,13 @@ class SampleSetsTable(Viewer):
             pn.Card(
                 self.param.page_size,
                 self.param.create_sample_set_textinput,
+                pn.Row(self.remove_sample_set, self.remove_button),
                 title="Sample sets table options",
                 collapsed=False,
                 header_background=config.SIDEBAR_BACKGROUND,
                 active_header_background=config.SIDEBAR_BACKGROUND,
                 styles=config.VCARD_STYLE,
             ),
-            self.warning_pane,
         )
 
     @property
