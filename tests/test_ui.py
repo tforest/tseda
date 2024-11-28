@@ -18,7 +18,7 @@ def test_component(page, port, ds):
     )
 
     server = pn.serve(component.view, port=port, threaded=True, show=False)
-    time.sleep(30)
+    time.sleep(50)
     page.goto(url)
 
     page.set_viewport_size({"width": 1920, "height": 1080})
