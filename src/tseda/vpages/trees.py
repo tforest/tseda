@@ -188,8 +188,10 @@ class Tree(View):
             )
             self.advanced_warning.visible = True
         return pn.Column(
-            pn.pane.Markdown(
-                f"## Tree index {self.tree_index} (position {pos1} - {pos2})"
+            pn.pane.HTML(
+                f"<h2>Tree index {self.tree_index}"
+                f" (position {pos1} - {pos2})</h2>",
+                sizing_mode="stretch_width",
             ),
             pn.pane.HTML(plot),
             pn.Row(
@@ -272,6 +274,19 @@ class TreesPage(View):
 
     def sidebar(self):
         return pn.Column(
+            pn.pane.HTML(
+                "<h2 style='margin: 0;'>Trees</h2>",
+                sizing_mode="stretch_width",
+            ),
+            pn.pane.Markdown(
+                (
+                    "This section allows you to explore local genealogical "
+                    "trees.<br><br>"
+                    "Use the controls below to customize the plots and adjust"
+                    "parameters."
+                ),
+                sizing_mode="stretch_width",
+            ),
             self.data.sidebar,
             self.data.advanced_options,
             self.sample_sets.sidebar_table,
