@@ -91,12 +91,12 @@ class IndividualsTable(Viewer):
     )
     mod_update_button = pn.widgets.Button(name="Update")
 
-    # data_mod_warning = pn.pane.Alert(
-    #     """Please enter a valid population ID and
-    #     a non-negative new sample set ID""",
-    #     alert_type="warning",
-    #     visible=False,
-    # )
+    data_mod_warning = pn.pane.Alert(
+        """Please enter a valid population ID and
+        a non-negative new sample set ID""",
+        alert_type="warning",
+        visible=False,
+    )
 
     filters = {
         "name": {"type": "input", "func": "like", "placeholder": "Enter name"},
@@ -199,16 +199,16 @@ class IndividualsTable(Viewer):
         if self.sample_set_to is not None and self.population_from is not None:
             population_ids = self.get_population_ids()
             if self.population_from not in population_ids:
-                # self.data_mod_warning.visible = True
+                self.data_mod_warning.visible = True
                 return False
             elif int(self.sample_set_to) < 0:
-                # self.data_mod_warning.visible = True
+                self.data_mod_warning.visible = True
                 return False
             else:
-                # self.data_mod_warning.visible = False
+                self.data_mod_warning.visible = False
                 return True
         else:
-            # self.data_mod_warning.visible = False
+            self.data_mod_warning.visible = False
             return False
 
     @pn.depends("page_size", "sample_select.value", "mod_update_button.value")
