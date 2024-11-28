@@ -28,11 +28,11 @@ def test_component(page, port, ds):
     expect(page.get_by_text("predefined")).to_be_visible()
 
     page.get_by_role("button", name="Individuals").click()
-    # expect(page.get_by_text("Data modification")).to_be_visible()
-    # expect(page.get_by_text("Population ID")).to_be_visible()
+    expect(page.get_by_text("Data modification")).to_be_visible()
+    expect(page.get_by_text("Population ID")).to_be_visible()
 
     page.get_by_role("button", name="Structure").click()
-    # expect(page.get_by_text("GNN cluster plot")).to_be_visible()
+    expect(page.get_by_text("GNN cluster plot")).to_be_visible()
 
     page.get_by_role("button", name="iGNN").click()
     expect(page.get_by_text("Sample sets table quick view")).to_be_visible()
