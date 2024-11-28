@@ -92,7 +92,7 @@ class IndividualsTable(Viewer):
     mod_update_button = pn.widgets.Button(name="Update")
 
     # data_mod_warning = pn.pane.Alert(
-    #     """Please enter a valid population ID and
+    #     """Please enter a valid population ID and 
     #     a non-negative new sample set ID""",
     #     alert_type="warning",
     #     visible=False,
@@ -261,7 +261,7 @@ class IndividualsTable(Viewer):
                 pn.Row(self.param.population_from, self.param.sample_set_to),
                 self.mod_update_button,
             ),
-            self.data_mod_warning,
+            # self.data_mod_warning,
             collapsed=False,
             title="Data modification",
             header_background=config.SIDEBAR_BACKGROUND,
