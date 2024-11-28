@@ -65,7 +65,7 @@ class Tree(View):
             Examle: {1: 'label1', 2: 'label2',...}"""
         ),
     )
-    more_options = param.String(
+    additional_options = param.String(
         default="{}",
         doc=(
             """Add more options as specified by the documentation.
@@ -138,7 +138,7 @@ class Tree(View):
             y_ticks = {}
         if self.node_labels == "":
             self.node_labels = "{}"
-        if self.more_options == "":
+        if self.additional_options == "":
             self.node_options = "{}"
         return omit_sites, y_ticks
 
@@ -153,7 +153,7 @@ class Tree(View):
         "x_axis.value",
         "sites_mutations.value",
         "node_labels",
-        "more_options",
+        "additional_options",
     )
     def __panel__(self):
         if self.position is not None:
@@ -166,7 +166,7 @@ class Tree(View):
         try:
             omit_sites, y_ticks = self.handle_advanced()
             node_labels = eval_options(self.node_labels)
-            more_options = eval_options(self.more_options)
+            additional_options = eval_options(self.additional_options)
             plot = tree.draw_svg(
                 size=(self.width, self.height),
                 symbol_size=self.symbol_size,
@@ -176,7 +176,7 @@ class Tree(View):
                 node_labels=node_labels,
                 y_ticks=y_ticks,
                 style=self.default_css,
-                **more_options,
+                **additional_options,
             )
             self.advanced_warning.visible = False
         except (ValueError, SyntaxError, TypeError):
@@ -243,7 +243,7 @@ class Tree(View):
                 self.sites_mutations,
                 self.param.symbol_size,
                 self.param.node_labels,
-                self.param.more_options,
+                self.param.additional_options,
                 collapsed=True,
                 title="Advanced plotting options",
                 header_background=config.SIDEBAR_BACKGROUND,
