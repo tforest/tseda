@@ -266,7 +266,7 @@ class IndividualsTable(Viewer):
                 active_header_background=config.SIDEBAR_BACKGROUND,
                 styles=config.VCARD_STYLE,
             ),
-            # self.data_mod_warning,
+            self.data_mod_warning,
         )
 
 
