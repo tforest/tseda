@@ -199,16 +199,16 @@ class IndividualsTable(Viewer):
         if self.sample_set_to is not None and self.population_from is not None:
             population_ids = self.get_population_ids()
             if self.population_from not in population_ids:
-                # self.data_mod_warning.visible = True
+                self.data_mod_warning.visible = True
                 return False
             elif int(self.sample_set_to) < 0:
-                # self.data_mod_warning.visible = True
+                self.data_mod_warning.visible = True
                 return False
             else:
-                # self.data_mod_warning.visible = False
+                self.data_mod_warning.visible = False
                 return True
         else:
-            # self.data_mod_warning.visible = False
+            self.data_mod_warning.visible = False
             return False
 
     @pn.depends("page_size", "sample_select.value", "mod_update_button.value")
@@ -255,16 +255,18 @@ class IndividualsTable(Viewer):
     modification_header = pn.pane.Markdown("#### Batch reassign indivuduals:")
 
     def modification_sidebar(self):
-        return pn.Card(
-            self.modification_header,
-            pn.Row(self.param.population_from, self.param.sample_set_to),
-            self.mod_update_button,
+        return pn.Column(
+            pn.Card(
+                self.modification_header,
+                pn.Row(self.param.population_from, self.param.sample_set_to),
+                self.mod_update_button,
+                collapsed=False,
+                title="Data modification",
+                header_background=config.SIDEBAR_BACKGROUND,
+                active_header_background=config.SIDEBAR_BACKGROUND,
+                styles=config.VCARD_STYLE,
+            ),
             self.data_mod_warning,
-            collapsed=False,
-            title="Data modification",
-            header_background=config.SIDEBAR_BACKGROUND,
-            active_header_background=config.SIDEBAR_BACKGROUND,
-            styles=config.VCARD_STYLE,
         )
 
 
