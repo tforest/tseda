@@ -194,6 +194,7 @@ class Tree(View):
                 sizing_mode="stretch_width",
             ),
             pn.pane.HTML(plot),
+            pn.pane.Markdown("**Tree plot** - Lorem Ipsum"),
             pn.Row(
                 self.param.prev,
                 self.param.next,

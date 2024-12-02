@@ -221,8 +221,8 @@ class IndividualsTable(Viewer):
         )
         title = pn.pane.HTML(
                 "<h2 style='margin: 0;'>Individuals Table</h2>",
-                sizing_mode="stretch_width",
-            ),
+                sizing_mode="stretch_width"
+            )
         return pn.Column(title, self.tooltip, table)
 
     def options_sidebar(self):

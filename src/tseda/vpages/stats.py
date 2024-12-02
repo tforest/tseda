@@ -90,10 +90,12 @@ class OnewayStats(View):
             data = self.datastore.tsm.ts.Tajimas_D(
                 sample_sets, windows=windows, mode=self.mode
             )
+            fig_text = "**Oneway Tajimas_D plot** - Lorem Ipsum"
         elif self.statistic == "diversity":
             data = self.datastore.tsm.ts.diversity(
                 sample_sets, windows=windows, mode=self.mode
             )
+            fig_text = "**Oneway Diversity plot** - Lorem Ipsum"
         else:
             raise ValueError("Invalid statistic")
 
@@ -119,9 +121,14 @@ class OnewayStats(View):
         }
         kdims = [hv.Dimension("ss", label="Sample set")]
         holomap = hv.HoloMap(data_dict, kdims=kdims)
-        return pn.panel(
-            holomap.overlay("ss").opts(legend_position="right"),
-            sizing_mode="stretch_width",
+        return pn.Column(
+            pn.panel(
+                holomap.overlay("ss").opts(legend_position="right"),
+                sizing_mode="stretch_width",
+            ),
+            pn.pane.Markdown(
+                fig_text
+            )
         )
 
     def sidebar(self):
@@ -226,6 +233,7 @@ class MultiwayStats(View):
                 indexes=comparisons,
                 mode=self.mode,
             )
+            fig_text = "**Multiway Fst plot** - Lorem Ipsum"
         elif self.statistic == "divergence":
             data = tsm.ts.divergence(
                 sample_sets,
@@ -233,6 +241,7 @@ class MultiwayStats(View):
                 indexes=comparisons,
                 mode=self.mode,
             )
+            fig_text = "**Multiway divergence plot** - Lorem Ipsum"
         else:
             raise ValueError("Invalid statistic")
         sample_sets_table = self.datastore.sample_sets_table
@@ -264,9 +273,14 @@ class MultiwayStats(View):
         }
         kdims = [hv.Dimension("sspair", label="Sample set combination")]
         holomap = hv.HoloMap(data_dict, kdims=kdims)
-        return pn.panel(
-            holomap.overlay("sspair").opts(legend_position="right"),
-            sizing_mode="stretch_width",
+        return pn.Column(
+            pn.panel(
+                holomap.overlay("sspair").opts(legend_position="right"),
+                sizing_mode="stretch_width",
+            ),
+            pn.pane.Markdown(
+                fig_text
+            )
         )
 
     def sidebar(self):
@@ -298,10 +312,18 @@ class StatsPage(View):
     def __panel__(self):
         return pn.Column(
             pn.Column(
+                pn.pane.HTML(
+                    "<h2 style='margin: 0;'>Oneway statistics plot</h2>",
+                    sizing_mode="stretch_width"
+                ),
                 self.oneway.tooltip,
                 self.oneway,
             ),
             pn.Column(
+                pn.pane.HTML(
+                    "<h2 style='margin: 0;'>Multiway statistics plot</h2>",
+                    sizing_mode="stretch_width"
+                ),
                 self.multiway.tooltip,
                 self.multiway,
             ),
