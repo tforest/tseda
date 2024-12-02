@@ -28,6 +28,7 @@ class IndividualsPage(View):
         super().__init__(**params)
         self.data = self.datastore.individuals_table
         self.geomap = GeoMap(datastore=self.datastore)
+        self.sample_sets = self.datastore.sample_sets_table
 
     def __panel__(self):
         return pn.Column(
@@ -59,4 +60,5 @@ class IndividualsPage(View):
             self.geomap.sidebar,
             self.data.options_sidebar,
             self.data.modification_sidebar,
+            self.sample_sets.sidebar_table,
         )
