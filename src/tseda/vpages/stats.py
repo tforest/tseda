@@ -126,9 +126,7 @@ class OnewayStats(View):
                 holomap.overlay("ss").opts(legend_position="right"),
                 sizing_mode="stretch_width",
             ),
-            pn.pane.Markdown(
-                fig_text
-            )
+            pn.pane.Markdown(fig_text),
         )
 
     def sidebar(self):
@@ -278,9 +276,7 @@ class MultiwayStats(View):
                 holomap.overlay("sspair").opts(legend_position="right"),
                 sizing_mode="stretch_width",
             ),
-            pn.pane.Markdown(
-                fig_text
-            )
+            pn.pane.Markdown(fig_text),
         )
 
     def sidebar(self):
@@ -314,7 +310,7 @@ class StatsPage(View):
             pn.Column(
                 pn.pane.HTML(
                     "<h2 style='margin: 0;'>Oneway statistics plot</h2>",
-                    sizing_mode="stretch_width"
+                    sizing_mode="stretch_width",
                 ),
                 self.oneway.tooltip,
                 self.oneway,
@@ -322,7 +318,7 @@ class StatsPage(View):
             pn.Column(
                 pn.pane.HTML(
                     "<h2 style='margin: 0;'>Multiway statistics plot</h2>",
-                    sizing_mode="stretch_width"
+                    sizing_mode="stretch_width",
                 ),
                 self.multiway.tooltip,
                 self.multiway,

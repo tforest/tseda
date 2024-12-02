@@ -220,9 +220,9 @@ class IndividualsTable(Viewer):
             header_filters=self.filters,
         )
         title = pn.pane.HTML(
-                "<h2 style='margin: 0;'>Individuals Table</h2>",
-                sizing_mode="stretch_width"
-            )
+            "<h2 style='margin: 0;'>Individuals Table</h2>",
+            sizing_mode="stretch_width",
+        )
         return pn.Column(title, self.tooltip, table)
 
     def options_sidebar(self):
@@ -339,7 +339,9 @@ class SampleSetsTable(Viewer):
             formatters=self.formatters,
             editors=self.editors,
         )
-        return pn.Column(pn.pane.Markdown("### Sample Set Table"), self.tooltip, table)
+        return pn.Column(
+            pn.pane.Markdown("### Sample Set Table"), self.tooltip, table
+        )
 
     def sidebar_table(self):
         table = pn.widgets.Tabulator(

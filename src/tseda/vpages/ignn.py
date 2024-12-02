@@ -126,11 +126,14 @@ class GNNHaplotype(View):
             ylabel="Proportion",
         )
         return p
-    
+
     def check_inputs(self, inds):
         try:
             print(self.individual_id)
-            if not isinstance(self.individual_id, (int, float)) or self.individual_id < 0:
+            if (
+                not isinstance(self.individual_id, (int, float))
+                or self.individual_id < 0
+            ):
                 self.position_index_warning.visible = True
                 return None
             else:
@@ -145,7 +148,9 @@ class GNNHaplotype(View):
     def __panel__(self, **params):
         inds = self.datastore.individuals_table.data.rx.value
         if self.individual_id is None:
-            return pn.pane.Markdown("**Enter a valid sample id to see the GNN haplotype plot.**")
+            return pn.pane.Markdown(
+                "**Enter a valid sample id to see the GNN haplotype plot.**"
+            )
         nodes = self.check_inputs(inds)
         if nodes is not None:
             return pn.Column(
@@ -160,9 +165,7 @@ class GNNHaplotype(View):
                 self.plot(1),
             )
         else:
-            return pn.Column(
-                pn.pane.Markdown(f"")
-            )
+            return pn.Column(pn.pane.Markdown(f""))
 
     def sidebar(self):
         return pn.Card(
@@ -170,7 +173,7 @@ class GNNHaplotype(View):
             self.param.window_size,
             self.position_index_warning,
             collapsed=False,
-            title="GNN haplotype options", 
+            title="GNN haplotype options",
             header_background=config.SIDEBAR_BACKGROUND,
             active_header_background=config.SIDEBAR_BACKGROUND,
             styles=config.VCARD_STYLE,
