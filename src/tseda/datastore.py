@@ -121,8 +121,12 @@ class IndividualsTable(Viewer):
         super().__init__(**params)
         self.table.set_index(["id"], inplace=True)
         self.data = self.param.table.rx()
-        self.sample_select.options = self.sample_set_indices()
-        self.sample_select.value = self.sample_set_indices()
+        self.sample_select.options = sorted(
+            self.data.rx.value["sample_set_id"].unique().tolist()
+        )
+        self.sample_select.value = sorted(
+            self.data.rx.value["sample_set_id"].unique().tolist()
+        )
 
     @property
     def tooltip(self):
@@ -143,6 +147,8 @@ class IndividualsTable(Viewer):
         )
 
     def sample_sets(self):
+        """Return list of all samples and a dictionary
+        with a sample set id to samples list mapping."""
         sample_sets = {}
         samples = []
         inds = self.data.rx.value
@@ -155,21 +161,6 @@ class IndividualsTable(Viewer):
             sample_sets[sample_set].extend(ind.nodes)
             samples.extend(ind.nodes)
         return samples, sample_sets
-
-    def get_sample_sets(self, indexes=None):
-        """Return list of sample sets and their samples."""
-        samples, sample_sets = self.sample_sets()
-        if indexes:
-            return [sample_sets[i] for i in indexes]
-        return [sample_sets[i] for i in sample_sets]
-
-    def sample_set_indices(self):
-        """Return indices of sample groups."""
-        return sorted(self.data.rx.value["sample_set_id"].unique().tolist())
-
-    def selected_sample_set_indices(self):
-        samples, sample_sets = self.sample_sets()
-        return list(sample_sets.keys())
 
     def get_population_ids(self):
         """Return indices of sample groups."""
