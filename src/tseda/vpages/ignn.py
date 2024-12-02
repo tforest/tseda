@@ -41,7 +41,6 @@ class GNNHaplotype(View):
 
     individual_id = param.Integer(
         default=None,
-        bounds=(0, None),
         doc="Individual ID (0-indexed)",
     )
 
@@ -56,9 +55,15 @@ class GNNHaplotype(View):
         visible=False,
     )
 
+    position_index_warning = pn.pane.Alert(
+        "The individual id does not exist, try something else.",
+        alert_type="warning",
+        visible=False,
+    )
+
     def plot(self, haplotype=0):
         if self.individual_id is None:
-            return
+            return pn.pane.Markdown("Enter a sample ID")
         if self.window_size is not None:
             windows = make_windows(
                 self.window_size, self.datastore.tsm.ts.sequence_length
@@ -121,28 +126,51 @@ class GNNHaplotype(View):
             ylabel="Proportion",
         )
         return p
+    
+    def check_inputs(self, inds):
+        try:
+            print(self.individual_id)
+            if not isinstance(self.individual_id, (int, float)) or self.individual_id < 0:
+                self.position_index_warning.visible = True
+                return None
+            else:
+                self.position_index_warning.visible = False
+                nodes = inds.loc[self.individual_id].nodes
+                return nodes
+        except KeyError:
+            self.position_index_warning.visible = True
+            return None
 
     @pn.depends("individual_id", "window_size")
     def __panel__(self, **params):
         inds = self.datastore.individuals_table.data.rx.value
         if self.individual_id is None:
-            return pn.pane.Markdown("")
-        nodes = inds.loc[self.individual_id].nodes
-        return pn.Column(
-            pn.pane.Markdown(f"## Individual id {self.individual_id}"),
-            self.warning_pane,
-            pn.pane.Markdown(f"### Haplotype 0 (sample id {nodes[0]})"),
-            self.plot(0),
-            pn.pane.Markdown(f"### Haplotype 1 (sample id {nodes[1]})"),
-            self.plot(1),
-        )
+            return pn.pane.Markdown("**Enter a valid sample id to see the GNN haplotype plot.**")
+        nodes = self.check_inputs(inds)
+        if nodes is not None:
+            return pn.Column(
+                pn.pane.HTML(
+                    f"<h2 style='margin: 0;'>GNN Haplotype plot - Individual id {self.individual_id}</h2>",
+                    sizing_mode="stretch_width",
+                ),
+                self.warning_pane,
+                pn.pane.Markdown(f"### Haplotype 0 (sample id {nodes[0]})"),
+                self.plot(0),
+                pn.pane.Markdown(f"### Haplotype 1 (sample id {nodes[1]})"),
+                self.plot(1),
+            )
+        else:
+            return pn.Column(
+                pn.pane.Markdown(f"")
+            )
 
     def sidebar(self):
         return pn.Card(
             self.param.individual_id,
             self.param.window_size,
+            self.position_index_warning,
             collapsed=False,
-            title="GNN haplotype options",
+            title="GNN haplotype options", 
             header_background=config.SIDEBAR_BACKGROUND,
             active_header_background=config.SIDEBAR_BACKGROUND,
             styles=config.VCARD_STYLE,
@@ -328,7 +356,15 @@ class IGNNPage(View):
                 "affiliations through colors.",
                 sizing_mode="stretch_width",
             ),
+            pn.pane.HTML(
+                "<h2 style='margin: 0;'>vBar plot</h2>",
+                sizing_mode="stretch_width",
+            ),
             self.vbar,
+            pn.pane.Markdown(
+                "**vBar** - Lorem ipsum",
+                sizing_mode="stretch_width",
+            ),
             self.gnnhaplotype,
         )
 
