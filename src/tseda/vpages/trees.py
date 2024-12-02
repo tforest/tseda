@@ -82,7 +82,7 @@ class Tree(View):
         visible=False,
     )
 
-    slider = pn.widgets.IntSlider(name='Chromosome Position')
+    slider = pn.widgets.IntSlider(name="Chromosome Position")
 
     def __init__(self, **params):
         super().__init__(**params)
@@ -147,7 +147,7 @@ class Tree(View):
         if self.additional_options == "":
             self.node_options = "{}"
         return omit_sites, y_ticks
-    
+
     @param.depends("position", watch=True)
     def update_slider(self):
         if self.position is not None:
@@ -169,7 +169,7 @@ class Tree(View):
         "sites_mutations.value",
         "node_labels",
         "additional_options",
-        "slider.value_throttled"
+        "slider.value_throttled",
     )
     def __panel__(self):
         if self.position is not None:
