@@ -165,7 +165,7 @@ class GNNHaplotype(View):
                 self.plot(1),
             )
         else:
-            return pn.Column(pn.pane.Markdown(f""))
+            return pn.Column(pn.pane.Markdown(""))
 
     def sidebar(self):
         return pn.Card(
