@@ -155,7 +155,8 @@ class GNNHaplotype(View):
         if nodes is not None:
             return pn.Column(
                 pn.pane.HTML(
-                    f"<h2 style='margin: 0;'>GNN Haplotype plot - Individual id {self.individual_id}</h2>",
+                    "<h2 style='margin: 0;'>GNN Haplotype plot " 
+                    f"- Individual id {self.individual_id}</h2>",
                     sizing_mode="stretch_width",
                 ),
                 self.warning_pane,
