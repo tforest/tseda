@@ -79,7 +79,7 @@ class OnewayStats(View):
         windows = make_windows(
             self.window_size, self.datastore.tsm.ts.sequence_length
         )
-        _, sample_sets_dictionary = (
+        sample_sets_dictionary = (
             self.datastore.individuals_table.sample_sets()
         )
         sample_sets_list = list(sample_sets_dictionary.keys())
@@ -190,7 +190,7 @@ class MultiwayStats(View):
         )
 
     def set_multichoice_options(self):
-        _, sample_sets = self.datastore.individuals_table.sample_sets()
+        sample_sets = self.datastore.individuals_table.sample_sets()
         all_comparisons = list(
             f"{x}-{y}"
             for x, y in itertools.combinations(
@@ -215,7 +215,7 @@ class MultiwayStats(View):
         windows = make_windows(self.window_size, tsm.ts.sequence_length)
         comparisons = eval_comparisons(self.comparisons.value)
 
-        _, sample_sets_dictionary = (
+        sample_sets_dictionary = (
             self.datastore.individuals_table.sample_sets()
         )
         sample_sets_list = list(sample_sets_dictionary.keys())

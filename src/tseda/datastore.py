@@ -150,7 +150,6 @@ class IndividualsTable(Viewer):
         """Return list of all samples and a dictionary
         with a sample set id to samples list mapping."""
         sample_sets = {}
-        samples = []
         inds = self.data.rx.value
         for _, ind in inds.iterrows():
             if not ind.selected:
@@ -159,8 +158,7 @@ class IndividualsTable(Viewer):
             if sample_set not in sample_sets:
                 sample_sets[sample_set] = []
             sample_sets[sample_set].extend(ind.nodes)
-            samples.extend(ind.nodes)
-        return samples, sample_sets
+        return sample_sets
 
     def get_population_ids(self):
         """Return indices of sample groups."""
@@ -442,7 +440,7 @@ class DataStore(Viewer):
         return color.loc[color.selected].color
 
     def haplotype_gnn(self, focal_ind, windows=None):
-        _, sample_sets = self.individuals_table.sample_sets()
+        sample_sets = self.individuals_table.sample_sets()
         ind = self.individuals_table.loc(focal_ind)
         hap = windowed_genealogical_nearest_neighbours(
             self.tsm.ts, ind.nodes, sample_sets, windows=windows
