@@ -14,7 +14,7 @@ def test_datastore_preprocess(tsm):
     individuals_table, sample_sets_table = datastore.preprocess(tsm)
     assert individuals_table is not None
     assert sample_sets_table is not None
-    samples, sample_sets = individuals_table.sample_sets()
+    _, sample_sets = individuals_table.sample_sets()
     assert len(sample_sets) == 6
     np.testing.assert_equal(sample_sets[1], np.arange(0, 12))
 

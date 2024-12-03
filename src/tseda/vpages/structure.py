@@ -90,7 +90,7 @@ class Fst(View):
     )
 
     def __panel__(self):
-        samples, sample_sets = self.datastore.individuals_table.sample_sets()
+        _, sample_sets = self.datastore.individuals_table.sample_sets()
         if len(sample_sets) <= 1:
             return pn.Column(pn.pane.Markdown("## Fst\n"), self.warning_pane)
         else:

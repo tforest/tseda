@@ -197,7 +197,7 @@ class VBar(View):
 
     @pn.depends("sorting", "sort_order")
     def __panel__(self):
-        samples, sample_sets = self.datastore.individuals_table.sample_sets()
+        _, sample_sets = self.datastore.individuals_table.sample_sets()
         if len(list(sample_sets.keys())) < 1:
             return self.warning_pane
         df = self.gnn()

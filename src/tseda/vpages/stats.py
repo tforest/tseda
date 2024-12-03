@@ -79,7 +79,7 @@ class OnewayStats(View):
         windows = make_windows(
             self.window_size, self.datastore.tsm.ts.sequence_length
         )
-        samples, sample_sets_dictionary = (
+        _, sample_sets_dictionary = (
             self.datastore.individuals_table.sample_sets()
         )
         sample_sets_list = list(sample_sets_dictionary.keys())

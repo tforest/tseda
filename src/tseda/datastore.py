@@ -442,7 +442,7 @@ class DataStore(Viewer):
         return color.loc[color.selected].color
 
     def haplotype_gnn(self, focal_ind, windows=None):
-        samples, sample_sets = self.individuals_table.sample_sets()
+        _, sample_sets = self.individuals_table.sample_sets()
         ind = self.individuals_table.loc(focal_ind)
         hap = windowed_genealogical_nearest_neighbours(
             self.tsm.ts, ind.nodes, sample_sets, windows=windows
