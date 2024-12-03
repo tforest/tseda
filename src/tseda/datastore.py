@@ -80,15 +80,15 @@ class IndividualsTable(Viewer):
     population_from = pn.widgets.IntInput(
         name="Population ID",
         value=None,
-        placeholder = "0",
-        sizing_mode='stretch_width',
+        placeholder="0",
+        sizing_mode="stretch_width",
         description=("Reassign individuals with this population ID."),
     )
     sample_set_to = pn.widgets.IntInput(
         name="New sample set ID",
-        placeholder = "0",
+        placeholder="0",
         value=None,
-        sizing_mode='stretch_width',
+        sizing_mode="stretch_width",
         description=("Reassign individuals to this sample set ID."),
     )
     mod_update_button = pn.widgets.Button(name="Update")
@@ -198,7 +198,10 @@ class IndividualsTable(Viewer):
         return self.data.rx.value.loc[i]
 
     def check_data_modification(self):
-        if self.sample_set_to.value is not None and self.population_from.value is not None:
+        if (
+            self.sample_set_to.value is not None
+            and self.population_from.value is not None
+        ):
             population_ids = self.get_population_ids()
             if self.population_from.value not in population_ids:
                 self.data_mod_warning.visible = True
@@ -213,7 +216,12 @@ class IndividualsTable(Viewer):
             self.data_mod_warning.visible = False
             return False
 
-    @pn.depends("page_size", "sample_select.value", "mod_update_button.value", watch=True)
+    @pn.depends(
+        "page_size",
+        "sample_select.value",
+        "mod_update_button.value",
+        watch=True,
+    )
     def __panel__(self):
         if isinstance(self.sample_select.value, list):
             self.data.rx.value["selected"] = False
