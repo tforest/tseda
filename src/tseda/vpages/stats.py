@@ -79,9 +79,7 @@ class OnewayStats(View):
         windows = make_windows(
             self.window_size, self.datastore.tsm.ts.sequence_length
         )
-        sample_sets_dictionary = (
-            self.datastore.individuals_table.sample_sets()
-        )
+        sample_sets_dictionary = self.datastore.individuals_table.sample_sets()
         sample_sets_list = list(sample_sets_dictionary.keys())
         if len(sample_sets_list) < 1:
             return self.sample_select_warning
@@ -215,9 +213,7 @@ class MultiwayStats(View):
         windows = make_windows(self.window_size, tsm.ts.sequence_length)
         comparisons = eval_comparisons(self.comparisons.value)
 
-        sample_sets_dictionary = (
-            self.datastore.individuals_table.sample_sets()
-        )
+        sample_sets_dictionary = self.datastore.individuals_table.sample_sets()
         sample_sets_list = list(sample_sets_dictionary.keys())
         if len(sample_sets_list) < 2:
             return self.sample_select_warning

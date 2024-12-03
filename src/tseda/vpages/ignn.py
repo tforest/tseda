@@ -176,8 +176,10 @@ class VBar(View):
     def gnn(self):
         inds = self.datastore.individuals_table.data.rx.value
         sample_sets = self.datastore.individuals_table.sample_sets()
-        samples = [sample for sublist in sample_sets.values() for sample  in sublist]
-        print('heeer')
+        samples = [
+            sample for sublist in sample_sets.values() for sample in sublist
+        ]
+        print("heeer")
         print(samples)
         self.param.sorting.objects = [""] + list(
             self.datastore.sample_sets_table.names.values()
