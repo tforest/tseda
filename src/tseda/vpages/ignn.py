@@ -179,8 +179,6 @@ class VBar(View):
         samples = [
             sample for sublist in sample_sets.values() for sample in sublist
         ]
-        print("heeer")
-        print(samples)
         self.param.sorting.objects = [""] + list(
             self.datastore.sample_sets_table.names.values()
         )
