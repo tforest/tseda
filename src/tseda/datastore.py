@@ -121,12 +121,11 @@ class IndividualsTable(Viewer):
         super().__init__(**params)
         self.table.set_index(["id"], inplace=True)
         self.data = self.param.table.rx()
-        self.sample_select.options = sorted(
+        all_sample_set_ids = sorted(
             self.data.rx.value["sample_set_id"].unique().tolist()
         )
-        self.sample_select.value = sorted(
-            self.data.rx.value["sample_set_id"].unique().tolist()
-        )
+        self.sample_select.options = all_sample_set_ids
+        self.sample_select.value = all_sample_set_ids
 
     @property
     def tooltip(self):
@@ -147,8 +146,8 @@ class IndividualsTable(Viewer):
         )
 
     def sample_sets(self):
-        """Return list of all samples and a dictionary
-        with a sample set id to samples list mapping."""
+        """Returns a dictionary with a sample
+        set id to samples list mapping."""
         sample_sets = {}
         inds = self.data.rx.value
         for _, ind in inds.iterrows():
