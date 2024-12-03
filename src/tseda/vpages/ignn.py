@@ -55,8 +55,8 @@ class GNNHaplotype(View):
         visible=False,
     )
 
-    position_index_warning = pn.pane.Alert(
-        "The individual id does not exist, try something else.",
+    individual_id_warning = pn.pane.Alert(
+        "",
         alert_type="warning",
         visible=False,
     )
@@ -128,31 +128,48 @@ class GNNHaplotype(View):
         return p
 
     def check_inputs(self, inds):
+        max_id = inds.index.max()
+        info_column = pn.Column(
+                pn.pane.HTML(
+                    "<h2 style='margin: 0;'>GNN Haplotype plot</h2>",
+                    sizing_mode="stretch_width",
+                ),
+                pn.pane.Markdown(
+                    "**Enter a valid sample id to see the GNN haplotype plot.**"
+                )
+            )
+        if self.individual_id is None:
+            self.individual_id_warning.visible = False  # No warning for None
+            return None, info_column
+
         try:
-            print(self.individual_id)
-            if (
-                not isinstance(self.individual_id, (int, float))
-                or self.individual_id < 0
-            ):
-                self.position_index_warning.visible = True
-                return None
+
+            if (not isinstance(self.individual_id, (int, float))
+                or self.individual_id < 0):
+                self.individual_id_warning.object = (
+                    f"The individual ID does not exist. Valid IDs are in the range 0-{max_id}."
+                )
+                self.individual_id_warning.visible = True
+                return (None, info_column)
             else:
-                self.position_index_warning.visible = False
+                self.individual_id_warning.visible = False
                 nodes = inds.loc[self.individual_id].nodes
-                return nodes
+                info_column = pn.Column(pn.pane.Markdown(
+                    ""
+                ))
+                return (nodes, info_column)
         except KeyError:
-            self.position_index_warning.visible = True
-            return None
+            self.individual_id_warning.object = (
+                f"The individual ID does not exist. Valid IDs are in the range 0-{max_id}."
+            )
+            self.individual_id_warning.visible = True
+            return (None, info_column)
 
     @pn.depends("individual_id", "window_size")
     def __panel__(self, **params):
         inds = self.datastore.individuals_table.data.rx.value
-        if self.individual_id is None:
-            return pn.pane.Markdown(
-                "**Enter a valid sample id to see the GNN haplotype plot.**"
-            )
         nodes = self.check_inputs(inds)
-        if nodes is not None:
+        if nodes[0] is not None:
             return pn.Column(
                 pn.pane.HTML(
                     "<h2 style='margin: 0;'>GNN Haplotype plot "
@@ -160,19 +177,19 @@ class GNNHaplotype(View):
                     sizing_mode="stretch_width",
                 ),
                 self.warning_pane,
-                pn.pane.Markdown(f"### Haplotype 0 (sample id {nodes[0]})"),
+                pn.pane.Markdown(f"### Haplotype 0 (sample id {nodes[0][0]})"),
                 self.plot(0),
-                pn.pane.Markdown(f"### Haplotype 1 (sample id {nodes[1]})"),
+                pn.pane.Markdown(f"### Haplotype 1 (sample id {nodes[0][1]})"),
                 self.plot(1),
             )
         else:
-            return pn.Column(pn.pane.Markdown(""))
+            return nodes[1]
 
     def sidebar(self):
         return pn.Card(
             self.param.individual_id,
             self.param.window_size,
-            self.position_index_warning,
+            self.individual_id_warning,
             collapsed=False,
             title="GNN haplotype options",
             header_background=config.SIDEBAR_BACKGROUND,
