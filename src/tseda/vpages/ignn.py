@@ -122,6 +122,12 @@ class GNNHaplotype(View):
         )
         return p
 
+    def plot_haplotype0(self):
+        return self.plot(0)
+
+    def plot_haplotype1(self):
+        return self.plot(1)
+
     @pn.depends("individual_id", "window_size")
     def __panel__(self, **params):
         inds = self.datastore.individuals_table.data.rx.value
@@ -132,9 +138,9 @@ class GNNHaplotype(View):
             pn.pane.Markdown(f"## Individual id {self.individual_id}"),
             self.warning_pane,
             pn.pane.Markdown(f"### Haplotype 0 (sample id {nodes[0]})"),
-            self.plot(0),
+            self.plot_haplotype0,
             pn.pane.Markdown(f"### Haplotype 1 (sample id {nodes[1]})"),
-            self.plot(1),
+            self.plot_haplotype1,
         )
 
     def sidebar(self):
