@@ -127,6 +127,12 @@ class GNNHaplotype(View):
         )
         return p
 
+    def plot_haplotype0(self):
+        return self.plot(0)
+
+    def plot_haplotype1(self):
+        return self.plot(1)
+
     def check_inputs(self, inds):
         max_id = inds.index.max()
         info_column = pn.Column(
@@ -179,9 +185,9 @@ class GNNHaplotype(View):
                 ),
                 self.warning_pane,
                 pn.pane.Markdown(f"### Haplotype 0 (sample id {nodes[0][0]})"),
-                self.plot(0),
+                self.plot_haplotype0,
                 pn.pane.Markdown(f"### Haplotype 1 (sample id {nodes[0][1]})"),
-                self.plot(1),
+                self.plot_haplotype0,
             )
         else:
             return nodes[1]
