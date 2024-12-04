@@ -41,7 +41,6 @@ class GNNHaplotype(View):
 
     individual_id = param.Integer(
         default=None,
-        bounds=(0, None),
         doc="Individual ID (0-indexed)",
     )
 
@@ -56,9 +55,15 @@ class GNNHaplotype(View):
         visible=False,
     )
 
+    individual_id_warning = pn.pane.Alert(
+        "",
+        alert_type="warning",
+        visible=False,
+    )
+
     def plot(self, haplotype=0):
         if self.individual_id is None:
-            return
+            return pn.pane.Markdown("Enter a sample ID")
         if self.window_size is not None:
             windows = make_windows(
                 self.window_size, self.datastore.tsm.ts.sequence_length
@@ -128,25 +133,71 @@ class GNNHaplotype(View):
     def plot_haplotype1(self):
         return self.plot(1)
 
+    def check_inputs(self, inds):
+        max_id = inds.index.max()
+        info_column = pn.Column(
+            pn.pane.HTML(
+                "<h2 style='margin: 0;'>GNN Haplotype plot</h2>",
+                sizing_mode="stretch_width",
+            ),
+            pn.pane.Markdown(
+                "**Enter a valid sample id to see the GNN haplotype plot.**"
+            ),
+        )
+        if self.individual_id is None:
+            self.individual_id_warning.visible = False  # No warning for None
+            return None, info_column
+
+        try:
+            if (
+                not isinstance(self.individual_id, (int, float))
+                or self.individual_id < 0
+            ):
+                self.individual_id_warning.object = (
+                    "The individual ID does not exist. "
+                    f"Valid IDs are in the range 0-{max_id}."
+                )
+                self.individual_id_warning.visible = True
+                return (None, info_column)
+            else:
+                self.individual_id_warning.visible = False
+                nodes = inds.loc[self.individual_id].nodes
+                info_column = pn.Column(pn.pane.Markdown(""))
+                return (nodes, info_column)
+        except KeyError:
+            self.individual_id_warning.object = (
+                "The individual ID does not exist. "
+                f"Valid IDs are in the range 0-{max_id}."
+            )
+            self.individual_id_warning.visible = True
+            return (None, info_column)
+
+
     @pn.depends("individual_id", "window_size")
     def __panel__(self, **params):
         inds = self.datastore.individuals_table.data.rx.value
-        if self.individual_id is None:
-            return pn.pane.Markdown("")
-        nodes = inds.loc[self.individual_id].nodes
-        return pn.Column(
-            pn.pane.Markdown(f"## Individual id {self.individual_id}"),
-            self.warning_pane,
-            pn.pane.Markdown(f"### Haplotype 0 (sample id {nodes[0]})"),
-            self.plot_haplotype0,
-            pn.pane.Markdown(f"### Haplotype 1 (sample id {nodes[1]})"),
-            self.plot_haplotype1,
-        )
+        nodes = self.check_inputs(inds)
+        if nodes[0] is not None:
+            return pn.Column(
+                pn.pane.HTML(
+                    "<h2 style='margin: 0;'>GNN Haplotype plot "
+                    f"- Individual id {self.individual_id}</h2>",
+                    sizing_mode="stretch_width",
+                ),
+                self.warning_pane,
+                pn.pane.Markdown(f"### Haplotype 0 (sample id {nodes[0][0]})"),
+                self.plot(0),
+                pn.pane.Markdown(f"### Haplotype 1 (sample id {nodes[0][1]})"),
+                self.plot(1),
+            )
+        else:
+            return nodes[1]
 
     def sidebar(self):
         return pn.Card(
             self.param.individual_id,
             self.param.window_size,
+            self.individual_id_warning,
             collapsed=False,
             title="GNN haplotype options",
             header_background=config.SIDEBAR_BACKGROUND,
@@ -334,7 +385,15 @@ class IGNNPage(View):
                 "affiliations through colors.",
                 sizing_mode="stretch_width",
             ),
+            pn.pane.HTML(
+                "<h2 style='margin: 0;'>vBar plot</h2>",
+                sizing_mode="stretch_width",
+            ),
             self.vbar,
+            pn.pane.Markdown(
+                "**vBar** - Lorem ipsum",
+                sizing_mode="stretch_width",
+            ),
             self.gnnhaplotype,
         )
 
