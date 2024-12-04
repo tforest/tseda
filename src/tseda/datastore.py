@@ -77,17 +77,19 @@ class IndividualsTable(Viewer):
         description="Select samples based on the sample set ID.",
         options=[],
     )
-    population_from = param.Integer(
-        label="Population ID",
-        default=None,
-        bounds=(0, None),
-        doc=("Reassign individuals with this population ID."),
+    population_from = pn.widgets.IntInput(
+        name="Population ID",
+        value=None,
+        placeholder="0",
+        sizing_mode="stretch_width",
+        description=("Reassign individuals with this population ID."),
     )
-    sample_set_to = param.Integer(
-        label="New sample set ID",
-        default=None,
-        bounds=(0, None),
-        doc=("Reassign individuals to this sample set ID."),
+    sample_set_to = pn.widgets.IntInput(
+        name="New sample set ID",
+        placeholder="0",
+        value=None,
+        sizing_mode="stretch_width",
+        description=("Reassign individuals to this sample set ID."),
     )
     mod_update_button = pn.widgets.Button(name="Update")
 
@@ -184,12 +186,15 @@ class IndividualsTable(Viewer):
         return self.data.rx.value.loc[i]
 
     def check_data_modification(self):
-        if self.sample_set_to is not None and self.population_from is not None:
+        if (
+            self.sample_set_to.value is not None
+            and self.population_from.value is not None
+        ):
             population_ids = self.get_population_ids()
-            if self.population_from not in population_ids:
+            if self.population_from.value not in population_ids:
                 self.data_mod_warning.visible = True
                 return False
-            elif int(self.sample_set_to) < 0:
+            elif int(self.sample_set_to.value) < 0:
                 self.data_mod_warning.visible = True
                 return False
             else:
@@ -199,7 +204,12 @@ class IndividualsTable(Viewer):
             self.data_mod_warning.visible = False
             return False
 
-    @pn.depends("page_size", "sample_select.value", "mod_update_button.value")
+    @pn.depends(
+        "page_size",
+        "sample_select.value",
+        "mod_update_button.value",
+        watch=True,
+    )
     def __panel__(self):
         if isinstance(self.sample_select.value, list):
             self.data.rx.value["selected"] = False
@@ -210,9 +220,9 @@ class IndividualsTable(Viewer):
                 ] = True
         if self.check_data_modification():
             self.table.loc[
-                self.table["population"] == self.population_from,  # pyright: ignore[reportIndexIssue]
+                self.table["population"] == self.population_from.value,  # pyright: ignore[reportIndexIssue]
                 "sample_set_id",
-            ] = self.sample_set_to
+            ] = self.sample_set_to.value
         data = self.data[self.columns]
 
         table = pn.widgets.Tabulator(
@@ -256,7 +266,7 @@ class IndividualsTable(Viewer):
         return pn.Column(
             pn.Card(
                 self.modification_header,
-                pn.Row(self.param.population_from, self.param.sample_set_to),
+                pn.Row(self.population_from, self.sample_set_to),
                 self.mod_update_button,
                 collapsed=False,
                 title="Data modification",
