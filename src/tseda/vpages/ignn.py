@@ -130,37 +130,38 @@ class GNNHaplotype(View):
     def check_inputs(self, inds):
         max_id = inds.index.max()
         info_column = pn.Column(
-                pn.pane.HTML(
-                    "<h2 style='margin: 0;'>GNN Haplotype plot</h2>",
-                    sizing_mode="stretch_width",
-                ),
-                pn.pane.Markdown(
-                    "**Enter a valid sample id to see the GNN haplotype plot.**"
-                )
-            )
+            pn.pane.HTML(
+                "<h2 style='margin: 0;'>GNN Haplotype plot</h2>",
+                sizing_mode="stretch_width",
+            ),
+            pn.pane.Markdown(
+                "**Enter a valid sample id to see the GNN haplotype plot.**"
+            ),
+        )
         if self.individual_id is None:
             self.individual_id_warning.visible = False  # No warning for None
             return None, info_column
 
         try:
-
-            if (not isinstance(self.individual_id, (int, float))
-                or self.individual_id < 0):
+            if (
+                not isinstance(self.individual_id, (int, float))
+                or self.individual_id < 0
+            ):
                 self.individual_id_warning.object = (
-                    f"The individual ID does not exist. Valid IDs are in the range 0-{max_id}."
+                    "The individual ID does not exist. "
+                    f"Valid IDs are in the range 0-{max_id}."
                 )
                 self.individual_id_warning.visible = True
                 return (None, info_column)
             else:
                 self.individual_id_warning.visible = False
                 nodes = inds.loc[self.individual_id].nodes
-                info_column = pn.Column(pn.pane.Markdown(
-                    ""
-                ))
+                info_column = pn.Column(pn.pane.Markdown(""))
                 return (nodes, info_column)
         except KeyError:
             self.individual_id_warning.object = (
-                f"The individual ID does not exist. Valid IDs are in the range 0-{max_id}."
+                "The individual ID does not exist. "
+                f"Valid IDs are in the range 0-{max_id}."
             )
             self.individual_id_warning.visible = True
             return (None, info_column)
