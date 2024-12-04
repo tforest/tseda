@@ -216,15 +216,18 @@ class MultiwayStats(View):
         windows = make_windows(self.window_size, tsm.ts.sequence_length)
         comparisons = eval_comparisons(self.comparisons.value)
 
-        sample_sets_dictionary = self.datastore.individuals_table.sample_sets()
-        sample_sets_ids = list(sample_sets_dictionary.keys())
-        if len(sample_sets_ids) < 2:
+        selected_sample_sets = self.datastore.individuals_table.sample_sets()
+        selected_sample_sets_ids = list(selected_sample_sets.keys())
+        if len(selected_sample_sets_ids) < 2:
             return self.sample_select_warning
         elif self.comparisons.value == []:
             return pn.pane.Markdown(
                 "**Select which sample sets to compare to see this plot.**"
             )
-        sample_sets_individuals = list(sample_sets_dictionary.values())
+        all_sample_sets = self.datastore.individuals_table.sample_sets(
+            only_selected=False
+        )
+        sample_sets_individuals = list(all_sample_sets.values())
         if self.statistic == "Fst":
             data = tsm.ts.Fst(
                 sample_sets_individuals,
