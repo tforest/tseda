@@ -186,9 +186,9 @@ class GNNHaplotype(View):
                 ),
                 self.warning_pane,
                 pn.pane.Markdown(f"### Haplotype 0 (sample id {nodes[0][0]})"),
-                self.plot(0),
+                self.plot_haplotype0,
                 pn.pane.Markdown(f"### Haplotype 1 (sample id {nodes[0][1]})"),
-                self.plot(1),
+                self.plot_haplotype0,
             )
         else:
             return nodes[1]
