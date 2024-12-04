@@ -157,7 +157,7 @@ class MultiwayStats(View):
         default=10000, bounds=(1, None), doc="Size of window"
     )
     comparisons = pn.widgets.MultiChoice(
-        name="Comparisons", description="Choose indexes to compare."
+        name="Comparisons", description="Choose indexes to compare.", value=[]
     )
 
     sample_select_warning = pn.pane.Alert(
@@ -202,8 +202,6 @@ class MultiwayStats(View):
             )
         )
         self.comparisons.options = all_comparisons
-        if self.comparisons.value == [] and all_comparisons != []:
-            self.comparisons.value = [all_comparisons[0]]
 
     @pn.depends(
         "mode", "statistic", "window_size", "colormap", "comparisons.value"
@@ -222,6 +220,10 @@ class MultiwayStats(View):
         sample_sets_ids = list(sample_sets_dictionary.keys())
         if len(sample_sets_ids) < 2:
             return self.sample_select_warning
+        elif self.comparisons.value == []:
+            return pn.pane.Markdown(
+                "**Select which sample sets to compare to see this plot.**"
+            )
         sample_sets_individuals = list(sample_sets_dictionary.values())
         if self.statistic == "Fst":
             data = tsm.ts.Fst(
