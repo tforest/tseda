@@ -228,7 +228,10 @@ class IndividualsTable(Viewer):
                 "sample_set_id",
             ] = self.sample_set_to.value
 
-        if isinstance(self.restore_button.value, bool) and self.restore_button.value:
+        if (
+            isinstance(self.restore_button.value, bool)
+            and self.restore_button.value
+        ):
             self.reset_modification()
 
         data = self.data[self.columns]
