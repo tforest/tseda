@@ -235,6 +235,10 @@ class IndividualsTable(Viewer):
             page_size=self.page_size,
             formatters=self.formatters,
             editors=self.editors,
+            sorters=[
+                {"field": "id", "dir": "asc"},
+                {"field": "selected", "dir": "des"},
+            ],
             margin=10,
             text_align={col: "right" for col in self.columns},
             header_filters=self.filters,
