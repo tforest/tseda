@@ -80,18 +80,18 @@ class OnewayStats(View):
             self.window_size, self.datastore.tsm.ts.sequence_length
         )
         sample_sets_dictionary = self.datastore.individuals_table.sample_sets()
-        sample_sets_list = list(sample_sets_dictionary.keys())
-        if len(sample_sets_list) < 1:
+        sample_sets_ids = list(sample_sets_dictionary.keys())
+        if len(sample_sets_ids) < 1:
             return self.sample_select_warning
-        sample_sets = list(sample_sets_dictionary.values())
+        sample_sets_individuals = list(sample_sets_dictionary.values())
 
         if self.statistic == "Tajimas_D":
             data = self.datastore.tsm.ts.Tajimas_D(
-                sample_sets, windows=windows, mode=self.mode
+                sample_sets_individuals, windows=windows, mode=self.mode
             )
         elif self.statistic == "diversity":
             data = self.datastore.tsm.ts.diversity(
-                sample_sets, windows=windows, mode=self.mode
+                sample_sets_individuals, windows=windows, mode=self.mode
             )
         else:
             raise ValueError("Invalid statistic")
@@ -100,7 +100,7 @@ class OnewayStats(View):
             data,
             columns=[
                 self.datastore.sample_sets_table.names[i]
-                for i in sample_sets_list
+                for i in sample_sets_ids
             ],
         )
         position = hv.Dimension(
@@ -214,20 +214,20 @@ class MultiwayStats(View):
         comparisons = eval_comparisons(self.comparisons.value)
 
         sample_sets_dictionary = self.datastore.individuals_table.sample_sets()
-        sample_sets_list = list(sample_sets_dictionary.keys())
-        if len(sample_sets_list) < 2:
+        sample_sets_ids = list(sample_sets_dictionary.keys())
+        if len(sample_sets_ids) < 2:
             return self.sample_select_warning
-        sample_sets = list(sample_sets_dictionary.values())
+        sample_sets_individuals = list(sample_sets_dictionary.values())
         if self.statistic == "Fst":
             data = tsm.ts.Fst(
-                sample_sets,
+                sample_sets_individuals,
                 windows=windows,
                 indexes=comparisons,
                 mode=self.mode,
             )
         elif self.statistic == "divergence":
             data = tsm.ts.divergence(
-                sample_sets,
+                sample_sets_individuals,
                 windows=windows,
                 indexes=comparisons,
                 mode=self.mode,
