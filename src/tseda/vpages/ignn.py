@@ -295,7 +295,7 @@ class VBar(View):
 
             columns = df.columns.tolist()
             columns.remove(self.sorting)
-            id_index = columns.index('id')
+            id_index = columns.index("id")
             columns.insert(id_index + 1, self.sorting)
             df = df[columns]
             sorting_index = groups.index(self.sorting)
