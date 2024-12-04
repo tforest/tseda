@@ -92,8 +92,7 @@ class IndividualsTable(Viewer):
         description=("Reassign individuals to this sample set ID."),
     )
     mod_update_button = pn.widgets.Button(name="Update")
-    restore_button = pn.widgets.Button(name="Restore",
-                                        button_type="danger")
+    restore_button = pn.widgets.Button(name="Restore", button_type="danger")
 
     data_mod_warning = pn.pane.Alert(
         """Please enter a valid population ID and
@@ -131,7 +130,6 @@ class IndividualsTable(Viewer):
         self.sample_select.options = all_sample_set_ids
         self.sample_select.value = all_sample_set_ids
 
-    
     @property
     def tooltip(self):
         return pn.widgets.TooltipIcon(
@@ -206,7 +204,7 @@ class IndividualsTable(Viewer):
         else:
             self.data_mod_warning.visible = False
             return False
-        
+
     def reset_modification(self):
         self.data.rx.value.sample_set_id = self.data.rx.value.population
 
@@ -215,7 +213,7 @@ class IndividualsTable(Viewer):
         "sample_select.value",
         "mod_update_button.value",
         "restore_button.value",
-        )
+    )
     def __panel__(self):
         if isinstance(self.sample_select.value, list):
             self.data.rx.value["selected"] = False
