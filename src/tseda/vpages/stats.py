@@ -79,21 +79,20 @@ class OnewayStats(View):
         windows = make_windows(
             self.window_size, self.datastore.tsm.ts.sequence_length
         )
-        sample_sets_list = (
-            self.datastore.individuals_table.selected_sample_set_indices()
-        )
-        if len(sample_sets_list) < 1:
+        sample_sets_dictionary = self.datastore.individuals_table.sample_sets()
+        sample_sets_ids = list(sample_sets_dictionary.keys())
+        if len(sample_sets_ids) < 1:
             return self.sample_select_warning
-        sample_sets = self.datastore.individuals_table.get_sample_sets()
+        sample_sets_individuals = list(sample_sets_dictionary.values())
 
         if self.statistic == "Tajimas_D":
             data = self.datastore.tsm.ts.Tajimas_D(
-                sample_sets, windows=windows, mode=self.mode
+                sample_sets_individuals, windows=windows, mode=self.mode
             )
             fig_text = "**Oneway Tajimas_D plot** - Lorem Ipsum"
         elif self.statistic == "diversity":
             data = self.datastore.tsm.ts.diversity(
-                sample_sets, windows=windows, mode=self.mode
+                sample_sets_individuals, windows=windows, mode=self.mode
             )
             fig_text = "**Oneway Diversity plot** - Lorem Ipsum"
         else:
@@ -103,7 +102,7 @@ class OnewayStats(View):
             data,
             columns=[
                 self.datastore.sample_sets_table.names[i]
-                for i in sample_sets_list
+                for i in sample_sets_ids
             ],
         )
         position = hv.Dimension(
@@ -194,10 +193,11 @@ class MultiwayStats(View):
         )
 
     def set_multichoice_options(self):
+        sample_sets = self.datastore.individuals_table.sample_sets()
         all_comparisons = list(
             f"{x}-{y}"
             for x, y in itertools.combinations(
-                self.datastore.individuals_table.selected_sample_set_indices(),
+                list(sample_sets.keys()),
                 2,
             )
         )
@@ -218,15 +218,14 @@ class MultiwayStats(View):
         windows = make_windows(self.window_size, tsm.ts.sequence_length)
         comparisons = eval_comparisons(self.comparisons.value)
 
-        sample_sets_list = (
-            self.datastore.individuals_table.selected_sample_set_indices()
-        )
-        if len(sample_sets_list) < 2:
+        sample_sets_dictionary = self.datastore.individuals_table.sample_sets()
+        sample_sets_ids = list(sample_sets_dictionary.keys())
+        if len(sample_sets_ids) < 2:
             return self.sample_select_warning
-        sample_sets = self.datastore.individuals_table.get_sample_sets()
+        sample_sets_individuals = list(sample_sets_dictionary.values())
         if self.statistic == "Fst":
             data = tsm.ts.Fst(
-                sample_sets,
+                sample_sets_individuals,
                 windows=windows,
                 indexes=comparisons,
                 mode=self.mode,
@@ -234,7 +233,7 @@ class MultiwayStats(View):
             fig_text = "**Multiway Fst plot** - Lorem Ipsum"
         elif self.statistic == "divergence":
             data = tsm.ts.divergence(
-                sample_sets,
+                sample_sets_individuals,
                 windows=windows,
                 indexes=comparisons,
                 mode=self.mode,

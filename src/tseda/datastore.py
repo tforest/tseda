@@ -121,8 +121,11 @@ class IndividualsTable(Viewer):
         super().__init__(**params)
         self.table.set_index(["id"], inplace=True)
         self.data = self.param.table.rx()
-        self.sample_select.options = self.sample_set_indices()
-        self.sample_select.value = self.sample_set_indices()
+        all_sample_set_ids = sorted(
+            self.data.rx.value["sample_set_id"].unique().tolist()
+        )
+        self.sample_select.options = all_sample_set_ids
+        self.sample_select.value = all_sample_set_ids
 
     @property
     def tooltip(self):
@@ -143,8 +146,9 @@ class IndividualsTable(Viewer):
         )
 
     def sample_sets(self):
+        """Returns a dictionary with a sample
+        set id to samples list mapping."""
         sample_sets = {}
-        samples = []
         inds = self.data.rx.value
         for _, ind in inds.iterrows():
             if not ind.selected:
@@ -153,23 +157,7 @@ class IndividualsTable(Viewer):
             if sample_set not in sample_sets:
                 sample_sets[sample_set] = []
             sample_sets[sample_set].extend(ind.nodes)
-            samples.extend(ind.nodes)
-        return samples, sample_sets
-
-    def get_sample_sets(self, indexes=None):
-        """Return list of sample sets and their samples."""
-        samples, sample_sets = self.sample_sets()
-        if indexes:
-            return [sample_sets[i] for i in indexes]
-        return [sample_sets[i] for i in sample_sets]
-
-    def sample_set_indices(self):
-        """Return indices of sample groups."""
-        return sorted(self.data.rx.value["sample_set_id"].unique().tolist())
-
-    def selected_sample_set_indices(self):
-        samples, sample_sets = self.sample_sets()
-        return list(sample_sets.keys())
+        return sample_sets
 
     def get_population_ids(self):
         """Return indices of sample groups."""
@@ -461,7 +449,7 @@ class DataStore(Viewer):
         return color.loc[color.selected].color
 
     def haplotype_gnn(self, focal_ind, windows=None):
-        samples, sample_sets = self.individuals_table.sample_sets()
+        sample_sets = self.individuals_table.sample_sets()
         ind = self.individuals_table.loc(focal_ind)
         hap = windowed_genealogical_nearest_neighbours(
             self.tsm.ts, ind.nodes, sample_sets, windows=windows

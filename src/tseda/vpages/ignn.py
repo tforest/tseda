@@ -231,7 +231,10 @@ class VBar(View):
     # TODO: move to DataStore class?
     def gnn(self):
         inds = self.datastore.individuals_table.data.rx.value
-        samples, sample_sets = self.datastore.individuals_table.sample_sets()
+        sample_sets = self.datastore.individuals_table.sample_sets()
+        samples = [
+            sample for sublist in sample_sets.values() for sample in sublist
+        ]
         self.param.sorting.objects = [""] + list(
             self.datastore.sample_sets_table.names.values()
         )
@@ -253,7 +256,7 @@ class VBar(View):
 
     @pn.depends("sorting", "sort_order")
     def __panel__(self):
-        samples, sample_sets = self.datastore.individuals_table.sample_sets()
+        sample_sets = self.datastore.individuals_table.sample_sets()
         if len(list(sample_sets.keys())) < 1:
             return self.warning_pane
         df = self.gnn()
