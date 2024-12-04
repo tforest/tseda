@@ -172,7 +172,6 @@ class GNNHaplotype(View):
             self.individual_id_warning.visible = True
             return (None, info_column)
 
-
     @pn.depends("individual_id", "window_size")
     def __panel__(self, **params):
         inds = self.datastore.individuals_table.data.rx.value
