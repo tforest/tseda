@@ -227,7 +227,17 @@ class MultiwayStats(View):
         all_sample_sets = self.datastore.individuals_table.sample_sets(
             only_selected=False
         )
-        sample_sets_individuals = list(all_sample_sets.values())
+        all_sample_sets_sorted = {
+            key: all_sample_sets[key] for key in sorted(all_sample_sets)
+        }
+        sample_sets_individuals = list(all_sample_sets_sorted.values())
+        comparisons = [
+            (
+                list(all_sample_sets_sorted.keys()).index(x),
+                list(all_sample_sets_sorted.keys()).index(y),
+            )
+            for x, y in comparisons
+        ]
         if self.statistic == "Fst":
             data = tsm.ts.Fst(
                 sample_sets_individuals,
