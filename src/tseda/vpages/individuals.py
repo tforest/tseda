@@ -67,7 +67,7 @@ class IndividualsPage(View):
             ),
             pn.pane.Markdown(
                 (
-                    "This section allows you to manage and explore" 
+                    "This section allows you to manage and explore"
                     "individual samples in your dataset "
                     "and customize Sample Sets.<br><br>"
                     "Use the controls below to customize the plots,"
