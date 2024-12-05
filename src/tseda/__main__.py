@@ -91,8 +91,8 @@ def serve(path, port, show, log_level, no_log_filter, admin):
     app_ = app.DataStoreApp(
         datastore=datastore.DataStore(
             tsm=tsm,
-            individuals_table=individuals_table,
             sample_sets_table=sample_sets_table,
+            individuals_table=individuals_table,
         ),
         title="TSEda Datastore App",
         views=[IndividualsTable],
