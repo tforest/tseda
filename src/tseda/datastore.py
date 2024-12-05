@@ -77,13 +77,13 @@ class IndividualsTable(Viewer):
         description="Select samples based on the sample set ID.",
         options=[],
     )
-    population_from = pn.widgets.NestedSelect(
+    population_from = pn.widgets.Select(
         name="Population ID",
         value=None,
         sizing_mode="stretch_width",
         # description=("Reassign individuals with this population ID."),
     )
-    sample_set_to = pn.widgets.NestedSelect(
+    sample_set_to = pn.widgets.Select(
         name="New sample set ID",
         value=None,
         sizing_mode="stretch_width",
@@ -160,8 +160,12 @@ class IndividualsTable(Viewer):
         return sample_sets
 
     def get_population_ids(self):
-        """Return indices of sample groups."""
+        """Return indices of populations."""
         return sorted(self.data.rx.value["population"].unique().tolist())
+    
+    def get_sample_set_ids(self):
+        """Return indices of sample groups."""
+        return sorted(self.data.rx.value["sample_set_id"].unique().tolist())
 
     @property
     def sample2ind(self):
@@ -209,6 +213,10 @@ class IndividualsTable(Viewer):
         watch=True,
     )
     def __panel__(self):
+
+        self.population_from.options = self.get_population_ids()
+        self.sample_set_to.options = self.get_sample_set_ids()
+
         if isinstance(self.sample_select.value, list):
             self.data.rx.value["selected"] = False
             for sample_set_id in self.sample_select.value:
