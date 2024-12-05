@@ -12,7 +12,7 @@ combinations.
 import panel as pn
 import param
 
-from tseda.datastore import IndividualsTable
+from tseda.datastore import IndividualsTable, SampleSetsTable
 
 from .core import View
 from .map import GeoMap
@@ -21,14 +21,17 @@ from .map import GeoMap
 class IndividualsPage(View):
     key = "individuals"
     title = "Individuals"
-    data = param.ClassSelector(class_=IndividualsTable)
+    sample_sets_table = param.ClassSelector(class_=SampleSetsTable)
+    individuals_table = param.ClassSelector(class_=IndividualsTable)
+
     geomap = param.ClassSelector(class_=GeoMap)
 
     def __init__(self, **params):
         super().__init__(**params)
-        self.data = self.datastore.individuals_table
         self.geomap = GeoMap(datastore=self.datastore)
-        self.sample_sets = self.datastore.sample_sets_table
+        self.sample_sets_table = self.datastore.sample_sets_table
+        self.individuals_table = self.datastore.individuals_table
+        self.individuals_table.sample_sets_table = self.sample_sets_table
 
     def __panel__(self):
         return pn.Column(
@@ -39,7 +42,7 @@ class IndividualsPage(View):
                 "affiliations through colors.",
                 sizing_mode="stretch_width",
             ),
-            self.data,
+            self.individuals_table,
         )
 
     def sidebar(self):
@@ -58,7 +61,7 @@ class IndividualsPage(View):
                 sizing_mode="stretch_width",
             ),
             self.geomap.sidebar,
-            self.data.options_sidebar,
-            self.data.modification_sidebar,
-            self.sample_sets.sidebar_table,
+            self.individuals_table.options_sidebar,
+            self.individuals_table.modification_sidebar,
+            self.sample_sets_table.sidebar_table,
         )

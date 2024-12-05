@@ -36,8 +36,8 @@ individuals_table, sample_sets_table = datastore.preprocess(tsm)
 app_ = app.DataStoreApp(
     datastore=datastore.DataStore(
         tsm=tsm,
-        individuals_table=individuals_table,
         sample_sets_table=sample_sets_table,
+        individuals_table=individuals_table,
     ),
     title="TSEda Datastore App",
     views=[datastore.IndividualsTable],

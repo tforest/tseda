@@ -86,7 +86,7 @@ class SampleSet:
 
     name_re = re.compile(r"^(name|Name|population|Population)$")
 
-    id: np.int32
+    sample_set_id: np.int32
     name: str = None
     color: str = None
     population: dataclasses.InitVar[tskit.Population | None] = None
@@ -96,11 +96,11 @@ class SampleSet:
 
     def __post_init__(self, population):
         if self.color is None:
-            self.color = self.colormap[self.id % len(self.colormap)]
+            self.color = self.colormap[self.sample_set_id % len(self.colormap)]
         if population is not None:
             self.name = parse_metadata(population, self.name_re)
         if self.name is None:
-            self.name = f"SampleSet-{self.id}"
+            self.name = f"SampleSet-{self.sample_set_id}"
 
 
 @dataclasses.dataclass

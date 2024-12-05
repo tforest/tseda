@@ -71,8 +71,8 @@ class DataStoreApp(Viewer):
         logger.info(f"Initialised pages in {time.time() - t:.2f}s")
 
         updating = (
-            self.datastore.individuals_table.data.rx.updating()
-            | self.datastore.sample_sets_table.data.rx.updating()
+            self.datastore.sample_sets_table.data.rx.updating()
+            | self.datastore.individuals_table.data.rx.updating()
         )
         updating.rx.watch(
             lambda updating: pn.state.curdoc.hold()
