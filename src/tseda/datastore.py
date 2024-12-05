@@ -77,19 +77,17 @@ class IndividualsTable(Viewer):
         description="Select samples based on the sample set ID.",
         options=[],
     )
-    population_from = pn.widgets.IntInput(
+    population_from = pn.widgets.NestedSelect(
         name="Population ID",
         value=None,
-        placeholder="0",
         sizing_mode="stretch_width",
-        description=("Reassign individuals with this population ID."),
+        # description=("Reassign individuals with this population ID."),
     )
-    sample_set_to = pn.widgets.IntInput(
+    sample_set_to = pn.widgets.NestedSelect(
         name="New sample set ID",
-        placeholder="0",
         value=None,
         sizing_mode="stretch_width",
-        description=("Reassign individuals to this sample set ID."),
+        # description=("Reassign individuals to this sample set ID."),
     )
     mod_update_button = pn.widgets.Button(name="Update")
 
