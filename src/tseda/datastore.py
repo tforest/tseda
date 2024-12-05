@@ -284,10 +284,6 @@ class SampleSetsTable(Viewer):
     default_columns = ["name", "color", "predefined"]
     editors = {k: None for k in default_columns}
 
-    config = {
-        "COLORS": config.COLORS[:]
-    }
-
     editors = {
         "name": {"type": "input", "validator": "unique", "search": True},
         "color": {
@@ -297,10 +293,11 @@ class SampleSetsTable(Viewer):
                     "value": color, 
                     "label": f'<div style="background-color:{color}; width: 100%; height: 20px;"></div>'
                 }
-                for color in config["COLORS"]
+                for color in config.COLORS
             ],
         },
         "predefined": {"type": "tickCross"},
+        "valueLookup": True,
     }
 
     formatters = {
