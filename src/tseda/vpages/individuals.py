@@ -19,8 +19,8 @@ from .map import GeoMap
 
 
 class IndividualsPage(View):
-    key = "individuals"
-    title = "Individuals"
+    key = "individuals and sets"
+    title = "Individuals & sets"
     sample_sets_table = param.ClassSelector(class_=SampleSetsTable)
     individuals_table = param.ClassSelector(class_=IndividualsTable)
 
@@ -35,12 +35,24 @@ class IndividualsPage(View):
 
     def __panel__(self):
         return pn.Column(
-            self.geomap,
-            pn.pane.Markdown(
-                "**Map** - Displays the geographical locations where samples "
-                "were collected and visually represents their group sample "
-                "affiliations through colors.",
-                sizing_mode="stretch_width",
+            pn.Row(pn.Column(
+                    pn.pane.HTML(
+                    "<h2 style='margin: 0;'>Geomap</h2>",
+                    sizing_mode="stretch_width",
+                    ),
+                    self.geomap,
+                    pn.pane.Markdown(
+                        "**Map** - Displays the geographical locations where samples "
+                        "were collected and visually represents their group sample "
+                        "affiliations through colors.",
+                        sizing_mode="stretch_width",
+                    ),
+                ),
+                pn.Spacer(width=50),
+                pn.Column(
+                    self.sample_sets_table,
+                    width=400,
+                ),
             ),
             self.individuals_table,
         )
@@ -48,20 +60,19 @@ class IndividualsPage(View):
     def sidebar(self):
         return pn.Column(
             pn.pane.HTML(
-                "<h2 style='margin: 0;'>Individuals</h2>",
+                "<h2 style='margin: 0;'>Individuals & sets</h2>",
                 sizing_mode="stretch_width",
             ),
             pn.pane.Markdown(
                 (
-                    "This section allows you to manage and explore "
-                    "individual samples in your dataset.<br><br>"
-                    "Use the controls below to customize the "
-                    "plots and adjust parameters."
+                    "This section allows you to manage and explore individual samples in your dataset "
+                    "and customize Sample Sets.<br><br>"
+                    "Use the controls below to customize the plots, adjust parameters, and add new samples."
                 ),
                 sizing_mode="stretch_width",
             ),
             self.geomap.sidebar,
             self.individuals_table.options_sidebar,
             self.individuals_table.modification_sidebar,
-            self.sample_sets_table.sidebar_table,
+            self.sample_sets_table.sidebar,
         )
