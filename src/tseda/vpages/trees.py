@@ -51,12 +51,26 @@ class Tree(View):
         lambda x: x.prev_tree(), doc="Previous tree", label="Previous tree"
     )
 
-    y_axis = pn.widgets.Checkbox(name="Y-axis", value=True)
-    y_ticks = pn.widgets.Checkbox(name="Y-ticks", value=True)
-    x_axis = pn.widgets.Checkbox(name="X-axis", value=False)
+    y_axis = pn.widgets.Checkbox(name="Include y-axis", value=True)
+    y_ticks = pn.widgets.Checkbox(name="Include y-ticks", value=True)
+    x_axis = pn.widgets.Checkbox(name="Include x-axis", value=False)
     sites_mutations = pn.widgets.Checkbox(
-        name="Sites and mutations", value=True
+        name="Include sites and mutations", value=True
     )
+    pack_unselected = pn.widgets.Checkbox(
+        name="Pack unselected sample sets", value=False, width=197
+    )
+    options_doc = pn.widgets.TooltipIcon(
+        value=(
+            """Select various elements to include in your graph.
+            Pack unselected sample sets: Selecting this option 
+            will allow large polytomies involving unselected 
+            samples to be summarised as a dotted line. Selection 
+            of samples and sample sets can be done on the 
+            Individuals page."""
+        ),
+    )
+
     node_labels = param.String(
         default="{}",
         doc=(
@@ -167,16 +181,25 @@ class Tree(View):
         "y_ticks.value",
         "x_axis.value",
         "sites_mutations.value",
+        "pack_unselected.value",
         "node_labels",
         "additional_options",
         "slider.value_throttled",
     )
     def __panel__(self):
+        sample_sets = self.datastore.individuals_table.sample_sets()
+        selected_samples = [
+            int(i) for sublist in list(sample_sets.values()) for i in sublist
+        ]
         if self.position is not None:
-            tree = self.datastore.tsm.ts.at(self.position)
+            tree = self.datastore.tsm.ts.at(
+                self.position, tracked_samples=selected_samples
+            )
             self.tree_index = tree.index
         else:
-            tree = self.datastore.tsm.ts.at_index(self.tree_index)
+            tree = self.datastore.tsm.ts.at_index(
+                self.tree_index, tracked_samples=selected_samples
+            )
             self.slider.value = int(tree.get_interval()[0])
         try:
             omit_sites, y_ticks = self.handle_advanced()
@@ -190,6 +213,7 @@ class Tree(View):
                 omit_sites=omit_sites,
                 node_labels=node_labels,
                 y_ticks=y_ticks,
+                pack_untracked_polytomies=self.pack_unselected.value,
                 style=self.default_css,
                 **additional_options,
             )
@@ -258,11 +282,12 @@ class Tree(View):
                     tskit documentation</a> for more information
                     about these plotting options.<b>"""
                 ),
-                pn.pane.HTML("Include"),
+                pn.Row(pn.pane.HTML("Options", width=30), self.options_doc),
                 self.x_axis,
                 self.y_axis,
                 self.y_ticks,
                 self.sites_mutations,
+                self.pack_unselected,
                 self.param.symbol_size,
                 self.param.node_labels,
                 self.param.additional_options,
