@@ -74,7 +74,7 @@ class SampleSetsTable(Viewer):
 
     def __init__(self, **params):
         super().__init__(**params)
-        self.table.set_index(["id"], inplace=True)
+        self.table.set_index(["sample_set_id"], inplace=True)
         self.data = self.param.table.rx()
 
     @property
@@ -131,9 +131,8 @@ class SampleSetsTable(Viewer):
         )
     
     def get_ids(self):
-        print(self.table.values)
-        print(self.table.columns)
-        return self.table["sample_set_id"].tolist()
+        # id is not present in the table so cant be used
+        return [i for i in range(len(self.table["name"].tolist()))]
 
     def sidebar_table(self):
         table = pn.widgets.Tabulator(
