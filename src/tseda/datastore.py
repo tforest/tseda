@@ -129,12 +129,12 @@ class SampleSetsTable(Viewer):
             editors=self.editors,
         )
         title = pn.pane.HTML(
-                    "<h2 style='margin: 0;'>Sample set table</h2>",
-                    sizing_mode="stretch_width",
-                    )
+            "<h2 style='margin: 0;'>Sample set table</h2>",
+            sizing_mode="stretch_width",
+        )
         return pn.Column(
-            pn.Row(title, self.tooltip, align=('start', 'end')),
-            table
+            pn.Row(title, self.tooltip, align=("start", "end")),
+            table,
         )
 
     def get_ids(self):
@@ -444,8 +444,9 @@ class IndividualsTable(Viewer):
             "<h2 style='margin: 0;'>Individuals table</h2>",
             sizing_mode="stretch_width",
         )
-        return pn.Column(pn.Row(title, self.tooltip, align=('start', 'end')), 
-                         table)
+        return pn.Column(
+            pn.Row(title, self.tooltip, align=("start", "end")), table
+        )
 
     def options_sidebar(self):
         return pn.Card(
