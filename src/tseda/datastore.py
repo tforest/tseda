@@ -291,7 +291,10 @@ class SampleSetsTable(Viewer):
             "values": [
                 {
                     "value": color,
-                    "label": f'<div style="background-color:{color}; width: 100%; height: 20px;"></div>',
+                    "label": (
+                        f'<div style="background-color:{color}; '
+                        f'width: 100%; height: 20px;"></div>'
+                    ),
                 }
                 for color in config.COLORS
             ],
