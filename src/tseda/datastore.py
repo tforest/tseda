@@ -26,7 +26,7 @@ def make_individuals_table(tsm):
 def make_sample_sets_table(tsm):
     result = []
     for ts_pop in tsm.ts.populations():
-        ss = SampleSet(id=ts_pop.id, population=ts_pop, predefined=True)
+        ss = SampleSet(sample_set_id=ts_pop.id, population=ts_pop, predefined=True)
         result.append(ss)
     return SampleSetsTable(table=pd.DataFrame(result))
 
@@ -36,8 +36,9 @@ def preprocess(tsm):
     logger.info(
         "Preprocessing data: making individuals and sample sets tables"
     )
-    individuals_table = make_individuals_table(tsm)
+    
     sample_sets_table = make_sample_sets_table(tsm)
+    individuals_table = make_individuals_table(tsm)
     return individuals_table, sample_sets_table
 
 
@@ -128,6 +129,11 @@ class SampleSetsTable(Viewer):
         return pn.Column(
             pn.pane.Markdown("### Sample Set Table"), self.tooltip, table
         )
+    
+    def get_ids(self):
+        print(self.table.values)
+        print(self.table.columns)
+        return self.table["sample_set_id"].tolist()
 
     def sidebar_table(self):
         table = pn.widgets.Tabulator(
@@ -207,6 +213,8 @@ class IndividualsTable(Viewer):
     """Class to hold and view individuals and perform calculations to
     change filters."""
 
+    sample_sets_table = param.ClassSelector(class_=SampleSetsTable)
+    
     columns = [
         "name",
         "population",
@@ -327,8 +335,12 @@ class IndividualsTable(Viewer):
     
     def get_sample_set_ids(self):
         """Return indices of sample groups."""
-        return sorted(self.data.rx.value["sample_set_id"].unique().tolist())
-
+        individuals_sets = sorted(self.data.rx.value["sample_set_id"].tolist())
+        if self.sample_sets_table is not None: #Nonetype when not yet defined
+            individuals_sets = (individuals_sets +
+                            self.sample_sets_table.get_ids())
+        return sorted(list(set(individuals_sets)))
+    
     @property
     def sample2ind(self):
         """Map sample (tskit node) ids to individual ids"""
@@ -448,8 +460,8 @@ class IndividualsTable(Viewer):
 
 class DataStore(Viewer):
     tsm = param.ClassSelector(class_=model.TSModel)
-    individuals_table = param.ClassSelector(class_=IndividualsTable)
     sample_sets_table = param.ClassSelector(class_=SampleSetsTable)
+    individuals_table = param.ClassSelector(class_=IndividualsTable)
 
     views = param.List(constant=True)
 
