@@ -290,9 +290,7 @@ class IndividualsTable(Viewer):
         super().__init__(**params)
         self.table.set_index(["id"], inplace=True)
         self.data = self.param.table.rx()
-        all_sample_set_ids = sorted(
-            self.data.rx.value["sample_set_id"].unique().tolist()
-        )
+        all_sample_set_ids = self.get_sample_set_ids()
         self.sample_select.options = all_sample_set_ids
         self.sample_select.value = all_sample_set_ids
 
@@ -388,7 +386,9 @@ class IndividualsTable(Viewer):
     def __panel__(self):
 
         self.population_from.options = self.get_population_ids()
-        self.sample_set_to.options = self.get_sample_set_ids()
+        all_sample_set_ids = self.get_sample_set_ids()
+        self.sample_set_to.options = all_sample_set_ids
+        self.sample_select.options = all_sample_set_ids
 
         if isinstance(self.sample_select.value, list):
             self.data.rx.value["selected"] = False
