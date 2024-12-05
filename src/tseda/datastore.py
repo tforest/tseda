@@ -290,8 +290,8 @@ class SampleSetsTable(Viewer):
             "type": "list",
             "values": [
                 {
-                    "value": color, 
-                    "label": f'<div style="background-color:{color}; width: 100%; height: 20px;"></div>'
+                    "value": color,
+                    "label": f'<div style="background-color:{color}; width: 100%; height: 20px;"></div>',
                 }
                 for color in config.COLORS
             ],
@@ -303,7 +303,6 @@ class SampleSetsTable(Viewer):
     formatters = {
         "color": {"type": "color"},
         "predefined": {"type": "tickCross"},
-        
     }
 
     create_sample_set_textinput = param.String(
