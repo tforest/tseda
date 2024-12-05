@@ -67,9 +67,11 @@ class IndividualsPage(View):
             ),
             pn.pane.Markdown(
                 (
-                    "This section allows you to manage and explore individual samples in your dataset "
+                    "This section allows you to manage and explore" 
+                    "individual samples in your dataset "
                     "and customize Sample Sets.<br><br>"
-                    "Use the controls below to customize the plots, adjust parameters, and add new samples."
+                    "Use the controls below to customize the plots,"
+                    "adjust parameters, and add new samples."
                 ),
                 sizing_mode="stretch_width",
             ),
