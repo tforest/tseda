@@ -292,6 +292,15 @@ class VBar(View):
                 ["sample_set_id"] + [self.sorting] + ["sample_id", "id"]  # pyright: ignore[reportOperatorIssue]
             )
             ascending = [True, False, False, False]
+
+            columns = df.columns.tolist()
+            columns.remove(self.sorting)
+            id_index = columns.index("id")
+            columns.insert(id_index + 1, self.sorting)
+            df = df[columns]
+            sorting_index = groups.index(self.sorting)
+            groups[sorting_index], groups[0] = groups[0], groups[sorting_index]
+            color[sorting_index], color[0] = color[0], color[sorting_index]
         else:
             sort_by = ["sample_set_id", "sample_id", "id"]
             ascending = [True, False, False]
