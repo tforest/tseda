@@ -133,8 +133,10 @@ class SampleSetsTable(Viewer):
         )
 
     def get_ids(self):
-        # id is not present in the table so cant be used
-        return [i for i in range(len(self.table["name"].tolist()))]
+        if isinstance(self.table, pd.DataFrame):
+            return [i for i in range(len(self.table["name"].tolist()))]
+        else:
+            raise TypeError("self.table is not a valid pandas DataFrame.")
 
     def sidebar_table(self):
         table = pn.widgets.Tabulator(
