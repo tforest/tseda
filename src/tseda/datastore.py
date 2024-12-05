@@ -26,7 +26,9 @@ def make_individuals_table(tsm):
 def make_sample_sets_table(tsm):
     result = []
     for ts_pop in tsm.ts.populations():
-        ss = SampleSet(sample_set_id=ts_pop.id, population=ts_pop, predefined=True)
+        ss = SampleSet(
+            sample_set_id=ts_pop.id, population=ts_pop, predefined=True
+        )
         result.append(ss)
     return SampleSetsTable(table=pd.DataFrame(result))
 
@@ -36,7 +38,7 @@ def preprocess(tsm):
     logger.info(
         "Preprocessing data: making individuals and sample sets tables"
     )
-    
+
     sample_sets_table = make_sample_sets_table(tsm)
     individuals_table = make_individuals_table(tsm)
     return individuals_table, sample_sets_table
@@ -129,7 +131,7 @@ class SampleSetsTable(Viewer):
         return pn.Column(
             pn.pane.Markdown("### Sample Set Table"), self.tooltip, table
         )
-    
+
     def get_ids(self):
         # id is not present in the table so cant be used
         return [i for i in range(len(self.table["name"].tolist()))]
@@ -213,7 +215,7 @@ class IndividualsTable(Viewer):
     change filters."""
 
     sample_sets_table = param.ClassSelector(class_=SampleSetsTable)
-    
+
     columns = [
         "name",
         "population",
@@ -329,15 +331,16 @@ class IndividualsTable(Viewer):
     def get_population_ids(self):
         """Return indices of populations."""
         return sorted(self.data.rx.value["population"].unique().tolist())
-    
+
     def get_sample_set_ids(self):
         """Return indices of sample groups."""
         individuals_sets = sorted(self.data.rx.value["sample_set_id"].tolist())
-        if self.sample_sets_table is not None: #Nonetype when not yet defined
-            individuals_sets = (individuals_sets +
-                            self.sample_sets_table.get_ids())
+        if self.sample_sets_table is not None:  # Nonetype when not yet defined
+            individuals_sets = (
+                individuals_sets + self.sample_sets_table.get_ids()
+            )
         return sorted(list(set(individuals_sets)))
-    
+
     @property
     def sample2ind(self):
         """Map sample (tskit node) ids to individual ids"""
@@ -384,7 +387,6 @@ class IndividualsTable(Viewer):
         watch=True,
     )
     def __panel__(self):
-
         self.population_from.options = self.get_population_ids()
         all_sample_set_ids = self.get_sample_set_ids()
         self.sample_set_to.options = all_sample_set_ids

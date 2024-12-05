@@ -23,7 +23,7 @@ class IndividualsPage(View):
     title = "Individuals"
     sample_sets_table = param.ClassSelector(class_=SampleSetsTable)
     individuals_table = param.ClassSelector(class_=IndividualsTable)
-    
+
     geomap = param.ClassSelector(class_=GeoMap)
 
     def __init__(self, **params):
