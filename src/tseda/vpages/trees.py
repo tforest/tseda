@@ -171,36 +171,7 @@ class Tree(View):
     def update_position(self):
         self.position = self.slider.value
 
-    @param.depends(
-        "width",
-        "height",
-        "position",
-        "symbol_size",
-        "tree_index",
-        "y_axis.value",
-        "y_ticks.value",
-        "x_axis.value",
-        "sites_mutations.value",
-        "pack_unselected.value",
-        "node_labels",
-        "additional_options",
-        "slider.value_throttled",
-    )
-    def __panel__(self):
-        sample_sets = self.datastore.individuals_table.sample_sets()
-        selected_samples = [
-            int(i) for sublist in list(sample_sets.values()) for i in sublist
-        ]
-        if self.position is not None:
-            tree = self.datastore.tsm.ts.at(
-                self.position, tracked_samples=selected_samples
-            )
-            self.tree_index = tree.index
-        else:
-            tree = self.datastore.tsm.ts.at_index(
-                self.tree_index, tracked_samples=selected_samples
-            )
-            self.slider.value = int(tree.get_interval()[0])
+    def plot_tree(self, tree):
         try:
             omit_sites, y_ticks = self.handle_advanced()
             node_labels = eval_options(self.node_labels)
@@ -230,11 +201,58 @@ class Tree(View):
         pos2 = int(tree.get_interval()[1]) - 1
         return pn.Column(
             pn.pane.HTML(
-                f"<h2>Tree index {self.tree_index}"
+                f"<h2>Tree index {tree.index}"
                 f" (position {pos1} - {pos2})</h2>",
                 sizing_mode="stretch_width",
             ),
             pn.pane.HTML(plot),
+        )
+
+    def get_all_trees(self, trees):
+        if not trees:
+            return None
+        rows = [pn.Row(*trees[i : i + 2]) for i in range(0, len(trees), 2)]
+        return pn.Column(*rows)
+
+    @param.depends(
+        "width",
+        "height",
+        "position",
+        "symbol_size",
+        "tree_index",
+        "y_axis.value",
+        "y_ticks.value",
+        "x_axis.value",
+        "sites_mutations.value",
+        "pack_unselected.value",
+        "node_labels",
+        "additional_options",
+        "slider.value_throttled",
+    )
+    def __panel__(self):
+        num_trees = 5
+
+        sample_sets = self.datastore.individuals_table.sample_sets()
+        selected_samples = [
+            int(i) for sublist in list(sample_sets.values()) for i in sublist
+        ]
+        trees = []
+        for i in range(num_trees):
+            if self.position is not None:
+                tree = self.datastore.tsm.ts.at(self.position)
+                self.tree_index = tree.index
+                tree = self.datastore.tsm.ts.at_index(
+                    (tree.index + i), tracked_samples=selected_samples
+                )
+            else:
+                tree = self.datastore.tsm.ts.at_index(
+                    int(self.tree_index) + i, tracked_samples=selected_samples
+                )
+                self.slider.value = int(tree.get_interval()[0])
+            trees.append(self.plot_tree(tree))
+        all_trees = self.get_all_trees(trees)
+        return pn.Column(
+            all_trees,
             pn.pane.Markdown("**Tree plot** - Lorem Ipsum"),
             self.slider,
             pn.Row(
