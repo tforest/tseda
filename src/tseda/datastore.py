@@ -263,6 +263,7 @@ class IndividualsTable(Viewer):
         # description=("Reassign individuals to this sample set ID."),
     )
     mod_update_button = pn.widgets.Button(name="Update")
+    restore_button = pn.widgets.Button(name="Restore", button_type="danger")
 
     data_mod_warning = pn.pane.Alert(
         """Please enter a valid population ID and
@@ -382,11 +383,14 @@ class IndividualsTable(Viewer):
             self.data_mod_warning.visible = False
             return False
 
+    def reset_modification(self):
+        self.data.rx.value.sample_set_id = self.data.rx.value.population
+
     @pn.depends(
         "page_size",
         "sample_select.value",
         "mod_update_button.value",
-        watch=True,
+        "restore_button.value",
     )
     def __panel__(self):
         self.population_from.options = self.get_population_ids()
@@ -406,6 +410,13 @@ class IndividualsTable(Viewer):
                 self.table["population"] == self.population_from.value,  # pyright: ignore[reportIndexIssue]
                 "sample_set_id",
             ] = self.sample_set_to.value
+
+        if (
+            isinstance(self.restore_button.value, bool)
+            and self.restore_button.value
+        ):
+            self.reset_modification()
+
         data = self.data[self.columns]
 
         table = pn.widgets.Tabulator(
@@ -450,7 +461,7 @@ class IndividualsTable(Viewer):
             pn.Card(
                 self.modification_header,
                 pn.Row(self.population_from, self.sample_set_to),
-                self.mod_update_button,
+                pn.Column(self.mod_update_button, self.restore_button),
                 collapsed=False,
                 title="Data modification",
                 header_background=config.SIDEBAR_BACKGROUND,
