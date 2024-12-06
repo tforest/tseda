@@ -43,7 +43,9 @@ class Tree(View):
     )
 
     position_index_warning = pn.pane.Alert(
-        "The input for position or tree index is out of bounds for the specified number of trees.",
+        """The input for position or tree index is 
+        out of bounds for the specified number 
+        of trees.""",
         alert_type="warning",
         visible=False,
     )
