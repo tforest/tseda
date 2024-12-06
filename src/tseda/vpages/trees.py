@@ -51,6 +51,13 @@ class Tree(View):
         lambda x: x.prev_tree(), doc="Previous tree", label="Previous tree"
     )
 
+    num_trees = pn.widgets.Select(
+        name="Number of trees",
+        options=[1, 2, 3, 4, 5, 6],
+        value=1,
+        description="Select the number of trees to display. The first tree will represent your selected chromosome position or tree index.",
+    )
+
     y_axis = pn.widgets.Checkbox(name="Include y-axis", value=True)
     y_ticks = pn.widgets.Checkbox(name="Include y-ticks", value=True)
     x_axis = pn.widgets.Checkbox(name="Include x-axis", value=False)
@@ -220,6 +227,7 @@ class Tree(View):
         "position",
         "symbol_size",
         "tree_index",
+        "num_trees.value",
         "y_axis.value",
         "y_ticks.value",
         "x_axis.value",
@@ -230,14 +238,12 @@ class Tree(View):
         "slider.value_throttled",
     )
     def __panel__(self):
-        num_trees = 5
-
         sample_sets = self.datastore.individuals_table.sample_sets()
         selected_samples = [
             int(i) for sublist in list(sample_sets.values()) for i in sublist
         ]
         trees = []
-        for i in range(num_trees):
+        for i in range(self.num_trees.value):
             if self.position is not None:
                 tree = self.datastore.tsm.ts.at(self.position)
                 self.tree_index = tree.index
@@ -300,6 +306,7 @@ class Tree(View):
                     tskit documentation</a> for more information
                     about these plotting options.<b>"""
                 ),
+                self.num_trees,
                 pn.Row(pn.pane.HTML("Options", width=30), self.options_doc),
                 self.x_axis,
                 self.y_axis,
