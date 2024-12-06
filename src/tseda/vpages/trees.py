@@ -166,7 +166,7 @@ class Tree(View):
         if self.node_labels == "":
             self.node_labels = "{}"
         if self.additional_options == "":
-            self.node_options = "{}"
+            self.additional_options = "{}"
         return omit_sites, y_ticks
 
     @param.depends("position", watch=True)
@@ -178,11 +178,10 @@ class Tree(View):
     def update_position(self):
         self.position = self.slider.value
 
-    def plot_tree(self, tree):
+    def plot_tree(
+        self, tree, omit_sites, y_ticks, node_labels, additional_options
+    ):
         try:
-            omit_sites, y_ticks = self.handle_advanced()
-            node_labels = eval_options(self.node_labels)
-            additional_options = eval_options(self.additional_options)
             plot = tree.draw_svg(
                 size=(self.width, self.height),
                 symbol_size=self.symbol_size,
@@ -220,7 +219,7 @@ class Tree(View):
             return None
         rows = [pn.Row(*trees[i : i + 2]) for i in range(0, len(trees), 2)]
         return pn.Column(*rows)
-    
+
     @param.depends("num_trees.value", watch=True)
     def multiple_trees(self):
         if int(self.num_trees.value) > 1:
@@ -231,7 +230,7 @@ class Tree(View):
             self.y_ticks.value = False
             self.sites_mutations.value = False
             self.pack_unselected.value = True
-            self.symbol_size =6
+            self.symbol_size = 6
 
     @param.depends(
         "width",
@@ -254,6 +253,14 @@ class Tree(View):
         selected_samples = [
             int(i) for sublist in list(sample_sets.values()) for i in sublist
         ]
+        omit_sites, y_ticks = self.handle_advanced()
+        try:
+            node_labels = eval_options(self.node_labels)
+            additional_options = eval_options(self.additional_options)
+        except (ValueError, SyntaxError, TypeError):
+            node_labels = None
+            additional_options = None
+            self.advanced_warning.visible = True
         trees = []
         for i in range(self.num_trees.value):
             if self.position is not None:
@@ -267,7 +274,11 @@ class Tree(View):
                     int(self.tree_index) + i, tracked_samples=selected_samples
                 )
                 self.slider.value = int(tree.get_interval()[0])
-            trees.append(self.plot_tree(tree))
+            trees.append(
+                self.plot_tree(
+                    tree, omit_sites, y_ticks, node_labels, additional_options
+                )
+            )
         all_trees = self.get_all_trees(trees)
         return pn.Column(
             all_trees,
@@ -308,8 +319,7 @@ class Tree(View):
         return self.update_sidebar()
 
     def advanced_options(self):
-        doc_link = """https://tskit.dev/tskit/docs/stable/
-        python-api.html#tskit.TreeSequence.draw_svg"""
+        doc_link = """https://tskit.dev/tskit/docs/stable/python-api.html#tskit.TreeSequence.draw_svg"""
         sidebar_content = pn.Column(
             pn.Card(
                 pn.pane.HTML(
