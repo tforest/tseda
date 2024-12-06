@@ -242,6 +242,15 @@ class Tree(View):
             self.sites_mutations.value = False
             self.pack_unselected.value = True
             self.symbol_size = 6
+        else:
+            self.width = 750
+            self.height = 520
+            self.y_axis.value = True
+            self.x_axis.value = False
+            self.y_ticks.value = True
+            self.sites_mutations.value = True
+            self.pack_unselected.value = False
+            self.symbol_size = 8
 
     @param.depends(
         "width",
