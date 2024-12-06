@@ -37,7 +37,7 @@ class Tree(View):
     )
 
     position_index_warning = pn.pane.Alert(
-        "The input for position or tree index is out of bounds.",
+        "The input for position or tree index is out of bounds for the specified number of trees.",
         alert_type="warning",
         visible=False,
     )
@@ -113,7 +113,8 @@ class Tree(View):
     def next_tree(self):
         self.position = None
         self.tree_index = min(
-            self.datastore.tsm.ts.num_trees - 1, int(self.tree_index) + 1
+            self.datastore.tsm.ts.num_trees - self.num_trees.value,
+            int(self.tree_index) + 1,
         )
         # pyright: ignore[reportOperatorIssue]
 
@@ -137,20 +138,23 @@ class Tree(View):
         css_string = " ".join(styles)
         return css_string
 
-    @param.depends("position", "tree_index", watch=True)
     def check_inputs(self):
-        if self.position is not None and (
-            int(self.position) < 0
-            or int(self.position) >= self.datastore.tsm.ts.sequence_length
+        if self.position is not None:
+            if (
+                int(self.position) < 0
+                or int(self.position) >= self.datastore.tsm.ts.sequence_length
+            ):
+                raise ValueError
+            elif int(
+                self.datastore.tsm.ts.at(self.position).index
+                + self.num_trees.value
+            ) > int(self.datastore.tsm.ts.num_trees):
+                raise ValueError
+        if self.tree_index is not None and (
+            int(self.tree_index) < 0
+            or int(self.tree_index) + int(self.num_trees.value)
+            > self.datastore.tsm.ts.num_trees
         ):
-            self.position_index_warning.visible = True
-            raise ValueError
-        if (
-            self.tree_index is not None
-            and int(self.tree_index) < 0
-            or int(self.tree_index) >= self.datastore.tsm.ts.num_trees
-        ):
-            self.position_index_warning.visible = True
             raise ValueError
         else:
             self.position_index_warning.visible = False
@@ -250,6 +254,11 @@ class Tree(View):
         "slider.value_throttled",
     )
     def __panel__(self):
+        try:
+            self.check_inputs()
+        except ValueError:
+            self.position_index_warning.visible = True
+
         sample_sets = self.datastore.individuals_table.sample_sets()
         selected_samples = [
             int(i) for sublist in list(sample_sets.values()) for i in sublist
