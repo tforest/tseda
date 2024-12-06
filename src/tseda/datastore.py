@@ -52,7 +52,7 @@ class SampleSetsTable(Viewer):
         "values": config.COLORS,
         "valueLookup": True,
     }
-    
+
     editors = {
         "name": {"type": "input", "validator": "unique", "search": True},
         "color": {
