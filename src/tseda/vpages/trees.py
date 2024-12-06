@@ -31,13 +31,21 @@ class Tree(View):
         button_type="primary",
     )
 
-    tree_index = param.Integer(default=0, doc="Get tree by zero-based index")
+    tree_index = param.Integer(
+        default=0,
+        doc="""Get tree by zero-based index. If multiple trees are 
+        shown, this is the index of the first tree.""",
+    )
     position = param.Integer(
-        default=None, doc="Get tree at genome position (bp)"
+        default=None,
+        doc="""Get tree at genome position (bp). If multiple trees are 
+        shown, this is the position of the first tree.""",
     )
 
     position_index_warning = pn.pane.Alert(
-        "The input for position or tree index is out of bounds.",
+        """The input for position or tree index is 
+        out of bounds for the specified number 
+        of trees.""",
         alert_type="warning",
         visible=False,
     )
@@ -51,12 +59,34 @@ class Tree(View):
         lambda x: x.prev_tree(), doc="Previous tree", label="Previous tree"
     )
 
-    y_axis = pn.widgets.Checkbox(name="Y-axis", value=True)
-    y_ticks = pn.widgets.Checkbox(name="Y-ticks", value=True)
-    x_axis = pn.widgets.Checkbox(name="X-axis", value=False)
-    sites_mutations = pn.widgets.Checkbox(
-        name="Sites and mutations", value=True
+    num_trees = pn.widgets.Select(
+        name="Number of trees",
+        options=[1, 2, 3, 4, 5, 6],
+        value=1,
+        description="""Select the number of trees to display. The first tree 
+        will represent your selected chromosome position or tree index.""",
     )
+
+    y_axis = pn.widgets.Checkbox(name="Include y-axis", value=True)
+    y_ticks = pn.widgets.Checkbox(name="Include y-ticks", value=True)
+    x_axis = pn.widgets.Checkbox(name="Include x-axis", value=False)
+    sites_mutations = pn.widgets.Checkbox(
+        name="Include sites and mutations", value=True
+    )
+    pack_unselected = pn.widgets.Checkbox(
+        name="Pack unselected sample sets", value=False, width=197
+    )
+    options_doc = pn.widgets.TooltipIcon(
+        value=(
+            """Select various elements to include in your graph.
+            Pack unselected sample sets: Selecting this option 
+            will allow large polytomies involving unselected 
+            samples to be summarised as a dotted line. Selection 
+            of samples and sample sets can be done on the 
+            Individuals page."""
+        ),
+    )
+
     node_labels = param.String(
         default="{}",
         doc=(
@@ -91,7 +121,8 @@ class Tree(View):
     def next_tree(self):
         self.position = None
         self.tree_index = min(
-            self.datastore.tsm.ts.num_trees - 1, int(self.tree_index) + 1
+            self.datastore.tsm.ts.num_trees - self.num_trees.value,
+            int(self.tree_index) + 1,
         )
         # pyright: ignore[reportOperatorIssue]
 
@@ -107,28 +138,45 @@ class Tree(View):
         sample_sets = self.datastore.sample_sets_table.data.rx.value
         individuals = self.datastore.individuals_table.data.rx.value
         sample2ind = self.datastore.individuals_table.sample2ind
+        selected_sample_sets = self.datastore.individuals_table.sample_sets()
+        selected_samples = [
+            int(i)
+            for sublist in list(selected_sample_sets.values())
+            for i in sublist
+        ]
         for n in self.datastore.individuals_table.samples():
             ssid = individuals.loc[sample2ind[n]].sample_set_id
             ss = sample_sets.loc[ssid]
-            s = f".node.n{n} > .sym " + "{" + f"fill: {ss.color} " + "}"
+            if n in selected_samples:
+                s = (
+                    f".node.n{n} > .sym "
+                    + "{"
+                    + f"fill: {ss.color}; stroke: black; stroke-width: 2px;"
+                    + "}"
+                )
+            else:
+                s = f".node.n{n} > .sym " + "{" + f"fill: {ss.color} " + "}"
             styles.append(s)
         css_string = " ".join(styles)
         return css_string
 
-    @param.depends("position", "tree_index", watch=True)
     def check_inputs(self):
-        if self.position is not None and (
-            int(self.position) < 0
-            or int(self.position) >= self.datastore.tsm.ts.sequence_length
+        if self.position is not None:
+            if (
+                int(self.position) < 0
+                or int(self.position) >= self.datastore.tsm.ts.sequence_length
+            ):
+                raise ValueError
+            elif int(
+                self.datastore.tsm.ts.at(self.position).index
+                + self.num_trees.value
+            ) > int(self.datastore.tsm.ts.num_trees):
+                raise ValueError
+        if self.tree_index is not None and (
+            int(self.tree_index) < 0
+            or int(self.tree_index) + int(self.num_trees.value)
+            > self.datastore.tsm.ts.num_trees
         ):
-            self.position_index_warning.visible = True
-            raise ValueError
-        if (
-            self.tree_index is not None
-            and int(self.tree_index) < 0
-            or int(self.tree_index) >= self.datastore.tsm.ts.num_trees
-        ):
-            self.position_index_warning.visible = True
             raise ValueError
         else:
             self.position_index_warning.visible = False
@@ -145,7 +193,7 @@ class Tree(View):
         if self.node_labels == "":
             self.node_labels = "{}"
         if self.additional_options == "":
-            self.node_options = "{}"
+            self.additional_options = "{}"
         return omit_sites, y_ticks
 
     @param.depends("position", watch=True)
@@ -157,31 +205,10 @@ class Tree(View):
     def update_position(self):
         self.position = self.slider.value
 
-    @param.depends(
-        "width",
-        "height",
-        "position",
-        "symbol_size",
-        "tree_index",
-        "y_axis.value",
-        "y_ticks.value",
-        "x_axis.value",
-        "sites_mutations.value",
-        "node_labels",
-        "additional_options",
-        "slider.value_throttled",
-    )
-    def __panel__(self):
-        if self.position is not None:
-            tree = self.datastore.tsm.ts.at(self.position)
-            self.tree_index = tree.index
-        else:
-            tree = self.datastore.tsm.ts.at_index(self.tree_index)
-            self.slider.value = int(tree.get_interval()[0])
+    def plot_tree(
+        self, tree, omit_sites, y_ticks, node_labels, additional_options
+    ):
         try:
-            omit_sites, y_ticks = self.handle_advanced()
-            node_labels = eval_options(self.node_labels)
-            additional_options = eval_options(self.additional_options)
             plot = tree.draw_svg(
                 size=(self.width, self.height),
                 symbol_size=self.symbol_size,
@@ -190,6 +217,7 @@ class Tree(View):
                 omit_sites=omit_sites,
                 node_labels=node_labels,
                 y_ticks=y_ticks,
+                pack_untracked_polytomies=self.pack_unselected.value,
                 style=self.default_css,
                 **additional_options,
             )
@@ -206,12 +234,105 @@ class Tree(View):
         pos2 = int(tree.get_interval()[1]) - 1
         return pn.Column(
             pn.pane.HTML(
-                f"<h2>Tree index {self.tree_index}"
+                f"<h2>Tree index {tree.index}"
                 f" (position {pos1} - {pos2})</h2>",
                 sizing_mode="stretch_width",
             ),
             pn.pane.HTML(plot),
-            pn.pane.Markdown("**Tree plot** - Lorem Ipsum"),
+        )
+
+    def get_all_trees(self, trees):
+        if not trees:
+            return None
+        rows = [pn.Row(*trees[i : i + 2]) for i in range(0, len(trees), 2)]
+        return pn.Column(*rows)
+
+    @param.depends("num_trees.value", watch=True)
+    def multiple_trees(self):
+        if int(self.num_trees.value) > 1:
+            self.width = 470
+            self.height = 470
+            self.y_axis.value = False
+            self.x_axis.value = False
+            self.y_ticks.value = False
+            self.sites_mutations.value = False
+            self.pack_unselected.value = True
+            self.symbol_size = 6
+        else:
+            self.width = 750
+            self.height = 520
+            self.y_axis.value = True
+            self.x_axis.value = False
+            self.y_ticks.value = True
+            self.sites_mutations.value = True
+            self.pack_unselected.value = False
+            self.symbol_size = 8
+
+    @param.depends(
+        "width",
+        "height",
+        "position",
+        "symbol_size",
+        "tree_index",
+        "num_trees.value",
+        "y_axis.value",
+        "y_ticks.value",
+        "x_axis.value",
+        "sites_mutations.value",
+        "pack_unselected.value",
+        "node_labels",
+        "additional_options",
+        "slider.value_throttled",
+    )
+    def __panel__(self):
+        try:
+            self.check_inputs()
+        except ValueError:
+            self.position_index_warning.visible = True
+            raise ValueError("Inputs for position or tree index are not valid")
+
+        sample_sets = self.datastore.individuals_table.sample_sets()
+        selected_samples = [
+            int(i) for sublist in list(sample_sets.values()) for i in sublist
+        ]
+        if len(selected_samples) < 1:
+            self.pack_unselected.value = False
+            self.pack_unselected.disabled = True
+        else:
+            self.pack_unselected.disabled = False
+        omit_sites, y_ticks = self.handle_advanced()
+        try:
+            node_labels = eval_options(self.node_labels)
+            additional_options = eval_options(self.additional_options)
+        except (ValueError, SyntaxError, TypeError):
+            node_labels = None
+            additional_options = None
+            self.advanced_warning.visible = True
+        trees = []
+        for i in range(self.num_trees.value):
+            if self.position is not None:
+                tree = self.datastore.tsm.ts.at(self.position)
+                self.tree_index = tree.index
+                tree = self.datastore.tsm.ts.at_index(
+                    (tree.index + i), tracked_samples=selected_samples
+                )
+            else:
+                tree = self.datastore.tsm.ts.at_index(
+                    int(self.tree_index) + i, tracked_samples=selected_samples
+                )
+                self.slider.value = int(tree.get_interval()[0])
+            trees.append(
+                self.plot_tree(
+                    tree, omit_sites, y_ticks, node_labels, additional_options
+                )
+            )
+        all_trees = self.get_all_trees(trees)
+        return pn.Column(
+            all_trees,
+            pn.pane.Markdown(
+                """**Tree plot** - Lorem Ipsum... 
+            Selected samples are marked with a black outline."""
+            ),
             self.slider,
             pn.Row(
                 self.param.prev,
@@ -248,8 +369,7 @@ class Tree(View):
         return self.update_sidebar()
 
     def advanced_options(self):
-        doc_link = """https://tskit.dev/tskit/docs/stable/
-        python-api.html#tskit.TreeSequence.draw_svg"""
+        doc_link = """https://tskit.dev/tskit/docs/stable/python-api.html#tskit.TreeSequence.draw_svg"""
         sidebar_content = pn.Column(
             pn.Card(
                 pn.pane.HTML(
@@ -258,11 +378,13 @@ class Tree(View):
                     tskit documentation</a> for more information
                     about these plotting options.<b>"""
                 ),
-                pn.pane.HTML("Include"),
+                self.num_trees,
+                pn.Row(pn.pane.HTML("Options", width=30), self.options_doc),
                 self.x_axis,
                 self.y_axis,
                 self.y_ticks,
                 self.sites_mutations,
+                self.pack_unselected,
                 self.param.symbol_size,
                 self.param.node_labels,
                 self.param.additional_options,
