@@ -157,7 +157,7 @@ class MultiwayStats(View):
         default=10000, bounds=(1, None), doc="Size of window"
     )
     comparisons = pn.widgets.MultiChoice(
-        name="Comparisons", description="Choose indexes to compare."
+        name="Comparisons", description="Choose indexes to compare.", value=[]
     )
 
     sample_select_warning = pn.pane.Alert(
@@ -202,8 +202,6 @@ class MultiwayStats(View):
             )
         )
         self.comparisons.options = all_comparisons
-        if self.comparisons.value == [] and all_comparisons != []:
-            self.comparisons.value = [all_comparisons[0]]
 
     @pn.depends(
         "mode", "statistic", "window_size", "colormap", "comparisons.value"
@@ -218,16 +216,36 @@ class MultiwayStats(View):
         windows = make_windows(self.window_size, tsm.ts.sequence_length)
         comparisons = eval_comparisons(self.comparisons.value)
 
-        sample_sets_dictionary = self.datastore.individuals_table.sample_sets()
-        sample_sets_ids = list(sample_sets_dictionary.keys())
-        if len(sample_sets_ids) < 2:
+        selected_sample_sets = self.datastore.individuals_table.sample_sets()
+        selected_sample_sets_ids = list(selected_sample_sets.keys())
+        if len(selected_sample_sets_ids) < 2:
             return self.sample_select_warning
-        sample_sets_individuals = list(sample_sets_dictionary.values())
+        elif self.comparisons.value == []:
+            return pn.pane.Markdown(
+                "**Select which sample sets to compare to see this plot.**"
+            )
+        all_sample_sets = self.datastore.individuals_table.sample_sets(
+            only_selected=False
+        )
+        all_sample_sets_sorted = {
+            key: all_sample_sets[key] for key in sorted(all_sample_sets)
+        }
+        sample_sets_individuals = list(all_sample_sets_sorted.values())
+        comparisons_indexes = [
+            (
+                list(all_sample_sets_sorted.keys()).index(x),
+                list(all_sample_sets_sorted.keys()).index(y),
+            )
+            for x, y in comparisons
+            if x in all_sample_sets_sorted and y in all_sample_sets_sorted
+        ]
+        if comparisons_indexes == []:
+            comparisons_indexes = comparisons
         if self.statistic == "Fst":
             data = tsm.ts.Fst(
                 sample_sets_individuals,
                 windows=windows,
-                indexes=comparisons,
+                indexes=comparisons_indexes,
                 mode=self.mode,
             )
             fig_text = "**Multiway Fst plot** - Lorem Ipsum"
@@ -235,7 +253,7 @@ class MultiwayStats(View):
             data = tsm.ts.divergence(
                 sample_sets_individuals,
                 windows=windows,
-                indexes=comparisons,
+                indexes=comparisons_indexes,
                 mode=self.mode,
             )
             fig_text = "**Multiway divergence plot** - Lorem Ipsum"
@@ -251,7 +269,7 @@ class MultiwayStats(View):
                         sample_sets_table.loc(j)["name"],
                     ]
                 )
-                for i, j in comparisons
+                for i, j in comparisons_indexes
             ],
         )
         position = hv.Dimension(
