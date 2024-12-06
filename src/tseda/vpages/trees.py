@@ -220,6 +220,18 @@ class Tree(View):
             return None
         rows = [pn.Row(*trees[i : i + 2]) for i in range(0, len(trees), 2)]
         return pn.Column(*rows)
+    
+    @param.depends("num_trees.value", watch=True)
+    def multiple_trees(self):
+        if int(self.num_trees.value) > 1:
+            self.width = 470
+            self.height = 470
+            self.y_axis.value = False
+            self.x_axis.value = False
+            self.y_ticks.value = False
+            self.sites_mutations.value = False
+            self.pack_unselected.value = True
+            self.symbol_size =6
 
     @param.depends(
         "width",
