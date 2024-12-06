@@ -271,7 +271,7 @@ class Tree(View):
     def __panel__(self):
         try:
             self.check_inputs()
-        except (ValueError):
+        except ValueError:
             self.position_index_warning.visible = True
             raise ValueError("Inputs for position or tree index are not valid")
 
