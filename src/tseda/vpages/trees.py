@@ -331,7 +331,7 @@ class Tree(View):
             all_trees,
             pn.pane.Markdown(
                 """**Tree plot** - Lorem Ipsum... 
-            Selected samples have are marked with a black outline."""
+            Selected samples are marked with a black outline."""
             ),
             self.slider,
             pn.Row(
