@@ -52,7 +52,26 @@ class SampleSetsTable(Viewer):
         "values": config.COLORS,
         "valueLookup": True,
     }
-    editors["name"] = {"type": "input", "validator": "unique", "search": True}
+
+    editors = {
+        "name": {"type": "input", "validator": "unique", "search": True},
+        "color": {
+            "type": "list",
+            "values": [
+                {
+                    "value": color,
+                    "label": (
+                        f'<div style="background-color:{color}; '
+                        f'width: 100%; height: 20px;"></div>'
+                    ),
+                }
+                for color in config.COLORS
+            ],
+        },
+        "predefined": {"type": "tickCross"},
+        "valueLookup": True,
+    }
+
     formatters = {
         "color": {"type": "color"},
         "predefined": {"type": "tickCross"},
@@ -322,13 +341,13 @@ class IndividualsTable(Viewer):
             ),
         )
 
-    def sample_sets(self):
+    def sample_sets(self, only_selected=True):
         """Returns a dictionary with a sample
         set id to samples list mapping."""
         sample_sets = {}
         inds = self.data.rx.value
         for _, ind in inds.iterrows():
-            if not ind.selected:
+            if not ind.selected and only_selected:
                 continue
             sample_set = ind.sample_set_id
             if sample_set not in sample_sets:
