@@ -10,6 +10,7 @@ TODO:
 
 import ast
 import itertools
+import numpy as np
 
 import holoviews as hv
 import pandas as pd
@@ -240,7 +241,9 @@ class MultiwayStats(View):
             if x in all_sample_sets_sorted and y in all_sample_sets_sorted
         ]
         if comparisons_indexes == []:
-            comparisons_indexes = comparisons
+            return pn.pane.Markdown(
+                "**Select which sample sets to compare to see this plot.**"
+            )
         if self.statistic == "Fst":
             data = tsm.ts.Fst(
                 sample_sets_individuals,
