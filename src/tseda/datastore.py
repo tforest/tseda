@@ -256,7 +256,7 @@ class IndividualsTable(Viewer):
         options=[],
     )
     population_from = pn.widgets.Select(
-        name="Population ID",
+        name="Original population ID",
         value=None,
         sizing_mode="stretch_width",
         # description=("Reassign individuals with this population ID."),
@@ -267,8 +267,8 @@ class IndividualsTable(Viewer):
         sizing_mode="stretch_width",
         # description=("Reassign individuals to this sample set ID."),
     )
-    mod_update_button = pn.widgets.Button(name="Update")
-    restore_button = pn.widgets.Button(name="Restore", button_type="danger")
+    mod_update_button = pn.widgets.Button(name="Update", button_type="success", align = "end")
+    restore_button = pn.widgets.Button(name="Restore", button_type="danger", align = "end")
 
     data_mod_warning = pn.pane.Alert(
         """Please enter a valid population ID and
