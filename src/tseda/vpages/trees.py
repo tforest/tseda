@@ -138,10 +138,24 @@ class Tree(View):
         sample_sets = self.datastore.sample_sets_table.data.rx.value
         individuals = self.datastore.individuals_table.data.rx.value
         sample2ind = self.datastore.individuals_table.sample2ind
+        selected_sample_sets = self.datastore.individuals_table.sample_sets()
+        selected_samples = [
+            int(i)
+            for sublist in list(selected_sample_sets.values())
+            for i in sublist
+        ]
         for n in self.datastore.individuals_table.samples():
             ssid = individuals.loc[sample2ind[n]].sample_set_id
             ss = sample_sets.loc[ssid]
-            s = f".node.n{n} > .sym " + "{" + f"fill: {ss.color} " + "}"
+            if n in selected_samples:
+                s = (
+                    f".node.n{n} > .sym "
+                    + "{"
+                    + f"fill: {ss.color}; stroke: black; stroke-width: 2px;"
+                    + "}"
+                )
+            else:
+                s = f".node.n{n} > .sym " + "{" + f"fill: {ss.color} " + "}"
             styles.append(s)
         css_string = " ".join(styles)
         return css_string
@@ -315,7 +329,8 @@ class Tree(View):
         all_trees = self.get_all_trees(trees)
         return pn.Column(
             all_trees,
-            pn.pane.Markdown("**Tree plot** - Lorem Ipsum"),
+            pn.pane.Markdown("""**Tree plot** - Lorem Ipsum... 
+                             Selected samples have are marked with a black outline."""),
             self.slider,
             pn.Row(
                 self.param.prev,
