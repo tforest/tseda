@@ -10,7 +10,6 @@ TODO:
 
 import ast
 import itertools
-import numpy as np
 
 import holoviews as hv
 import pandas as pd
