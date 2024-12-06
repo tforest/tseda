@@ -248,12 +248,13 @@ class Tree(View):
         return self.update_sidebar()
 
     def advanced_options(self):
+        doc_link = """https://tskit.dev/tskit/docs/stable/
+        python-api.html#tskit.TreeSequence.draw_svg"""
         sidebar_content = pn.Column(
             pn.Card(
                 pn.pane.HTML(
-                    """<b>See the <a 
-                    href='https://tskit.dev/tskit/docs/stable/
-                    python-api.html#tskit.TreeSequence.draw_svg'>
+                    f"""<b>See the <a 
+                    href={doc_link}>
                     tskit documentation</a> for more information
                     about these plotting options.<b>"""
                 ),

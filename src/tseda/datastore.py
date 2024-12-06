@@ -148,13 +148,13 @@ class IndividualsTable(Viewer):
             ),
         )
 
-    def sample_sets(self):
+    def sample_sets(self, only_selected=True):
         """Returns a dictionary with a sample
         set id to samples list mapping."""
         sample_sets = {}
         inds = self.data.rx.value
         for _, ind in inds.iterrows():
-            if not ind.selected:
+            if not ind.selected and only_selected:
                 continue
             sample_set = ind.sample_set_id
             if sample_set not in sample_sets:
