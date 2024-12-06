@@ -55,7 +55,8 @@ class Tree(View):
         name="Number of trees",
         options=[1, 2, 3, 4, 5, 6],
         value=1,
-        description="Select the number of trees to display. The first tree will represent your selected chromosome position or tree index.",
+        description="""Select the number of trees to display. The first tree 
+        will represent your selected chromosome position or tree index.""",
     )
 
     y_axis = pn.widgets.Checkbox(name="Include y-axis", value=True)
