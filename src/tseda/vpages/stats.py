@@ -231,18 +231,21 @@ class MultiwayStats(View):
             key: all_sample_sets[key] for key in sorted(all_sample_sets)
         }
         sample_sets_individuals = list(all_sample_sets_sorted.values())
-        comparisons = [
+        comparisons_indexes = [
             (
                 list(all_sample_sets_sorted.keys()).index(x),
                 list(all_sample_sets_sorted.keys()).index(y),
             )
             for x, y in comparisons
+            if x in all_sample_sets_sorted and y in all_sample_sets_sorted
         ]
+        if comparisons_indexes == []:
+            comparisons_indexes = comparisons
         if self.statistic == "Fst":
             data = tsm.ts.Fst(
                 sample_sets_individuals,
                 windows=windows,
-                indexes=comparisons,
+                indexes=comparisons_indexes,
                 mode=self.mode,
             )
             fig_text = "**Multiway Fst plot** - Lorem Ipsum"
@@ -250,7 +253,7 @@ class MultiwayStats(View):
             data = tsm.ts.divergence(
                 sample_sets_individuals,
                 windows=windows,
-                indexes=comparisons,
+                indexes=comparisons_indexes,
                 mode=self.mode,
             )
             fig_text = "**Multiway divergence plot** - Lorem Ipsum"
@@ -266,7 +269,7 @@ class MultiwayStats(View):
                         sample_sets_table.loc(j)["name"],
                     ]
                 )
-                for i, j in comparisons
+                for i, j in comparisons_indexes
             ],
         )
         position = hv.Dimension(
