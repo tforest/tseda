@@ -31,9 +31,15 @@ class Tree(View):
         button_type="primary",
     )
 
-    tree_index = param.Integer(default=0, doc="Get tree by zero-based index")
+    tree_index = param.Integer(
+        default=0,
+        doc="""Get tree by zero-based index. If multiple trees are 
+        shown, this is the index of the first tree.""",
+    )
     position = param.Integer(
-        default=None, doc="Get tree at genome position (bp)"
+        default=None,
+        doc="""Get tree at genome position (bp). If multiple trees are 
+        shown, this is the position of the first tree.""",
     )
 
     position_index_warning = pn.pane.Alert(
@@ -256,8 +262,9 @@ class Tree(View):
     def __panel__(self):
         try:
             self.check_inputs()
-        except ValueError:
+        except (ValueError):
             self.position_index_warning.visible = True
+            raise ValueError("Inputs for position or tree index are not valid")
 
         sample_sets = self.datastore.individuals_table.sample_sets()
         selected_samples = [
