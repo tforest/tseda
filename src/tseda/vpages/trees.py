@@ -329,8 +329,10 @@ class Tree(View):
         all_trees = self.get_all_trees(trees)
         return pn.Column(
             all_trees,
-            pn.pane.Markdown("""**Tree plot** - Lorem Ipsum... 
-                             Selected samples have are marked with a black outline."""),
+            pn.pane.Markdown(
+                """**Tree plot** - Lorem Ipsum... 
+            Selected samples have are marked with a black outline."""
+            ),
             self.slider,
             pn.Row(
                 self.param.prev,
