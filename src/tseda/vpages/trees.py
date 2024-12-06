@@ -254,6 +254,9 @@ class Tree(View):
         selected_samples = [
             int(i) for sublist in list(sample_sets.values()) for i in sublist
         ]
+        if len(selected_samples) < 1:
+            self.pack_unselected.value = False
+            self.pack_unselected.disabled = True
         omit_sites, y_ticks = self.handle_advanced()
         try:
             node_labels = eval_options(self.node_labels)
