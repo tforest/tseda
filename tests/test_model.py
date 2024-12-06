@@ -21,12 +21,12 @@ def test_sample_set_init(ts):
     for pop in ts.populations():
         ss = model.SampleSet(pop.id, population=pop)
         assert ss is not None
-        assert ss.id == pop.id
+        assert ss.sample_set_id == pop.id
         assert ss.name == json.loads(pop.metadata.decode())["population"]
         assert ss.color == ss.colormap[pop.id]
     ss = model.SampleSet(0, name="test")
     assert ss is not None
-    assert ss.id == 0
+    assert ss.sample_set_id == 0
     assert ss.name == "test"
     assert ss.population is None
 
