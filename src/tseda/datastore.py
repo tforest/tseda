@@ -106,7 +106,7 @@ class SampleSetsTable(Viewer):
             ),
         )
 
-    @pn.depends("create_sample_set_textinput")  # , "columns")
+    @pn.depends("create_sample_set_textinput")
     def __panel__(self):
         if self.create_sample_set_textinput is not None:
             previous_names = [
@@ -144,8 +144,10 @@ class SampleSetsTable(Viewer):
             margin=10,
             formatters=self.formatters,
             editors=self.editors,
-            configuration={'rowHeight': 40,},
-            height = 500
+            configuration={
+                "rowHeight": 40,
+            },
+            height=500,
         )
         title = pn.pane.HTML(
             "<h2 style='margin: 0;'>Sample set table</h2>",
@@ -158,7 +160,7 @@ class SampleSetsTable(Viewer):
 
     def get_ids(self):
         if isinstance(self.table, pd.DataFrame):
-            return [i for i in range(len(self.table["name"].tolist()))]
+            return self.table.index.values.tolist()
         else:
             raise TypeError("self.table is not a valid pandas DataFrame.")
 
@@ -486,7 +488,9 @@ class IndividualsTable(Viewer):
             pn.Card(
                 self.modification_header,
                 pn.Row(self.population_from, self.sample_set_to),
-                pn.Row(self.restore_button, self.mod_update_button, align = "end"),
+                pn.Row(
+                    self.restore_button, self.mod_update_button, align="end"
+                ),
                 collapsed=False,
                 title="Data modification",
                 header_background=config.SIDEBAR_BACKGROUND,
