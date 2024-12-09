@@ -141,11 +141,13 @@ class SampleSetsTable(Viewer):
             self.data,
             layout="fit_data_table",
             selectable=True,
-            page_size=self.page_size,
+            page_size=10,
             pagination="remote",
             margin=10,
             formatters=self.formatters,
             editors=self.editors,
+            configuration={'rowHeight': 40,},
+            height = 500
         )
         title = pn.pane.HTML(
             "<h2 style='margin: 0;'>Sample set table</h2>",
