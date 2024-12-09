@@ -525,9 +525,6 @@ class DataStore(Viewer):
 
     views = param.List(constant=True)
 
-    
-    
-
     def combine_tables(self):
         """Combine individuals and sample sets table."""
 
@@ -542,20 +539,47 @@ class DataStore(Viewer):
             "latitude",
         ]
         self.combined_columns = self.combined_columns if self.combined_columns else default_columns
-        combined = pd.merge(
+        combined_df = pd.merge(
             self.individuals_table.data.rx.value,
             self.sample_sets_table.data.rx.value,
             left_on="sample_set_id",
             right_index=True, 
             suffixes=("_indiv", "_sample"),
         )
-        combined.reset_index(inplace=True)
-        combined["id"] = combined.index
-        combined.rename(
+        combined_df.reset_index(inplace=True)
+        combined_df["id"] = combined_df.index
+        combined_df.rename(
             columns={"index": "id"}, inplace=True
         )
-        combined = combined[self.combined_columns]
-        return combined
+        combined_df = combined_df[self.combined_columns]
+
+        editors = {k: None for k in self.combined_columns}
+        editors["sample_set_id"] = {
+            "type": "number",
+            "valueLookup": True,
+        }
+        editors["selected"] = {
+            "type": "list",
+            "values": [False, True],
+            "valuesLookup": True,
+        }
+        formatters = self.individuals_table.formatters
+        filters = self.individuals_table.filters
+        page_size = self.individuals_table.page_size
+
+        combined_table = pn.widgets.Tabulator(
+            combined_df,
+            pagination="remote",
+            layout="fit_columns",
+            selectable=True,
+            page_size=page_size,
+            formatters=formatters,
+            editors=editors,
+            margin=10,
+            text_align={col: "right" for col in self.combined_columns},
+            header_filters=filters,
+        )
+        return combined_table
     
     def __init__(self, **params):
         super().__init__(**params)
