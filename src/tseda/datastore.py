@@ -78,7 +78,8 @@ class SampleSetsTable(Viewer):
     }
 
     create_sample_set_textinput = param.String(
-        doc="Enter name of new sample set. Press Enter (⏎) to create.",
+        doc="""Enter name of new sample set. Press Enter (⏎) to create.
+            If the new sample set does not immediately show up, refresh the page""",
         default=None,
         label="Create new sample set",
     )

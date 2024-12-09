@@ -24,12 +24,6 @@ class IndividualsPage(View):
     sample_sets_table = param.ClassSelector(class_=SampleSetsTable)
     individuals_table = param.ClassSelector(class_=IndividualsTable)
 
-    create_sample_set_textinput = param.String(
-        doc="Enter name of new sample set. Press Enter (⏎) to create.",
-        default=None,
-        label="Create new sample set",
-    )
-
     geomap = param.ClassSelector(class_=GeoMap)
 
     def __init__(self, **params):
@@ -38,10 +32,7 @@ class IndividualsPage(View):
         self.sample_sets_table = self.datastore.sample_sets_table
         self.individuals_table = self.datastore.individuals_table
         self.individuals_table.sample_sets_table = self.sample_sets_table
-        if self.create_sample_set_textinput != None:
-            self.create_sample_set_textinput.value = self.sample_sets_table.create_sample_set_textinput.value
 
-    @pn.depends("create_sample_set_textinput")
     def __panel__(self):
         return pn.Column(
             pn.Row(
@@ -67,7 +58,7 @@ class IndividualsPage(View):
             ),
             self.individuals_table,
         )
-    
+
     def sidebar(self):
         return pn.Column(
             pn.pane.HTML(
@@ -87,5 +78,5 @@ class IndividualsPage(View):
             self.geomap.sidebar,
             self.sample_sets_table.sidebar,
             self.individuals_table.options_sidebar,
-            self.individuals_table.modification_sidebar,   
+            self.individuals_table.modification_sidebar,
         )
