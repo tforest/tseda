@@ -78,11 +78,15 @@ class SampleSetsTable(Viewer):
     }
 
     create_sample_set_textinput = param.String(
-        doc="""Enter name of new sample set. Press Enter (⏎) to create.
-            If the new sample set does not immediately show up, 
-            refresh the page""",
+        doc="Enter name of new sample set. Press Enter (⏎) to create",
         default=None,
         label="Create new sample set",
+    )
+
+    create_sample_set_warning = pn.pane.Alert(
+        "If the new sample set does not immediately show, click Update below",
+        alert_type="warning",
+        visible=False,
     )
 
     sample_set_warning = pn.pane.Alert(
@@ -111,6 +115,7 @@ class SampleSetsTable(Viewer):
     @pn.depends("create_sample_set_textinput")
     def __panel__(self):
         if self.create_sample_set_textinput is not None:
+            self.create_sample_set_warning.visible = True
             previous_names = [
                 self.table.name[i] for i in range(len(self.table))
             ]
@@ -191,6 +196,7 @@ class SampleSetsTable(Viewer):
         return pn.Column(
             pn.Card(
                 self.param.create_sample_set_textinput,
+                self.create_sample_set_warning,
                 title="Sample sets table options",
                 collapsed=False,
                 header_background=config.SIDEBAR_BACKGROUND,
@@ -289,8 +295,12 @@ class IndividualsTable(Viewer):
         sizing_mode="stretch_width",
         # description=("Reassign individuals to this sample set ID."),
     )
-    mod_update_button = pn.widgets.Button(name="Update", button_type="success")
-    restore_button = pn.widgets.Button(name="Restore", button_type="danger")
+    mod_update_button = pn.widgets.Button(
+        name="Update", button_type="success", margin=(10, 10)
+    )
+    restore_button = pn.widgets.Button(
+        name="Restore", button_type="danger", margin=(10, 10)
+    )
 
     data_mod_warning = pn.pane.Alert(
         """Please enter a valid population ID and
@@ -491,7 +501,10 @@ class IndividualsTable(Viewer):
                 self.modification_header,
                 pn.Row(self.population_from, self.sample_set_to),
                 pn.Row(
-                    self.restore_button, self.mod_update_button, align="end"
+                    pn.Spacer(width=132),
+                    self.restore_button,
+                    self.mod_update_button,
+                    align="end",
                 ),
                 collapsed=False,
                 title="Data modification",
