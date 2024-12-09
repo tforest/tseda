@@ -554,9 +554,7 @@ class DataStore(Viewer):
         combined.rename(
             columns={"index": "id"}, inplace=True
         )
-        combined = combined[
-
-        ]
+        combined = combined[self.combined_columns]
         return combined
     
     def __init__(self, **params):
