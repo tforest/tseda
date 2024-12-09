@@ -84,7 +84,7 @@ class SampleSetsTable(Viewer):
     )
 
     create_sample_set_warning = pn.pane.Alert(
-        'If the new sample set does not immediately show, click Update below',
+        "If the new sample set does not immediately show, click Update below",
         alert_type="warning",
         visible=False,
     )
@@ -295,10 +295,12 @@ class IndividualsTable(Viewer):
         sizing_mode="stretch_width",
         # description=("Reassign individuals to this sample set ID."),
     )
-    mod_update_button = pn.widgets.Button(name="Update", button_type="success",
-                                          margin=(10, 10))
-    restore_button = pn.widgets.Button(name="Restore", button_type="danger",
-                                       margin=(10, 10))
+    mod_update_button = pn.widgets.Button(
+        name="Update", button_type="success", margin=(10, 10)
+    )
+    restore_button = pn.widgets.Button(
+        name="Restore", button_type="danger", margin=(10, 10)
+    )
 
     data_mod_warning = pn.pane.Alert(
         """Please enter a valid population ID and
@@ -503,7 +505,7 @@ class IndividualsTable(Viewer):
                     self.restore_button,
                     self.mod_update_button,
                     align="end",
-                ), 
+                ),
                 collapsed=False,
                 title="Data modification",
                 header_background=config.SIDEBAR_BACKGROUND,
