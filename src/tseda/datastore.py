@@ -89,8 +89,6 @@ class SampleSetsTable(Viewer):
         visible=False,
     )
 
-    page_size = param.Selector(objects=[10, 20, 50, 100], default=20)
-
     table = param.DataFrame()
 
     def __init__(self, **params):
@@ -108,7 +106,7 @@ class SampleSetsTable(Viewer):
             ),
         )
 
-    @pn.depends("page_size", "create_sample_set_textinput")  # , "columns")
+    @pn.depends("create_sample_set_textinput")  # , "columns")
     def __panel__(self):
         if self.create_sample_set_textinput is not None:
             previous_names = [
@@ -188,7 +186,6 @@ class SampleSetsTable(Viewer):
     def sidebar(self):
         return pn.Column(
             pn.Card(
-                self.param.page_size,
                 self.param.create_sample_set_textinput,
                 title="Sample sets table options",
                 collapsed=False,
