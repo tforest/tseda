@@ -521,7 +521,49 @@ class DataStore(Viewer):
     sample_sets_table = param.ClassSelector(class_=SampleSetsTable)
     individuals_table = param.ClassSelector(class_=IndividualsTable)
 
+    combined_columns = param.List(default=[], doc="Columns for the table")
+
     views = param.List(constant=True)
+
+    
+    
+
+    def combine_tables(self):
+        """Combine individuals and sample sets table."""
+
+        default_columns =[
+            "color",
+            "sample_set_id",
+            "name_sample",
+            "population",
+            "name_indiv",
+            "selected",
+            "longitude",
+            "latitude",
+        ]
+        self.combined_columns = self.combined_columns if self.combined_columns else default_columns
+        combined = pd.merge(
+            self.individuals_table.data.rx.value,
+            self.sample_sets_table.data.rx.value,
+            left_on="sample_set_id",
+            right_index=True, 
+            suffixes=("_indiv", "_sample"),
+        )
+        combined.reset_index(inplace=True)
+        combined["id"] = combined.index
+        combined.rename(
+            columns={"index": "id"}, inplace=True
+        )
+        combined = combined[
+
+        ]
+        return combined
+    
+    def __init__(self, **params):
+        super().__init__(**params)
+        pn.bind(self.combine_tables,
+                self.individuals_table.data.rx.value.selected,
+                self.sample_sets_table.data.rx.value.color,)
 
     @property
     def color(self):
