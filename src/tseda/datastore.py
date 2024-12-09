@@ -289,8 +289,10 @@ class IndividualsTable(Viewer):
         sizing_mode="stretch_width",
         # description=("Reassign individuals to this sample set ID."),
     )
-    mod_update_button = pn.widgets.Button(name="Update", button_type="success")
-    restore_button = pn.widgets.Button(name="Restore", button_type="danger")
+    mod_update_button = pn.widgets.Button(name="Update", button_type="success",
+                                          margin=(10, 10))
+    restore_button = pn.widgets.Button(name="Restore", button_type="danger",
+                                       margin=(10, 10))
 
     data_mod_warning = pn.pane.Alert(
         """Please enter a valid population ID and
@@ -491,8 +493,11 @@ class IndividualsTable(Viewer):
                 self.modification_header,
                 pn.Row(self.population_from, self.sample_set_to),
                 pn.Row(
-                    self.restore_button, self.mod_update_button, align="end"
-                ),
+                    pn.Spacer(width=132),
+                    self.restore_button,
+                    self.mod_update_button,
+                    align="end",
+                ), 
                 collapsed=False,
                 title="Data modification",
                 header_background=config.SIDEBAR_BACKGROUND,
