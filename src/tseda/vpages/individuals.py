@@ -24,7 +24,6 @@ class IndividualsPage(View):
     sample_sets_table = param.ClassSelector(class_=SampleSetsTable)
     individuals_table = param.ClassSelector(class_=IndividualsTable)
 
-
     geomap = param.ClassSelector(class_=GeoMap)
 
     #
@@ -36,10 +35,12 @@ class IndividualsPage(View):
         self.individuals_table = self.datastore.individuals_table
         self.individuals_table.sample_sets_table = self.sample_sets_table
 
-    @pn.depends("individuals_table.sample_select.value",)
+    @pn.depends(
+        "individuals_table.sample_select.value",
+    )
     def __panel__(self):
         self.selected = list(self.individuals_table.data.rx.value.selected)
-     
+
         return pn.Column(
             # pn.Row(self.individuals_table, visible = False),
             pn.Row(

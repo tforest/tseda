@@ -275,8 +275,10 @@ class IndividualsTable(Viewer):
         "valuesLookup": True,
     }
 
-    formatters = {"selected": {"type": "tickCross"},
-                  "color": {"type": "color"}}
+    formatters = {
+        "selected": {"type": "tickCross"},
+        "color": {"type": "color"},
+    }
 
     table = param.DataFrame()
 
@@ -432,19 +434,18 @@ class IndividualsTable(Viewer):
 
     def combine_tables(self, individuals_table):
         """Combine individuals and sample sets table."""
-        
+
         combined_df = pd.merge(
             individuals_table.rx.value,
             self.sample_sets_table.data.rx.value,
             left_on="sample_set_id",
-            right_index=True, 
+            right_index=True,
             suffixes=("_indiv", "_sample"),
         )
 
         combined_df["id"] = combined_df.index
         combined_df = combined_df[self.columns]
 
-        
         formatters = self.formatters
         filters = self.filters
         page_size = self.page_size
@@ -457,7 +458,8 @@ class IndividualsTable(Viewer):
             page_size=page_size,
             formatters=formatters,
             editors=self.editors,
-            sorters=[{"field": "id", "dir": "asc"},
+            sorters=[
+                {"field": "id", "dir": "asc"},
                 {"field": "selected", "dir": "des"},
             ],
             margin=10,
@@ -506,7 +508,14 @@ class IndividualsTable(Viewer):
             sizing_mode="stretch_width",
         )
         return pn.Column(
-            pn.Row(title, self.tooltip, pn.Spacer(sizing_mode="stretch_width", max_width=1000) , self.mod_update_button, align=("start", "start")), table
+            pn.Row(
+                title,
+                self.tooltip,
+                pn.Spacer(sizing_mode="stretch_width", max_width=1000),
+                self.mod_update_button,
+                align=("start", "start"),
+            ),
+            table,
         )
 
     def options_sidebar(self):
@@ -549,7 +558,6 @@ class DataStore(Viewer):
     tsm = param.ClassSelector(class_=model.TSModel)
     sample_sets_table = param.ClassSelector(class_=SampleSetsTable)
     individuals_table = param.ClassSelector(class_=IndividualsTable)
-
 
     views = param.List(constant=True)
 
