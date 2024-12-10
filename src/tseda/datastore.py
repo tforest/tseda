@@ -417,7 +417,10 @@ class IndividualsTable(Viewer):
         return self.data.rx.value.loc[i]
 
     def check_data_modification(self):
-        if isinstance(self.mod_update_button.value, bool) and self.mod_update_button.value == False:
+        if (
+            isinstance(self.mod_update_button.value, bool)
+            and self.mod_update_button.value == False
+        ):
             return False
         if (
             self.sample_set_to.value is not None

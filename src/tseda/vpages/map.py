@@ -49,7 +49,6 @@ class GeoMap(View):
         super().__init__(**params)
         self.individuals_table = self.datastore.individuals_table
 
-
     @pn.depends("individuals_table.refresh_button.value")
     def __panel__(self):
         self.tiles = tiles_options[self.tiles_selector]
