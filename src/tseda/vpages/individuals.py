@@ -25,7 +25,6 @@ class IndividualsPage(View):
     individuals_table = param.ClassSelector(class_=IndividualsTable)
 
     combined_table = pn.widgets.Tabulator()
-    selected = param.List()
 
     geomap = param.ClassSelector(class_=GeoMap)
 
@@ -39,20 +38,20 @@ class IndividualsPage(View):
         self.individuals_table.sample_sets_table = self.sample_sets_table
 
         self.combined_table = self.datastore.combine_tables()
-        self.selected = list(self.individuals_table.data.rx.value.selected)
 
-    @pn.depends("selected", "individuals_table.sample_select.value",
-                "individuals_table.mod_update_button.value", watch =True)
+    @pn.depends("individuals_table.sample_select.value",)
     def __panel__(self):
         self.selected = list(self.individuals_table.data.rx.value.selected)
         self.combined_table.page_size = self.individuals_table.page_size
-        # self.mod_update_button = self.individuals_table.mod_update_button
-
         self.combined_table = self.datastore.combine_tables()
         pn.bind(self.datastore.combine_tables,
                 self.combined_table,
+                self.individuals_table,
+                self.sample_sets_table,
+                self.selected
                 )
         
+
         return pn.Column(
             pn.Row(self.individuals_table, visible = False),
             pn.Row(
