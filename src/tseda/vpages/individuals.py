@@ -24,7 +24,6 @@ class IndividualsPage(View):
     sample_sets_table = param.ClassSelector(class_=SampleSetsTable)
     individuals_table = param.ClassSelector(class_=IndividualsTable)
 
-    combined_table = pn.widgets.Tabulator()
 
     geomap = param.ClassSelector(class_=GeoMap)
 
@@ -37,23 +36,12 @@ class IndividualsPage(View):
         self.individuals_table = self.datastore.individuals_table
         self.individuals_table.sample_sets_table = self.sample_sets_table
 
-        self.combined_table = self.datastore.combine_tables()
-
     @pn.depends("individuals_table.sample_select.value",)
     def __panel__(self):
         self.selected = list(self.individuals_table.data.rx.value.selected)
-        self.combined_table.page_size = self.individuals_table.page_size
-        self.combined_table = self.datastore.combine_tables()
-        pn.bind(self.datastore.combine_tables,
-                self.combined_table,
-                self.individuals_table,
-                self.sample_sets_table,
-                self.selected
-                )
-        
-
+     
         return pn.Column(
-            pn.Row(self.individuals_table, visible = False),
+            # pn.Row(self.individuals_table, visible = False),
             pn.Row(
                 pn.Column(
                     pn.pane.HTML(
@@ -75,7 +63,7 @@ class IndividualsPage(View):
                 "affiliations through colors.",
                 sizing_mode="stretch_width",
             ),
-            self.combined_table,
+            self.individuals_table,
         )
 
     def sidebar(self):
