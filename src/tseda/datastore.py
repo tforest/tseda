@@ -84,7 +84,7 @@ class SampleSetsTable(Viewer):
     )
 
     create_sample_set_warning = pn.pane.Alert(
-        "If the new sample set does not immediately show, click Update below",
+        "If the new sample set is not shown immediately, click Update above",
         alert_type="warning",
         visible=False,
     )
@@ -303,10 +303,10 @@ class IndividualsTable(Viewer):
         description=("Reassign individuals to this sample set ID."),
     )
     mod_update_button = pn.widgets.Button(
-        name="Update", button_type="success", margin=(10, 10)
+        name="Reassign", button_type="success", margin=(10, 10)
     )
-    table_update_button = pn.widgets.Button(
-        name="Update", button_type="success", margin=(10, 10)
+    refresh_button = pn.widgets.Button(
+        name="Refresh", button_type="success", margin=(10, 0)
     )
     restore_button = pn.widgets.Button(
         name="Restore", button_type="danger", margin=(10, 10)
@@ -480,7 +480,7 @@ class IndividualsTable(Viewer):
         "page_size",
         "sample_select.value",
         "mod_update_button.value",
-        "table_update_button.value",
+        "refresh_button.value",
         "restore_button.value",
     )
     def __panel__(self):
@@ -520,9 +520,7 @@ class IndividualsTable(Viewer):
             pn.Row(
                 title,
                 self.tooltip,
-                pn.Spacer(sizing_mode="stretch_width", max_width=1000),
-                self.table_update_button,
-                align=("start", "start"),
+                align=("start", "end"),
             ),
             table,
         )
@@ -548,10 +546,9 @@ class IndividualsTable(Viewer):
                 self.modification_header,
                 pn.Row(self.population_from, self.sample_set_to),
                 pn.Row(
-                    pn.Spacer(width=132),
+                    pn.Spacer(width=120),
                     self.restore_button,
                     self.mod_update_button,
-                    self.table_update_button,
                     align="end",
                 ),
                 collapsed=False,

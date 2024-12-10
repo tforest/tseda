@@ -33,12 +33,14 @@ class IndividualsPage(View):
         self.individuals_table = self.datastore.individuals_table
         self.individuals_table.sample_sets_table = self.sample_sets_table
 
+
     @pn.depends(
         "individuals_table.sample_select.value",
+        "individuals_table.refresh_button.value"
     )
     def __panel__(self):
         return pn.Column(
-            # pn.Row(self.individuals_table, visible = False),
+            pn.Column(
             pn.Row(
                 pn.Column(
                     pn.pane.HTML(
@@ -61,7 +63,7 @@ class IndividualsPage(View):
                 sizing_mode="stretch_width",
             ),
             self.individuals_table,
-        )
+        ))
 
     def sidebar(self):
         return pn.Column(
@@ -79,6 +81,7 @@ class IndividualsPage(View):
                 ),
                 sizing_mode="stretch_width",
             ),
+            self.individuals_table.refresh_button,
             self.geomap.sidebar,
             self.sample_sets_table.sidebar,
             self.individuals_table.options_sidebar,
