@@ -419,7 +419,7 @@ class IndividualsTable(Viewer):
     def check_data_modification(self):
         if (
             isinstance(self.mod_update_button.value, bool)
-            and self.mod_update_button.value == False
+            and not self.mod_update_button.value
         ):
             return False
         if (

@@ -56,8 +56,10 @@ class IndividualsPage(View):
                     ),
                 ),
                 pn.pane.Markdown(
-                    "**Map** - Displays the geographical locations where samples "
-                    "were collected and visually represents their group sample "
+                    "**Map** - Displays the geographical"
+                    "locations where samples "
+                    "were collected and visually"
+                    "represents their group sample "
                     "affiliations through colors.",
                     sizing_mode="stretch_width",
                 ),
