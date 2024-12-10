@@ -26,8 +26,6 @@ class IndividualsPage(View):
 
     geomap = param.ClassSelector(class_=GeoMap)
 
-    #
-
     def __init__(self, **params):
         super().__init__(**params)
         self.geomap = GeoMap(datastore=self.datastore)
@@ -39,8 +37,6 @@ class IndividualsPage(View):
         "individuals_table.sample_select.value",
     )
     def __panel__(self):
-        self.selected = list(self.individuals_table.data.rx.value.selected)
-
         return pn.Column(
             # pn.Row(self.individuals_table, visible = False),
             pn.Row(

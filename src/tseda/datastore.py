@@ -252,16 +252,14 @@ class IndividualsTable(Viewer):
     sample_sets_table = param.ClassSelector(class_=SampleSetsTable)
 
     columns = [
-        # individuals
+        "color",
         "population",
-        "name_indiv",
-        "selected",
-        "longitude",
-        "latitude",
-        # sample sets
         "sample_set_id",
         "name_sample",
-        "color",
+        "name_indiv",
+        "longitude",
+        "latitude",
+        "selected",
     ]
 
     editors = {k: None for k in columns}
@@ -296,15 +294,18 @@ class IndividualsTable(Viewer):
         name="Original population ID",
         value=None,
         sizing_mode="stretch_width",
-        # description=("Reassign individuals with this population ID."),
+        description=("Reassign individuals with this population ID."),
     )
     sample_set_to = pn.widgets.Select(
         name="New sample set ID",
         value=None,
         sizing_mode="stretch_width",
-        # description=("Reassign individuals to this sample set ID."),
+        description=("Reassign individuals to this sample set ID."),
     )
     mod_update_button = pn.widgets.Button(
+        name="Update", button_type="success", margin=(10, 10)
+    )
+    table_update_button = pn.widgets.Button(
         name="Update", button_type="success", margin=(10, 10)
     )
     restore_button = pn.widgets.Button(
@@ -334,6 +335,11 @@ class IndividualsTable(Viewer):
             "type": "tickCross",
             "tristate": True,
             "indeterminateValue": None,
+        },
+        "name_sample": {
+            "type": "input",
+            "func": "like",
+            "placeholder": "Enter ID",
         },
     }
 
@@ -411,6 +417,8 @@ class IndividualsTable(Viewer):
         return self.data.rx.value.loc[i]
 
     def check_data_modification(self):
+        if isinstance(self.mod_update_button.value, bool) and self.mod_update_button.value == False:
+            return False
         if (
             self.sample_set_to.value is not None
             and self.population_from.value is not None
@@ -472,6 +480,7 @@ class IndividualsTable(Viewer):
         "page_size",
         "sample_select.value",
         "mod_update_button.value",
+        "table_update_button.value",
         "restore_button.value",
     )
     def __panel__(self):
@@ -512,7 +521,7 @@ class IndividualsTable(Viewer):
                 title,
                 self.tooltip,
                 pn.Spacer(sizing_mode="stretch_width", max_width=1000),
-                self.mod_update_button,
+                self.table_update_button,
                 align=("start", "start"),
             ),
             table,
@@ -542,6 +551,7 @@ class IndividualsTable(Viewer):
                     pn.Spacer(width=132),
                     self.restore_button,
                     self.mod_update_button,
+                    self.table_update_button,
                     align="end",
                 ),
                 collapsed=False,
