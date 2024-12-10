@@ -252,14 +252,19 @@ class IndividualsTable(Viewer):
     sample_sets_table = param.ClassSelector(class_=SampleSetsTable)
 
     columns = [
-        "name",
+        # individuals
         "population",
-        "sample_set_id",
+        "name_indiv",
         "selected",
         "longitude",
         "latitude",
+        # sample sets
+        "sample_set_id",
+        "name_sample",
+        "color",
     ]
-    editors = {k: None for k in columns}  # noqa
+
+    editors = {k: None for k in columns}
     editors["sample_set_id"] = {
         "type": "number",
         "valueLookup": True,
@@ -269,10 +274,11 @@ class IndividualsTable(Viewer):
         "values": [False, True],
         "valuesLookup": True,
     }
-    formatters = {"selected": {"type": "tickCross"}}
+
+    formatters = {"selected": {"type": "tickCross"},
+                  "color": {"type": "color"}}
 
     table = param.DataFrame()
-
 
     page_size = param.Selector(
         objects=[10, 20, 50, 100, 200, 500],
@@ -426,27 +432,7 @@ class IndividualsTable(Viewer):
 
     def combine_tables(self, individuals_table):
         """Combine individuals and sample sets table."""
-
-        combined_columns = [
-            "color",
-            "sample_set_id",
-            "name_sample",
-            "population",
-            "name_indiv",
-            "selected",
-            "longitude",
-            "latitude",]
-
-        editors = {k: None for k in combined_columns}
-        editors["sample_set_id"] = {
-            "type": "number",
-            "valueLookup": True,
-        }
-        editors["selected"] = {
-            "type": "list",
-            "values": [False, True],
-            "valuesLookup": True,
-        }
+        
         combined_df = pd.merge(
             individuals_table.rx.value,
             self.sample_sets_table.data.rx.value,
@@ -454,28 +440,29 @@ class IndividualsTable(Viewer):
             right_index=True, 
             suffixes=("_indiv", "_sample"),
         )
-        combined_df.reset_index(inplace=True)
+
         combined_df["id"] = combined_df.index
-        combined_df.rename(
-            columns={"index": "id"}, inplace=True
-        )
-        combined_df = combined_df[combined_columns]
+        combined_df = combined_df[self.columns]
+
+        
+        formatters = self.formatters
+        filters = self.filters
+        page_size = self.page_size
 
         combined_table = pn.widgets.Tabulator(
             combined_df,
             pagination="remote",
             layout="fit_columns",
             selectable=True,
-            page_size=self.page_size,
-            formatters=self.formatters,
+            page_size=page_size,
+            formatters=formatters,
             editors=self.editors,
-            sorters=[
-                {"field": "id", "dir": "asc"},
+            sorters=[{"field": "id", "dir": "asc"},
                 {"field": "selected", "dir": "des"},
             ],
             margin=10,
-            text_align={col: "right" for col in combined_columns},
-            header_filters=self.filters,
+            text_align={col: "right" for col in self.columns},
+            header_filters=filters,
         )
         return combined_table
 
@@ -510,7 +497,7 @@ class IndividualsTable(Viewer):
         ):
             self.reset_modification()
 
-        data = self.data[self.columns]
+        data = self.data
 
         table = self.combine_tables(data)
 
@@ -519,7 +506,7 @@ class IndividualsTable(Viewer):
             sizing_mode="stretch_width",
         )
         return pn.Column(
-            pn.Row(title, self.tooltip, align=("start", "end")), table
+            pn.Row(title, self.tooltip, pn.Spacer(sizing_mode="stretch_width", max_width=1000) , self.mod_update_button, align=("start", "start")), table
         )
 
     def options_sidebar(self):
