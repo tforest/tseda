@@ -84,7 +84,7 @@ class SampleSetsTable(Viewer):
     )
 
     create_sample_set_warning = pn.pane.Alert(
-        "If the new sample set is not shown immediately, click Update above",
+        "If the new sample set is not shown immediately, click Refresh above",
         alert_type="warning",
         visible=False,
     )
