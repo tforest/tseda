@@ -517,7 +517,6 @@ class IndividualsTable(Viewer):
 
         return pn.Column(pn.Row(self.tooltip, align=("start", "end")), table)
 
-
     def options_sidebar(self):
         return pn.Card(
             self.param.page_size,
