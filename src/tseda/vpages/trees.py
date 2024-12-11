@@ -232,14 +232,23 @@ class Tree(View):
             self.advanced_warning.visible = True
         pos1 = int(tree.get_interval()[0])
         pos2 = int(tree.get_interval()[1]) - 1
-        return pn.Column(
-            pn.pane.HTML(
-                f"<h2>Tree index {tree.index}"
-                f" (position {pos1} - {pos2})</h2>",
-                sizing_mode="stretch_width",
-            ),
-            pn.pane.HTML(plot),
-        )
+        if int(self.num_trees.value) > 1:
+            return pn.Accordion(
+                pn.Column(
+                    pn.pane.HTML(plot),
+                    name=f"Tree index {tree.index} (position {pos1} - {pos2})",
+                ),
+                active=[0],
+            )
+        else:
+            return pn.Column(
+                pn.pane.HTML(
+                    f"<h2>Tree index {tree.index}"
+                    f" (position {pos1} - {pos2})</h2>",
+                    sizing_mode="stretch_width",
+                ),
+                pn.pane.HTML(plot),
+            )
 
     def get_all_trees(self, trees):
         if not trees:

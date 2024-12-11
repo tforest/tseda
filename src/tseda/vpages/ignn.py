@@ -136,10 +136,6 @@ class GNNHaplotype(View):
     def check_inputs(self, inds):
         max_id = inds.index.max()
         info_column = pn.Column(
-            pn.pane.HTML(
-                "<h2 style='margin: 0;'>GNN Haplotype plot</h2>",
-                sizing_mode="stretch_width",
-            ),
             pn.pane.Markdown(
                 "**Enter a valid sample id to see the GNN haplotype plot.**"
             ),
@@ -179,7 +175,7 @@ class GNNHaplotype(View):
         if nodes[0] is not None:
             return pn.Column(
                 pn.pane.HTML(
-                    "<h2 style='margin: 0;'>GNN Haplotype plot "
+                    "<h2 style='margin: 0;'>"
                     f"- Individual id {self.individual_id}</h2>",
                     sizing_mode="stretch_width",
                 ),
@@ -387,29 +383,29 @@ class IGNNPage(View):
 
     def __panel__(self):
         return pn.Column(
-            pn.pane.HTML(
-                "<h2 style='margin: 0;'>Geomap</h2>",
-                sizing_mode="stretch_width",
+            pn.Accordion(
+                pn.Column(
+                    self.geomap,
+                    pn.pane.Markdown(
+                        "**Map** - Displays the geographical locations "
+                        "where samples were collected and visually "
+                        "represents their group sample affiliations "
+                        "through colors.",
+                        sizing_mode="stretch_width",
+                    ),
+                    name="Geomap",
+                ),
+                pn.Column(
+                    self.vbar,
+                    pn.pane.Markdown(
+                        "**vBar** - Lorem ipsum",
+                        sizing_mode="stretch_width",
+                    ),
+                    name="VBar Plot",
+                ),
+                pn.Column(self.gnnhaplotype, name="GNN Haplotype Plot"),
+                active=[0, 1, 2],
             ),
-            pn.Row(
-                self.geomap,
-            ),
-            pn.pane.Markdown(
-                "**Map** - Displays the geographical locations where samples "
-                "were collected and visually represents their group sample "
-                "affiliations through colors.",
-                sizing_mode="stretch_width",
-            ),
-            pn.pane.HTML(
-                "<h2 style='margin: 0;'>vBar plot</h2>",
-                sizing_mode="stretch_width",
-            ),
-            self.vbar,
-            pn.pane.Markdown(
-                "**vBar** - Lorem ipsum",
-                sizing_mode="stretch_width",
-            ),
-            self.gnnhaplotype,
         )
 
     def sidebar(self):

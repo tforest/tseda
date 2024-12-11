@@ -40,9 +40,7 @@ class GNN(View):
             sample for sublist in sample_sets.values() for sample in sublist
         ]
         if len(sample_sets) <= 1:
-            return pn.Column(
-                pn.pane.Markdown("## GNN cluster plot\n"), self.warning_pane
-            )
+            return self.warning_pane
         else:
             sstable = self.datastore.sample_sets_table.data.rx.value
             inds = self.datastore.individuals_table.data.rx.value
@@ -65,10 +63,6 @@ class GNN(View):
             mean_gnn = df.groupby("focal_population").mean()
             # Z-score normalization here!
             return pn.Column(
-                pn.pane.HTML(
-                    "<h2 style='margin: 0;'> GNN cluster plot </h2>",
-                    sizing_mode="stretch_width",
-                ),
                 mean_gnn.hvplot.heatmap(
                     cmap=cc.bgy, height=300, responsive=True
                 ),
@@ -95,7 +89,7 @@ class Fst(View):
     def __panel__(self):
         sample_sets = self.datastore.individuals_table.sample_sets()
         if len(sample_sets) <= 1:
-            return pn.Column(pn.pane.Markdown("## Fst\n"), self.warning_pane)
+            return self.warning_pane
         else:
             sstable = self.datastore.sample_sets_table.data.rx.value
             ts = self.datastore.tsm.ts
@@ -107,10 +101,6 @@ class Fst(View):
                 np.reshape(fst, newshape=(k, k)), columns=groups, index=groups
             )
             return pn.Column(
-                pn.pane.HTML(
-                    "<h2 style='margin: 0;'>Fst</h2>",
-                    sizing_mode="stretch_width",
-                ),
                 df.hvplot.heatmap(cmap=cc.bgy, height=300, responsive=True),
                 pn.pane.Markdown(
                     "**Fst Plot** - Shows the fixation index (Fst) between "
@@ -137,8 +127,11 @@ class StructurePage(View):
 
     def __panel__(self):
         return pn.Column(
-            self.gnn,
-            self.fst,
+            pn.Accordion(
+                pn.Column(self.gnn, name="GNN Cluster Plot"),
+                pn.Column(self.fst, name="Fst"),
+                active=[0, 1],
+            )
         )
 
     def sidebar(self):

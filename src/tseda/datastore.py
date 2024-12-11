@@ -156,12 +156,8 @@ class SampleSetsTable(Viewer):
             },
             height=500,
         )
-        title = pn.pane.HTML(
-            "<h2 style='margin: 0;'>Sample set table</h2>",
-            sizing_mode="stretch_width",
-        )
         return pn.Column(
-            pn.Row(title, self.tooltip, align=("start", "end")),
+            self.tooltip,
             table,
         )
 
@@ -519,18 +515,7 @@ class IndividualsTable(Viewer):
 
         table = self.combine_tables(data)
 
-        title = pn.pane.HTML(
-            "<h2 style='margin: 0;'>Individuals table</h2>",
-            sizing_mode="stretch_width",
-        )
-        return pn.Column(
-            pn.Row(
-                title,
-                self.tooltip,
-                align=("start", "end"),
-            ),
-            table,
-        )
+        return pn.Column(pn.Row(self.tooltip, align=("start", "end")), table)
 
     def options_sidebar(self):
         return pn.Card(
