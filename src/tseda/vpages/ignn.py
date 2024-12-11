@@ -387,9 +387,10 @@ class IGNNPage(View):
                 pn.Column(
                     self.geomap,
                     pn.pane.Markdown(
-                        "**Map** - Displays the geographical locations where samples "
-                        "were collected and visually represents their group sample "
-                        "affiliations through colors.",
+                        "**Map** - Displays the geographical locations "
+                        "where samples were collected and visually "
+                        "represents their group sample affiliations "
+                        "through colors.",
                         sizing_mode="stretch_width",
                     ),
                     name="Geomap",
