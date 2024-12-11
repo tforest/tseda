@@ -321,9 +321,9 @@ class IndividualsTable(Viewer):
 
     filters = {
         "name_individual": {
-            "type": "input", 
-            "func": "like", 
-            "placeholder": "Enter name"
+            "type": "input",
+            "func": "like",
+            "placeholder": "Enter name",
         },
         "population": {
             "type": "input",
