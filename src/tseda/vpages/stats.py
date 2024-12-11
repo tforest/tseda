@@ -327,21 +327,18 @@ class StatsPage(View):
 
     def __panel__(self):
         return pn.Column(
-            pn.Column(
-                pn.pane.HTML(
-                    "<h2 style='margin: 0;'>Oneway statistics plot</h2>",
-                    sizing_mode="stretch_width",
+            pn.Accordion(
+                pn.Column(
+                    self.oneway.tooltip,
+                    self.oneway,
+                    name="Oneway Statistics Plot",
                 ),
-                self.oneway.tooltip,
-                self.oneway,
-            ),
-            pn.Column(
-                pn.pane.HTML(
-                    "<h2 style='margin: 0;'>Multiway statistics plot</h2>",
-                    sizing_mode="stretch_width",
+                pn.Column(
+                    self.multiway.tooltip,
+                    self.multiway,
+                    name="Multiway Statistics Plot",
                 ),
-                self.multiway.tooltip,
-                self.multiway,
+                active=[0, 1],
             ),
         )
 

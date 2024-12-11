@@ -394,9 +394,6 @@ class IGNNPage(View):
                     ),
                     name="Geomap",
                 ),
-                active=[0],
-            ),
-            pn.Accordion(
                 pn.Column(
                     self.vbar,
                     pn.pane.Markdown(
@@ -405,11 +402,8 @@ class IGNNPage(View):
                     ),
                     name="VBar Plot",
                 ),
-                active=[0],
-            ),
-            pn.Accordion(
                 pn.Column(self.gnnhaplotype, name="GNN Haplotype Plot"),
-                active=[0],
+                active=[0, 1, 2],
             ),
         )
 
