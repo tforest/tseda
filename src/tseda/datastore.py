@@ -255,8 +255,8 @@ class IndividualsTable(Viewer):
         "color",
         "population",
         "sample_set_id",
-        "name_sample",
-        "name_indiv",
+        "name_sample_set",
+        "name_individual",
         "longitude",
         "latitude",
         "selected",
@@ -320,7 +320,11 @@ class IndividualsTable(Viewer):
     )
 
     filters = {
-        "name": {"type": "input", "func": "like", "placeholder": "Enter name"},
+        "name_individual": {
+            "type": "input", 
+            "func": "like", 
+            "placeholder": "Enter name"
+        },
         "population": {
             "type": "input",
             "func": "like",
@@ -336,10 +340,10 @@ class IndividualsTable(Viewer):
             "tristate": True,
             "indeterminateValue": None,
         },
-        "name_sample": {
+        "name_sample_set": {
             "type": "input",
             "func": "like",
-            "placeholder": "Enter ID",
+            "placeholder": "Enter name",
         },
     }
 
@@ -451,7 +455,7 @@ class IndividualsTable(Viewer):
             self.sample_sets_table.data.rx.value,
             left_on="sample_set_id",
             right_index=True,
-            suffixes=("_indiv", "_sample"),
+            suffixes=("_individual", "_sample_set"),
         )
 
         combined_df["id"] = combined_df.index
