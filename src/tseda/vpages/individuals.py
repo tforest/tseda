@@ -33,6 +33,10 @@ class IndividualsPage(View):
         self.individuals_table = self.datastore.individuals_table
         self.individuals_table.sample_sets_table = self.sample_sets_table
 
+    @pn.depends(
+        "individuals_table.sample_select.value",
+        "individuals_table.refresh_button.value",
+    )
     def __panel__(self):
         sample_sets_accordion = pn.Accordion(
             pn.Column(
@@ -96,6 +100,7 @@ class IndividualsPage(View):
                 ),
                 sizing_mode="stretch_width",
             ),
+            self.individuals_table.refresh_button,
             self.geomap.sidebar,
             self.sample_sets_table.sidebar,
             self.individuals_table.options_sidebar,
