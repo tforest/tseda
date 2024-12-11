@@ -20,6 +20,7 @@ import param
 import xyzservices.providers as xyz
 
 from tseda import config
+from tseda.datastore import IndividualsTable
 
 from .core import View
 
@@ -35,15 +36,20 @@ tiles_options = {
 
 
 class GeoMap(View):
+    individuals_table = param.ClassSelector(class_=IndividualsTable)
+
     tiles_selector = param.Selector(
         default="WorldPhysical",
         objects=list(tiles_options.keys()),
         doc="Select XYZ tiles for map",
     )
     tiles = tiles_options[tiles_selector.default]
-    refresh_button = pn.widgets.Button(name="Refresh map")
 
-    @pn.depends("refresh_button.value")
+    def __init__(self, **params):
+        super().__init__(**params)
+        self.individuals_table = self.datastore.individuals_table
+
+    @pn.depends("individuals_table.refresh_button.value")
     def __panel__(self):
         self.tiles = tiles_options[self.tiles_selector]
         df = self.datastore.individuals_table.data.rx.value
@@ -93,7 +99,6 @@ class GeoMap(View):
     def sidebar(self):
         return pn.Card(
             self.param.tiles_selector,
-            self.refresh_button,
             collapsed=True,
             title="Map options",
             header_background=config.SIDEBAR_BACKGROUND,

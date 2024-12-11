@@ -84,7 +84,7 @@ class SampleSetsTable(Viewer):
     )
 
     create_sample_set_warning = pn.pane.Alert(
-        "If the new sample set does not immediately show, click Update below",
+        "If the new sample set is not shown immediately, click Refresh above",
         alert_type="warning",
         visible=False,
     )
@@ -252,14 +252,17 @@ class IndividualsTable(Viewer):
     sample_sets_table = param.ClassSelector(class_=SampleSetsTable)
 
     columns = [
-        "name",
+        "color",
         "population",
         "sample_set_id",
-        "selected",
+        "name_sample_set",
+        "name_individual",
         "longitude",
         "latitude",
+        "selected",
     ]
-    editors = {k: None for k in columns}  # noqa
+
+    editors = {k: None for k in columns}
     editors["sample_set_id"] = {
         "type": "number",
         "valueLookup": True,
@@ -269,7 +272,11 @@ class IndividualsTable(Viewer):
         "values": [False, True],
         "valuesLookup": True,
     }
-    formatters = {"selected": {"type": "tickCross"}}
+
+    formatters = {
+        "selected": {"type": "tickCross"},
+        "color": {"type": "color"},
+    }
 
     table = param.DataFrame()
 
@@ -287,16 +294,19 @@ class IndividualsTable(Viewer):
         name="Original population ID",
         value=None,
         sizing_mode="stretch_width",
-        # description=("Reassign individuals with this population ID."),
+        description=("Reassign individuals with this population ID."),
     )
     sample_set_to = pn.widgets.Select(
         name="New sample set ID",
         value=None,
         sizing_mode="stretch_width",
-        # description=("Reassign individuals to this sample set ID."),
+        description=("Reassign individuals to this sample set ID."),
     )
     mod_update_button = pn.widgets.Button(
-        name="Update", button_type="success", margin=(10, 10)
+        name="Reassign", button_type="success", margin=(10, 10)
+    )
+    refresh_button = pn.widgets.Button(
+        name="Refresh", button_type="success", margin=(10, 0)
     )
     restore_button = pn.widgets.Button(
         name="Restore", button_type="danger", margin=(10, 10)
@@ -310,7 +320,11 @@ class IndividualsTable(Viewer):
     )
 
     filters = {
-        "name": {"type": "input", "func": "like", "placeholder": "Enter name"},
+        "name_individual": {
+            "type": "input",
+            "func": "like",
+            "placeholder": "Enter name",
+        },
         "population": {
             "type": "input",
             "func": "like",
@@ -325,6 +339,11 @@ class IndividualsTable(Viewer):
             "type": "tickCross",
             "tristate": True,
             "indeterminateValue": None,
+        },
+        "name_sample_set": {
+            "type": "input",
+            "func": "like",
+            "placeholder": "Enter name",
         },
     }
 
@@ -403,6 +422,11 @@ class IndividualsTable(Viewer):
 
     def check_data_modification(self):
         if (
+            isinstance(self.mod_update_button.value, bool)
+            and not self.mod_update_button.value
+        ):
+            return False
+        if (
             self.sample_set_to.value is not None
             and self.population_from.value is not None
         ):
@@ -423,10 +447,47 @@ class IndividualsTable(Viewer):
     def reset_modification(self):
         self.data.rx.value.sample_set_id = self.data.rx.value.population
 
+    def combine_tables(self, individuals_table):
+        """Combine individuals and sample sets table."""
+
+        combined_df = pd.merge(
+            individuals_table.rx.value,
+            self.sample_sets_table.data.rx.value,
+            left_on="sample_set_id",
+            right_index=True,
+            suffixes=("_individual", "_sample_set"),
+        )
+
+        combined_df["id"] = combined_df.index
+        combined_df = combined_df[self.columns]
+
+        formatters = self.formatters
+        filters = self.filters
+        page_size = self.page_size
+
+        combined_table = pn.widgets.Tabulator(
+            combined_df,
+            pagination="remote",
+            layout="fit_columns",
+            selectable=True,
+            page_size=page_size,
+            formatters=formatters,
+            editors=self.editors,
+            sorters=[
+                {"field": "id", "dir": "asc"},
+                {"field": "selected", "dir": "des"},
+            ],
+            margin=10,
+            text_align={col: "right" for col in self.columns},
+            header_filters=filters,
+        )
+        return combined_table
+
     @pn.depends(
         "page_size",
         "sample_select.value",
         "mod_update_button.value",
+        "refresh_button.value",
         "restore_button.value",
     )
     def __panel__(self):
@@ -454,30 +515,21 @@ class IndividualsTable(Viewer):
         ):
             self.reset_modification()
 
-        data = self.data[self.columns]
+        data = self.data
 
-        table = pn.widgets.Tabulator(
-            data,
-            pagination="remote",
-            layout="fit_columns",
-            selectable=True,
-            page_size=self.page_size,
-            formatters=self.formatters,
-            editors=self.editors,
-            sorters=[
-                {"field": "id", "dir": "asc"},
-                {"field": "selected", "dir": "des"},
-            ],
-            margin=10,
-            text_align={col: "right" for col in self.columns},
-            header_filters=self.filters,
-        )
+        table = self.combine_tables(data)
+
         title = pn.pane.HTML(
             "<h2 style='margin: 0;'>Individuals table</h2>",
             sizing_mode="stretch_width",
         )
         return pn.Column(
-            pn.Row(title, self.tooltip, align=("start", "end")), table
+            pn.Row(
+                title,
+                self.tooltip,
+                align=("start", "end"),
+            ),
+            table,
         )
 
     def options_sidebar(self):
@@ -501,7 +553,7 @@ class IndividualsTable(Viewer):
                 self.modification_header,
                 pn.Row(self.population_from, self.sample_set_to),
                 pn.Row(
-                    pn.Spacer(width=132),
+                    pn.Spacer(width=120),
                     self.restore_button,
                     self.mod_update_button,
                     align="end",

@@ -33,30 +33,38 @@ class IndividualsPage(View):
         self.individuals_table = self.datastore.individuals_table
         self.individuals_table.sample_sets_table = self.sample_sets_table
 
+    @pn.depends(
+        "individuals_table.sample_select.value",
+        "individuals_table.refresh_button.value",
+    )
     def __panel__(self):
         return pn.Column(
-            pn.Row(
-                pn.Column(
-                    pn.pane.HTML(
-                        "<h2 style='margin: 0;'>Geomap</h2>",
-                        sizing_mode="stretch_width",
+            pn.Column(
+                pn.Row(
+                    pn.Column(
+                        pn.pane.HTML(
+                            "<h2 style='margin: 0;'>Geomap</h2>",
+                            sizing_mode="stretch_width",
+                        ),
+                        pn.Row(self.geomap, min_width=400),
                     ),
-                    pn.Row(self.geomap, min_width=400),
+                    pn.Spacer(sizing_mode="stretch_width", max_width=50),
+                    pn.Column(
+                        self.sample_sets_table,
+                        sizing_mode="stretch_width",
+                        max_width=400,
+                    ),
                 ),
-                pn.Spacer(sizing_mode="stretch_width", max_width=50),
-                pn.Column(
-                    self.sample_sets_table,
+                pn.pane.Markdown(
+                    "**Map** - Displays the geographical"
+                    "locations where samples "
+                    "were collected and visually"
+                    "represents their group sample "
+                    "affiliations through colors.",
                     sizing_mode="stretch_width",
-                    max_width=400,
                 ),
-            ),
-            pn.pane.Markdown(
-                "**Map** - Displays the geographical locations where samples "
-                "were collected and visually represents their group sample "
-                "affiliations through colors.",
-                sizing_mode="stretch_width",
-            ),
-            self.individuals_table,
+                self.individuals_table,
+            )
         )
 
     def sidebar(self):
@@ -75,6 +83,7 @@ class IndividualsPage(View):
                 ),
                 sizing_mode="stretch_width",
             ),
+            self.individuals_table.refresh_button,
             self.geomap.sidebar,
             self.sample_sets_table.sidebar,
             self.individuals_table.options_sidebar,
