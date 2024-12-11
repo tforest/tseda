@@ -52,9 +52,7 @@ class Tree(View):
 
     width = param.Integer(default=750, doc="Width of the tree plot")
     height = param.Integer(default=520, doc="Height of the tree plot")
-    next = param.Action(
-        lambda x: x.next_tree(), doc="Next tree", label="Next tree"
-    )
+    next = param.Action(lambda x: x.next_tree(), doc="Next tree", label="Next tree")
     prev = param.Action(
         lambda x: x.prev_tree(), doc="Previous tree", label="Previous tree"
     )
@@ -140,9 +138,7 @@ class Tree(View):
         sample2ind = self.datastore.individuals_table.sample2ind
         selected_sample_sets = self.datastore.individuals_table.sample_sets()
         selected_samples = [
-            int(i)
-            for sublist in list(selected_sample_sets.values())
-            for i in sublist
+            int(i) for sublist in list(selected_sample_sets.values()) for i in sublist
         ]
         for n in self.datastore.individuals_table.samples():
             ssid = individuals.loc[sample2ind[n]].sample_set_id
@@ -168,8 +164,7 @@ class Tree(View):
             ):
                 raise ValueError
             elif int(
-                self.datastore.tsm.ts.at(self.position).index
-                + self.num_trees.value
+                self.datastore.tsm.ts.at(self.position).index + self.num_trees.value
             ) > int(self.datastore.tsm.ts.num_trees):
                 raise ValueError
         if self.tree_index is not None and (
@@ -205,9 +200,7 @@ class Tree(View):
     def update_position(self):
         self.position = self.slider.value
 
-    def plot_tree(
-        self, tree, omit_sites, y_ticks, node_labels, additional_options
-    ):
+    def plot_tree(self, tree, omit_sites, y_ticks, node_labels, additional_options):
         try:
             plot = tree.draw_svg(
                 size=(self.width, self.height),
@@ -232,13 +225,22 @@ class Tree(View):
             self.advanced_warning.visible = True
         pos1 = int(tree.get_interval()[0])
         pos2 = int(tree.get_interval()[1]) - 1
-        return pn.Accordion(
-            pn.Column(
+        if int(self.num_trees.value) > 1:
+            return pn.Accordion(
+                pn.Column(
+                    pn.pane.HTML(plot),
+                    name=f"Tree index {tree.index} (position {pos1} - {pos2})",
+                ),
+                active=[0],
+            )
+        else:
+            return pn.Column(
+                pn.pane.HTML(
+                    f"<h2>Tree index {tree.index}" f" (position {pos1} - {pos2})</h2>",
+                    sizing_mode="stretch_width",
+                ),
                 pn.pane.HTML(plot),
-                name=f"Tree index {tree.index} (position {pos1} - {pos2})",
-            ),
-            active=[0],
-        )
+            )
 
     def get_all_trees(self, trees):
         if not trees:
