@@ -34,6 +34,26 @@ class IndividualsPage(View):
         self.individuals_table.sample_sets_table = self.sample_sets_table
 
     def __panel__(self):
+        sample_sets_accordion = pn.Accordion(
+            pn.Column(
+                self.sample_sets_table,
+                sizing_mode="stretch_width",
+                name="Sample Sets Table",
+            ),
+            max_width=400,
+            active=[0],
+        )
+
+        def sample_sets_accordion_toggled(event):
+            if sample_sets_accordion.active == []:
+                sample_sets_accordion.max_width = 180
+            else:
+                sample_sets_accordion.max_width = 400
+
+        sample_sets_accordion.param.watch(
+            sample_sets_accordion_toggled, "active"
+        )
+
         return pn.Column(
             pn.Row(
                 pn.Accordion(
@@ -52,15 +72,7 @@ class IndividualsPage(View):
                     active=[0],
                 ),
                 pn.Spacer(sizing_mode="stretch_width", max_width=5),
-                pn.Accordion(
-                    pn.Column(
-                        self.sample_sets_table,
-                        sizing_mode="stretch_width",
-                        name="Sample Sets Table",
-                    ),
-                    max_width=400,
-                    active=[0],
-                ),
+                sample_sets_accordion,
             ),
             pn.Accordion(
                 pn.Column(self.individuals_table, name="Individuals Table"),
