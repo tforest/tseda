@@ -272,13 +272,13 @@ class SampleSetsTable(Viewer):
             table,
         )
 
-    def sidebar_table(self)-> pn.Card:
+    def sidebar_table(self) -> pn.Card:
         """
         Generates a sidebar table with quick view functionalities.
 
         Returns:
             pn.Card: The layout for the sidebar.
-        """     
+        """
         table = pn.widgets.Tabulator(
             self.data,
             layout="fit_data_table",

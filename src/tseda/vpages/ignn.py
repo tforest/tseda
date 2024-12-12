@@ -46,7 +46,7 @@ class GNNHaplotype(View):
         window_size (int): The size of the window to use for visualization. Defaults to 10000. Must be greater than 0.
         warning_pane (pn.Alert): a warning panel that is displayed if no samples are selected.
         individual_id_warning (pn.Alert): a warning panel that is displayed if an invalid individual ID is entered.
-    
+
     Methods:
         plot(haplotype=0): makes the haplotype plot.
         plot_haplotype0(): calls the plot function for haplotype 0.
@@ -83,7 +83,7 @@ class GNNHaplotype(View):
         Creates the GNN Haplotype plot.
 
         Args:
-            haplotype (int): Can be either 0 or 1 and will be used to plot haplotype 0 or haplotype 1. 
+            haplotype (int): Can be either 0 or 1 and will be used to plot haplotype 0 or haplotype 1.
 
 
         Returns:
@@ -187,7 +187,7 @@ class GNNHaplotype(View):
             inds (pandas.core.frame.DataFrame): Contains the data in the individuals table.
 
         Returns:
-            pn.pane.Column: If the input argument is valid this coloumn will return the nodes of the index and an empty Coloumn. Otherwise it will return a None value and a Coloumn telling the user to enter a valid sample ID. 
+            pn.pane.Column: If the input argument is valid this coloumn will return the nodes of the index and an empty Coloumn. Otherwise it will return a None value and a Coloumn telling the user to enter a valid sample ID.
         """
         max_id = inds.index.max()
         info_column = pn.Column(
@@ -253,7 +253,7 @@ class GNNHaplotype(View):
 
     def sidebar(self):
         """
-        Returns the content of the sidbar options for the GNN Haplotype plot. 
+        Returns the content of the sidbar options for the GNN Haplotype plot.
 
 
         Returns:
@@ -280,7 +280,7 @@ class VBar(View):
         sorting (pn.Selector): the selected population to base the sort order on.
         sort_order (pn.Selector): the selected sorting order (Ascending/Descending)
         warning_pane (pn.Alert): a warning panel that is displayed if no samples are selected.
-    
+
     Methods:
         gnn() -> pd.DataFrame: gets the data for the GNN VBar plot.
         __panel__() -> pn.panel: creates the panel containing the GNN VBar plot.
@@ -311,7 +311,7 @@ class VBar(View):
     # TODO: move to DataStore class?
     def gnn(self):
         """
-        Creates the data for the GNN VBar plot. 
+        Creates the data for the GNN VBar plot.
 
         Returns:
             pd.DataFrame: a dataframe containing all the information for the GNN VBar plot.
@@ -454,7 +454,7 @@ class VBar(View):
 
     def sidebar(self):
         """
-        Returns the content of the sidbar options for the VBar plot. 
+        Returns the content of the sidbar options for the VBar plot.
 
 
         Returns:
@@ -483,11 +483,12 @@ class IGNNPage(View):
         vbar (VBar): An instance of the VBar class, providing bar plot visualizations of genomic data.
         gnnhaplotype (GNNHaplotype): An instance of the GNNHaplotype class, handling GNN-based haplotype analysis.
         sample_sets (pandas.DataFrame): A DataFrame containing information about the available sample sets.
-    
+
     Methods:
         __panel__() -> pn.Column: Defines the layout of the main content area.
         sidebar() -> pn.Column: Defines the layout of the sidebar content area.
     """
+
     key = "iGNN"
     title = "iGNN"
     geomap = param.ClassSelector(class_=GeoMap)

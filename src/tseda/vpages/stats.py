@@ -46,11 +46,11 @@ class OnewayStats(View):
         A parameter to select the calculation mode ("site" or "branch").
         Branch mode is only available for calibrated data. (default: "site")
     statistic (param.Selector):
-        A parameter to select the statistic to calculate 
+        A parameter to select the statistic to calculate
         (e.g., "Tajimas_D", "diversity").
         Names correspond to tskit method names. (default: "diversity")
     window_size (param.Integer):
-        A parameter to define the size of the window for window-based statistics. 
+        A parameter to define the size of the window for window-based statistics.
         (default: 10000, bounds=(1, None))
     sample_select_warning (pn.pane.Alert):
         An alert panel displayed when no sample sets are selected.
@@ -66,6 +66,7 @@ class OnewayStats(View):
     sidebar() -> pn.Card:
         Creates the sidebar panel with controls for the plot.
     """
+
     mode = param.Selector(
         objects=["site"],
         default="site",
@@ -89,11 +90,11 @@ class OnewayStats(View):
     @property
     def tooltip(self):
         """
-        Returns a TooltipIcon widget containing information 
+        Returns a TooltipIcon widget containing information
         about the oneway statistical plot and how to edit it.
 
         Returns:
-            pn.widgets.TooltipIcon: A TooltipIcon widget displaying 
+            pn.widgets.TooltipIcon: A TooltipIcon widget displaying
             the information.
         """
         return pn.widgets.TooltipIcon(
@@ -111,7 +112,7 @@ class OnewayStats(View):
     @param.depends("mode", "statistic", "window_size")
     def __panel__(self) -> pn.Column:
         """
-        Returns the plot. 
+        Returns the plot.
 
         Returns:
             pn.Column: The layout for the plot.
@@ -169,7 +170,7 @@ class OnewayStats(View):
             pn.pane.Markdown(fig_text),
         )
 
-    def sidebar(self)-> pn.Card:
+    def sidebar(self) -> pn.Card:
         """
         Returns the content of the sidebar.
         Returns:
@@ -199,7 +200,7 @@ class MultiwayStats(View):
         A parameter to select the statistic to calculate (e.g., "Fst", "divergence").
         Names correspond to tskit method names. (default: "Fst")
     window_size (param.Integer):
-        A parameter to define the size of the window for window-based statistics. 
+        A parameter to define the size of the window for window-based statistics.
         (default: 10000, bounds=(1, None))
     comparisons (pn.widgets.MultiChoice):
         A multi-choice widget for selecting sample set pairs to compare.
@@ -212,7 +213,7 @@ class MultiwayStats(View):
 
     Methods:
     set_multichoice_options():
-        Updates the options for the comparisons multi-choice widget based 
+        Updates the options for the comparisons multi-choice widget based
         on available sample sets.
     __panel__() -> pn.Column:
         Generates the view containing the multiway statistics plot.
@@ -264,11 +265,11 @@ class MultiwayStats(View):
     @property
     def tooltip(self):
         """
-        Returns a TooltipIcon widget containing information 
+        Returns a TooltipIcon widget containing information
         about the multiway statistical plot and how to edit it.
 
         Returns:
-            pn.widgets.TooltipIcon: A TooltipIcon widget displaying 
+            pn.widgets.TooltipIcon: A TooltipIcon widget displaying
             the information.
         """
         return pn.widgets.TooltipIcon(
@@ -435,8 +436,9 @@ class StatsPage(View):
     __panel__() -> pn.Column:
         Generates the panel for the "Statistics" page with one-way and multi-way plot accordions.
     sidebar() -> pn.Card:
-        Creates the sidebar panel for the "Statistics" 
+        Creates the sidebar panel for the "Statistics"
     """
+
     key = "stats"
     title = "Statistics"
     oneway = param.ClassSelector(class_=OnewayStats)

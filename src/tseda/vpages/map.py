@@ -44,12 +44,13 @@ class GeoMap(View):
         tiles_selector (pn.Selector): the selected tiles for the map vizualisation.
         tiles (str): the selected tile for the map.
         individuals_table (IndividualsTable): An instance of the IndividualsTable class, containing the information from the individuals table.
-    
+
     Methods:
         __panel__() -> gdf.hvplot: Returns the Geomap as an Hvplot.
         sidebar() -> pn.Card: Defines the layout of the sidebar options for the Geomap.
 
     """
+
     individuals_table = param.ClassSelector(class_=IndividualsTable)
 
     tiles_selector = param.Selector(
@@ -119,7 +120,7 @@ class GeoMap(View):
 
     def sidebar(self):
         """
-        Returns the content of the sidbar options for the Geomap plot. 
+        Returns the content of the sidbar options for the Geomap plot.
 
 
         Returns:
