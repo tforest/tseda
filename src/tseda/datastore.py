@@ -5,7 +5,7 @@ Add sth here
 """
 
 import random
-from typing import Tuple, List, Dict
+from typing import Tuple, List, Dict, Optional
 
 
 import daiquiri
@@ -44,20 +44,22 @@ class SampleSetsTable(Viewer):
             Underlying DataFrame holding sample set data.
 
     Methods:
-        tooltip (pn.widgets.TooltipIcon):
+        tooltip() -> pn.widgets.TooltipIcon:
             Returns a tooltip for the table.
         def __panel__():
             Creates the main panel for the table with functionalities.
-        get_ids():
+        get_ids() -> List:
             Returns a list of sample set IDs.
-        sidebar_table():
+        sidebar_table() -> pn.Column:
             Generates a sidebar table with quick view functionalities.
-        sidebar():
+        sidebar() - > pn.Column:
             Creates the sidebar with options for managing sample sets.
         color_by_name (dict):
             Returns a dictionary with sample set colors as key-value pairs (name-color).
         names (dict):
             Returns a dictionary with sample set names as key-value pairs (index-name).
+        loc(self, i: int) -> pd.core.series.Series:
+            Returns a pd.core.series.Series (row) of a dataframe for a specific id
     """
 
     columns = ["name", "color", "predefined"]
@@ -195,29 +197,29 @@ class SampleSetsTable(Viewer):
 
     @property
     def names(self) -> Dict[int, str]:
-        #TODO: see why this is called 6 times in a row - unecessary
+        # TODO: see why this is called 6 times in a row - unecessary
         """
         Return the names of all sample sets as a dictionary
-        
+
         Returns:
-            Dict: dictionary of indices (int) as keys and 
+            Dict: dictionary of indices (int) as keys and
             names (str) as values
         """
         d = {}
         for index, row in self.data.rx.value.iterrows():
             d[index] = row["name"]
-            
+
         return d
 
-    def loc(self, i) -> pd.core.series.Series:
+    def loc(self, i: int) -> pd.core.series.Series:
         """
         Returns sample set pd.core.series.Series object (dataframe row)
         by index
 
         Arguments:
             i: Index for the sample set wanted
-        
-        Returns: 
+
+        Returns:
             pd.core.series.Series object:
                 Containing name, color and predefined status.
         """
@@ -294,11 +296,78 @@ class SampleSetsTable(Viewer):
 
 
 class IndividualsTable(Viewer):
-    """Class to hold and view individuals and perform calculations to
-    change filters."""
+    """
+    Class represents a table for managing individuals and perform calculations to
+    change filters.
+
+    Attributes:
+        sample_sets_table (param.ClassSelector):
+            ClassSelector for the SampleSetsTable class.
+        columns (list):
+            The default columns displayed in the table (["name", "color", "predefined"]).
+        editors (dict):
+            Dictionary specifying editor types for each column in the table.
+        formatters (dict):
+            Dictionary defining formatters for each column.
+        create_sample_set_textinput (String):
+            Parameter for entering a new sample set name (default=None).
+        create_sample_set_warning (pn.pane.Alert):
+            Warning alert to prompt user to refresh page after creating a dataset.
+        sample_set_warning (pn.pane.Alert):
+            Warning alert for duplicate sample set names.
+        table (param.DataFrame):
+            Underlying DataFrame holding sample set data.
+
+    Methods:
+
+        tooltip()  -> pn.widgets.TooltipIcon :
+            Returns a TooltipIcon widget containing information about the individuals
+            table and how to edit it.
+
+        sample_sets(only_selected: Optional[bool] = True):
+            Returns a dictionary with a sample set id to samples list mapping.
+
+        get_population_ids() -> List[int]:
+            Returns a sorted list of unique population IDs present in the data.
+
+        get_sample_set_ids() -> List[int]:
+            Returns a sorted list of unique sample set IDs present in the data.
+            This method combines IDs from two sources:
+                1. Underlying data ("sample_set_id" column).
+                2. Optional SampleSetsTable object (if defined).
+
+        sample2ind -> Dict[int, int]:
+            Creates a dictionary mapping sample (tskit node) IDs to individual IDs.
+
+        samples():
+            Yields all sample (tskit node) IDs present in the data.
+
+        loc(i: int) -> pd.core.series.Series:
+            Returns the individual data (pd.Series) for a specific index (ID).
+
+        reset_modification():
+            Resets the "sample_set_id" column to the original values from "population".
+
+        combine_tables(individuals_table: param.reactive.rx) -> pn.widgets.Tabulator:
+            Combines individuals and sample set data into a single table using pandas.merge.
+
+        __panel__ -> pn.Column:
+            The main content of the page, retrieved from `datastore.tsm.ts`.
+            Updates options based on button interactions and returns a Column layout.
+
+        options_sidebar() -> pn.Card:
+            Creates a Panel card containing options for the individuals table:
+                - Page size selector.
+                - Sample set selector.
+
+        modification_sidebar() -> pn.Column:
+            Creates a Panel column containing data modification options:
+                - Card with population from and sample set to selectors.
+                - Restore and update buttons.
+                - Warning message for invalid data.
+    """
 
     sample_sets_table = param.ClassSelector(class_=SampleSetsTable)
-
     columns = [
         "color",
         "population",
@@ -309,7 +378,6 @@ class IndividualsTable(Viewer):
         "latitude",
         "selected",
     ]
-
     editors = {k: None for k in columns}
     editors["sample_set_id"] = {
         "type": "number",
@@ -320,14 +388,38 @@ class IndividualsTable(Viewer):
         "values": [False, True],
         "valuesLookup": True,
     }
-
     formatters = {
         "selected": {"type": "tickCross"},
         "color": {"type": "color"},
     }
-
+    filters = {
+        "name_individual": {
+            "type": "input",
+            "func": "like",
+            "placeholder": "Enter name",
+        },
+        "population": {
+            "type": "input",
+            "func": "like",
+            "placeholder": "Enter ID",
+        },
+        "sample_set_id": {
+            "type": "input",
+            "func": "like",
+            "placeholder": "Enter ID",
+        },
+        "selected": {
+            "type": "tickCross",
+            "tristate": True,
+            "indeterminateValue": None,
+        },
+        "name_sample_set": {
+            "type": "input",
+            "func": "like",
+            "placeholder": "Enter name",
+        },
+    }
     table = param.DataFrame()
-
     page_size = param.Selector(
         objects=[10, 20, 50, 100, 200, 500],
         default=20,
@@ -359,41 +451,12 @@ class IndividualsTable(Viewer):
     restore_button = pn.widgets.Button(
         name="Restore", button_type="danger", margin=(10, 10)
     )
-
     data_mod_warning = pn.pane.Alert(
         """Please enter a valid population ID and
         a non-negative new sample set ID""",
         alert_type="warning",
         visible=False,
     )
-
-    filters = {
-        "name_individual": {
-            "type": "input",
-            "func": "like",
-            "placeholder": "Enter name",
-        },
-        "population": {
-            "type": "input",
-            "func": "like",
-            "placeholder": "Enter ID",
-        },
-        "sample_set_id": {
-            "type": "input",
-            "func": "like",
-            "placeholder": "Enter ID",
-        },
-        "selected": {
-            "type": "tickCross",
-            "tristate": True,
-            "indeterminateValue": None,
-        },
-        "name_sample_set": {
-            "type": "input",
-            "func": "like",
-            "placeholder": "Enter name",
-        },
-    }
 
     def __init__(self, **params):
         super().__init__(**params)
@@ -404,7 +467,14 @@ class IndividualsTable(Viewer):
         self.sample_select.value = all_sample_set_ids
 
     @property
-    def tooltip(self):
+    def tooltip(self) -> pn.widgets.TooltipIcon:
+        """
+        Returns a TooltipIcon widget containing information about the individuals
+        table and how to edit it.
+
+        Returns:
+            pn.widgets.TooltipIcon: A TooltipIcon widget displaying information.
+        """
         return pn.widgets.TooltipIcon(
             value=(
                 "Individuals table with columns relevant for modifying plots. "
@@ -421,9 +491,20 @@ class IndividualsTable(Viewer):
             ),
         )
 
-    def sample_sets(self, only_selected=True):
-        """Returns a dictionary with a sample
-        set id to samples list mapping."""
+    def sample_sets(self, only_selected: Optional[bool] = True):
+        """
+        Returns a dictionary with a sample set id to samples list mapping.
+
+        Arguments:
+            only_selected (bool, optional): If True, only considers
+            individuals marked as selected in the table. Defaults to True.
+
+        Returns:
+            dict: A dictionary where keys are sample set IDs and values are
+            lists of samples (tskit node IDs) belonging to that set. If
+            `only_selected` is True, only samples marked as selected are
+            included in the lists.
+        """
         sample_sets = {}
         inds = self.data.rx.value
         for _, ind in inds.iterrows():
@@ -435,12 +516,29 @@ class IndividualsTable(Viewer):
             sample_sets[sample_set].extend(ind.nodes)
         return sample_sets
 
-    def get_population_ids(self):
-        """Return indices of populations."""
+    def get_population_ids(self) -> List[int]:
+        """
+        Returns a sorted list of unique population IDs present in the data.
+
+        Returns:
+            list: A list containing all unique population IDs in the table.
+        """
         return sorted(self.data.rx.value["population"].unique().tolist())
 
-    def get_sample_set_ids(self):
-        """Return indices of sample groups."""
+    def get_sample_set_ids(self) -> List[int]:
+        """
+        Returns a sorted list of unique sample set IDs present in the data.
+
+        This method combines sample set IDs from two sources:
+
+        1. Unique IDs from the "sample_set_id" column of the underlying data
+           (self.data.rx.value).
+        2. (Optional) IDs retrieved from the SampleSetsTable object
+           (accessed through self.sample_sets_table) iff it is defined.
+
+        Returns:
+            list: A sorted list containing all unique sample set IDs found in the data and potentially from the `SampleSetsTable`.
+        """
         individuals_sets = sorted(self.data.rx.value["sample_set_id"].tolist())
         if self.sample_sets_table is not None:  # Nonetype when not yet defined
             individuals_sets = (
@@ -449,8 +547,18 @@ class IndividualsTable(Viewer):
         return sorted(list(set(individuals_sets)))
 
     @property
-    def sample2ind(self):
-        """Map sample (tskit node) ids to individual ids"""
+    def sample2ind(self) -> Dict[int, int]:
+        """
+        Creates a dictionary that maps sample (tskit node) IDs to individual IDs.
+
+        This method iterates through the underlying data and builds a dictionary where:
+        Keys are sample (tskit node) IDs. Values are the corresponding individual IDs
+        (indices) in the data.
+
+        Returns:
+            dict: A dictionary mapping sample (tskit node) IDs to their corresponding
+            individual IDs.
+        """
         inds = self.data.rx.value
         d = {}
         for index, ind in inds.iterrows():
@@ -459,44 +567,68 @@ class IndividualsTable(Viewer):
         return d
 
     def samples(self):
-        """Return all samples"""
+        """
+        Yields all sample (tskit node) IDs present in the data.
+
+        This method iterates through the underlying data and yields each sample
+        (tskit node) ID.
+
+        Yields:
+            int: Sample (tskit node) ID from the data.
+        """
+
         for _, ind in self.data.rx.value.iterrows():
             for node in ind.nodes:
                 yield node
 
-    def loc(self, i):
-        """Return individual by index"""
+    def loc(self, i: int) -> pd.core.series.Series:
+        """
+        Returns the individual data, pd.core.series.Series object,
+        for a specific index (ID) i.
+
+        Arguments:
+            i (int): The index (ID) of the individual to retrieve.
+
+        Returns:
+            pd.core.series.Series: A pandas Series representing the individual
+            data corresponding to the provided index.
+        """
         return self.data.rx.value.loc[i]
 
-    def check_data_modification(self):
-        if (
-            isinstance(self.mod_update_button.value, bool)
-            and not self.mod_update_button.value
-        ):
-            return False
-        if (
-            self.sample_set_to.value is not None
-            and self.population_from.value is not None
-        ):
-            population_ids = self.get_population_ids()
-            if self.population_from.value not in population_ids:
-                self.data_mod_warning.visible = True
-                return False
-            elif int(self.sample_set_to.value) < 0:
-                self.data_mod_warning.visible = True
-                return False
-            else:
-                self.data_mod_warning.visible = False
-                return True
-        else:
-            self.data_mod_warning.visible = False
-            return False
-
     def reset_modification(self):
+        """
+        Resets the "sample_set_id" column of the underlying data
+        (`self.data.rx.value`) back to the original values from the "population" column.
+        This effectively undoes any modifications made to sample set assignments.
+        """
         self.data.rx.value.sample_set_id = self.data.rx.value.population
 
-    def combine_tables(self, individuals_table):
-        """Combine individuals and sample sets table."""
+    def combine_tables(
+        self, individuals_table: param.reactive.rx
+    ) -> pn.widgets.Tabulator:
+        """
+        Combines individuals data and sample set data into a single table.
+
+        This method merges the data from two sources:
+
+        1. The individuals data (`individuals_table.rx.value`) from the provided
+           `individuals_table` argument.
+        2. The sample set data (`self.sample_sets_table.data.rx.value`)
+           from the `SampleSetsTable` object (accessed through `self.sample_sets_table`)
+           if it's defined.
+
+        The merge is performed using pandas.merge based on the "sample_set_id" column.
+        The resulting table includes additional columns with suffixes indicating their
+        origin (e.g., "_individual" for data from `individuals_table`).
+
+        Arguments:
+            individuals_table (aram.reactive.rx object):
+                An object containing the individuals data table.
+
+        Returns:
+            pn.widgets.Tabulator:
+                A Tabulator widget representing the combined individuals and sample set data.
+        """
 
         combined_df = pd.merge(
             individuals_table.rx.value,
@@ -538,7 +670,14 @@ class IndividualsTable(Viewer):
         "refresh_button.value",
         "restore_button.value",
     )
-    def __panel__(self):
+    def __panel__(self) -> pn.Column:
+        """
+        Returns the main content of the page which is retrieved
+        from the `datastore.tsm.ts` attribute
+
+        Returns:
+            pn.Column: The layout for the main content area.
+        """
         self.population_from.options = self.get_population_ids()
         all_sample_set_ids = self.get_sample_set_ids()
         self.sample_set_to.options = all_sample_set_ids
@@ -551,7 +690,10 @@ class IndividualsTable(Viewer):
                     self.data.rx.value.sample_set_id == sample_set_id,
                     "selected",
                 ] = True
-        if self.check_data_modification():
+        if (
+            isinstance(self.mod_update_button.value, bool)
+            and self.mod_update_button.value
+        ):
             self.table.loc[
                 self.table["population"] == self.population_from.value,  # pyright: ignore[reportIndexIssue]
                 "sample_set_id",
@@ -569,7 +711,15 @@ class IndividualsTable(Viewer):
 
         return pn.Column(pn.Row(self.tooltip, align=("start", "end")), table)
 
-    def options_sidebar(self):
+    def options_sidebar(self) -> pn.Card:
+        """
+        Creates a Panel card containing options for the individuals table.
+
+        Returns:
+            pn.Card: A Panel card containing the following options:
+                - Page size selector: Allows the user to adjust the number of rows per page.
+                - Sample set selector: Allows the user to select specific sample sets to filter the data.
+        """
         return pn.Card(
             self.param.page_size,
             self.sample_select,
@@ -580,14 +730,28 @@ class IndividualsTable(Viewer):
             styles=config.VCARD_STYLE,
         )
 
-    modification_header = pn.pane.HTML(
-        "<h4 style='margin: 0;'>Batch reassign individuals</h4>"
-    )
+    def modification_sidebar(self) -> pn.Column:
+        """
+        Creates a Panel column containing the data modification options.
 
-    def modification_sidebar(self):
+        Returns:
+            pn.Column: A Panel column containing the following elements:
+                - A card with the following options:
+                    - Population from selector: Allows the user to select the
+                      original population ID.
+                    - Sample set to selector: Allows the user to select the
+                      new sample set ID.
+                    - Restore button: Resets modifications.
+                    - Update button: Applies the modifications.
+                - A warning message (`self.data_mod_warning`) that is displayed
+                  when invalid data is entered.
+        """
+        modification_header = pn.pane.HTML(
+            "<h4 style='margin: 0;'>Batch reassign individuals</h4>"
+        )
         return pn.Column(
             pn.Card(
-                self.modification_header,
+                modification_header,
                 pn.Row(self.population_from, self.sample_set_to),
                 pn.Row(
                     pn.Spacer(width=120),
@@ -606,6 +770,31 @@ class IndividualsTable(Viewer):
 
 
 class DataStore(Viewer):
+    """
+    Class representing a data store for managing and accessing data used for analysis.
+    This class provides access to various data sources and functionalities related to
+    individuals, sample sets, and the underlying TreeSequenceModel.
+
+    Attributes:
+        tsm (param.ClassSelector):
+            ClassSelector for the model.TSModel object holding the TreeSequence data.
+        sample_sets_table (param.ClassSelector):
+            ClassSelector for the SampleSetsTable object managing sample set information.
+        individuals_table (param.ClassSelector):
+            ClassSelector for the IndividualsTable object handling individual data and filtering.
+        views (param.List, constant=True):
+            A list of views to be displayed.
+
+    Methods:
+        color(self) -> pd.core.series.Series:
+            Returns a pandas DataFrame containing the colors of selected individuals
+            merged with their corresponding sample set names.
+
+        haplotype_gnn(self, focal_ind, windows=None):
+            Calculates and returns the haplotype Genealogical Nearest Neighbors (GNN)
+            for a specified focal individual and optional window sizes.
+    """
+
     tsm = param.ClassSelector(class_=model.TSModel)
     sample_sets_table = param.ClassSelector(class_=SampleSetsTable)
     individuals_table = param.ClassSelector(class_=IndividualsTable)
@@ -613,7 +802,7 @@ class DataStore(Viewer):
     views = param.List(constant=True)
 
     @property
-    def color(self):
+    def color(self) -> pd.core.series.Series:
         """Return colors of selected individuals"""
         color = pd.merge(
             self.individuals_table.data.rx.value,
@@ -623,7 +812,24 @@ class DataStore(Viewer):
         )
         return color.loc[color.selected].color
 
-    def haplotype_gnn(self, focal_ind, windows=None):
+    def haplotype_gnn(
+        self, focal_ind: int, windows: Optional[List[int]] = None
+    ) -> pd.DataFrame:
+        """
+        Calculates and returns the haplotype Genealogical Nearest Neighbors (GNN)
+        for a specified focal individual and optional window sizes.
+
+        Arguments:
+            focal_ind (int): The index (ID) of the focal individual within the
+                individuals table.
+            windows (List[int], optional): A list of window sizes for calculating
+                GNNs within those specific windows. If None, GNNs are calculated
+                across the entire sequence length.
+
+        Returns:
+            pandas.DataFrame: A DataFrame containing GNN information for each haplotype.
+        """
+        print("ksbhflbsdfj", type(focal_ind), type(windows))
         sample_sets = self.individuals_table.sample_sets()
         ind = self.individuals_table.loc(focal_ind)
         hap = windowed_genealogical_nearest_neighbours(
@@ -654,13 +860,6 @@ class DataStore(Viewer):
         df.set_index(["haplotype", "start", "end"], inplace=True)
         return df
 
-    # Not needed? Never used?
-    def __panel__(self):
-        return pn.Row(
-            self.individuals_table,
-            self.sample_sets_table,
-        )
-
 
 def make_individuals_table(tsm: model.TSModel) -> IndividualsTable:
     """
@@ -684,7 +883,7 @@ def make_individuals_table(tsm: model.TSModel) -> IndividualsTable:
     return IndividualsTable(table=pd.DataFrame(result))
 
 
-def make_sample_sets_table(tsm: model.TSModel) -> SampleSet:
+def make_sample_sets_table(tsm: model.TSModel) -> SampleSetsTable:
     """
     Creates a SampleSetsTable object from the data in the provided TSModel
     object, by iterating through the populations in the tree sequence and
@@ -726,8 +925,6 @@ def preprocess(tsm: model.TSModel) -> Tuple[IndividualsTable, SampleSetsTable]:
     logger.info(
         "Preprocessing data: making individuals and sample sets tables"
     )
-    print(type(tsm), tsm)
-
     sample_sets_table = make_sample_sets_table(tsm)
     individuals_table = make_individuals_table(tsm)
     return individuals_table, sample_sets_table
