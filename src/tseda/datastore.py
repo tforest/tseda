@@ -178,14 +178,6 @@ class SampleSetsTable(Viewer):
             raise TypeError("self.table is not a valid pandas DataFrame.")
 
     @property
-    def color(self):
-        """Return the color of all sample sets as a dictionary"""
-        d = {}
-        for index, row in self.data.rx.value.iterrows():
-            d[index] = row.color
-        return d
-
-    @property
     def color_by_name(self):
         """Return the color of all sample sets as a dictionary with
         sample set names as keys"""
