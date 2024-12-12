@@ -47,39 +47,58 @@ class Tree(View):
         height (param.Integer): Height of the tree plot.
         num_trees (pn.widgets.Select): Select the number of trees to display.
         y_axis (pn.widgets.Checkbox): Toggle to include y-axis in the plot.
-        y_ticks (pn.widgets.Checkbox): Toggle to include y-axis ticks in the plot.
+        y_ticks (pn.widgets.Checkbox): Toggle to include y-axis ticks in the 
+        plot.
         x_axis (pn.widgets.Checkbox): Toggle to include x-axis in the plot.
-        sites_mutations (pn.widgets.Checkbox): Toggle to clude sites and mutations
+        sites_mutations (pn.widgets.Checkbox): Toggle to clude sites and 
+        mutations
         in the plot.
-        pack_unselected (pn.widgets.Checkbox): Toggle to pack unselected sample sets
+        pack_unselected (pn.widgets.Checkbox): Toggle to pack unselected 
+        sample sets
         in the plot.
-        options_doc (pn.widgets.TooltipIcon): Tooltip explaining advanced options.
-        symbol_size (param.Number): Size of the symbols representing tree nodes.
-        node_labels (param.String): Dictionary specifying custom labels for tree nodes.
-        additional_options (param.String): Dictionary specifying additional plot options.
-        advanced_warning (pn.pane.Alert): Warning message displayed when advanced options
+        options_doc (pn.widgets.TooltipIcon): Tooltip explaining advanced 
+        options.
+        symbol_size (param.Number): Size of the symbols representing tree 
+        nodes.
+        node_labels (param.String): Dictionary specifying custom labels for 
+        tree nodes.
+        additional_options (param.String): Dictionary specifying additional 
+        plot options.
+        advanced_warning (pn.pane.Alert): Warning message displayed when 
+        advanced options
         are invalid.
         next (param.Action): Action triggered by the "Next tree" button.
         prev (param.Action): Action triggered by the "Previous tree" button.
-        slider (pn.widgets.IntSlider): Slider for selecting chromosome position.
+        slider (pn.widgets.IntSlider): Slider for selecting chromosome 
+        position.
 
     Methods:
-        __init__(self, **params): Initializes the `Tree` class with provided parameters.
+        __init__(self, **params): Initializes the `Tree` class with provided 
+        parameters.
         default_css(self): Generates default CSS styles for tree nodes.
         next_tree(self): Increments the tree index to display the next tree.
-        prev_tree(self): Decrements the tree index to display the previous tree.
-        check_inputs(self): Raises a ValueError if position or tree index is invalid.
+        prev_tree(self): Decrements the tree index to display the previous 
+        tree.
+        check_inputs(self): Raises a ValueError if position or tree index is 
+        invalid.
         handle_advanced(self): Processes advanced  options for plotting.
-        update_slider(self): Updates the slider value based on the selected position.
+        update_slider(self): Updates the slider value based on the selected 
+        position.
         update_position(self): Updates the position based on the slider value.
-        plot_tree(self, tree, omit_sites, y_ticks, node_labels, additional_options): Generates
+        plot_tree(self, tree, omit_sites, y_ticks, node_labels, 
+        additional_options): Generates
         the HTML plot for a single tree with specified options.
-        get_all_trees(self, trees): Constructs a panel layout displaying all provided trees.
-        multiple_trees(self): Adjusts layout and options for displaying multiple trees.
-        advanced_options(self): Defines the layout for the advanced options in the sidebar.
+        get_all_trees(self, trees): Constructs a panel layout displaying all 
+        provided trees.
+        multiple_trees(self): Adjusts layout and options for displaying 
+        multiple trees.
+        advanced_options(self): Defines the layout for the advanced options 
+        in the sidebar.
         __panel__(self): Defines the layout of the main content on the page.
-        update_sidebar(self): Created the sidebar based on the chosen search method.
-        sidebar(self): Calls the update_sidebar method whenever chosen search method changes.
+        update_sidebar(self): Created the sidebar based on the chosen search 
+        method.
+        sidebar(self): Calls the update_sidebar method whenever chosen search 
+        method changes.
     """
 
     search_by = pn.widgets.ToggleGroup(
@@ -296,13 +315,16 @@ class Tree(View):
 
         Arguments:
             tree (tskit.trees.Tree): The tree to be plotted.
-            omit_sites (bool): If sites & mutaions should be included in the plot.
-            y_ticks (Union[None, dict]): If y_ticks should be included in the plot.
+            omit_sites (bool): If sites & mutaions should be included in the 
+            plot.
+            y_ticks (Union[None, dict]): If y_ticks should be included in the 
+            plot.
             nodel_labels (dict): Any customised node labels.
             additional_options (dict): Any additional plotting options.
 
         Returns:
-            Union[pn.Accordion, pn.Column]: A panel element containing the tree.
+            Union[pn.Accordion, pn.Column]: A panel element containing the 
+            tree.
         """
         try:
             plot = tree.draw_svg(
@@ -386,7 +408,8 @@ class Tree(View):
 
     def advanced_options(self):
         """Defined the content of the advanced options card in the sidebar."""
-        doc_link = """https://tskit.dev/tskit/docs/stable/python-api.html#tskit.TreeSequence.draw_svg"""
+        doc_link = """https://tskit.dev/tskit/docs/"
+        "stable/python-api.html#tskit.TreeSequence.draw_svg""" #######33
         sidebar_content = pn.Column(
             pn.Card(
                 pn.pane.HTML(
@@ -543,7 +566,8 @@ class TreesPage(View):
         data (param.ClassSelector): The main content of the page.
 
     Methods:
-        __init__(self, **params): Initializes the `TreesPage` class with provided parameters.
+        __init__(self, **params): Initializes the `TreesPage` class with 
+        provided parameters.
         __panel__() -> pn.Column: Defines the layout of the main content area.
         sidebar() -> pn.Column: Defines the layout of the sidebar content area.
     """

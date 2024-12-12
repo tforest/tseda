@@ -231,7 +231,8 @@ class GNNHaplotype(View):
         retrieved from the `datastore.tsm.ts` attribute.
 
         Returns:
-            pn.Column: The layout for the main content area of the GNN Haplotype plot or a warning message if the input isn't validated.
+            pn.Column: The layout for the main content area of the GNN 
+            Haplotype plot or a warning message if the input isn't validated.
         """
 
         inds = self.datastore.individuals_table.data.rx.value
@@ -257,7 +258,8 @@ class GNNHaplotype(View):
         plot.
 
         Returns:
-            pn.Card: The layout for the sidebar content area connected to the GNN Haplotype plot.
+            pn.Card: The layout for the sidebar content area connected to the 
+            GNN Haplotype plot.
         """
         return pn.Card(
             self.param.individual_id,
@@ -276,14 +278,19 @@ class VBar(View):
     displays a VBar plot of the sample sets.
 
     Attributes:
-        sorting (pn.Selector): the selected population to base the sort order on.
-        sort_order (pn.Selector): the selected sorting order (Ascending/Descending)
-        warning_pane (pn.Alert): a warning panel that is displayed if no samples are selected.
+        sorting (pn.Selector): the selected population to base the sort order 
+        on.
+        sort_order (pn.Selector): the selected sorting order 
+        (Ascending/Descending)
+        warning_pane (pn.Alert): a warning panel that is displayed if no 
+        samples are selected.
 
     Methods:
         gnn() -> pd.DataFrame: gets the data for the GNN VBar plot.
-        __panel__() -> pn.panel: creates the panel containing the GNN VBar plot.
-        sidebar() -> pn.Card: defines the layout of the sidebar content area for the VBar options.
+        __panel__() -> pn.panel: creates the panel containing the GNN VBar 
+        plot.
+        sidebar() -> pn.Card: defines the layout of the sidebar content area 
+        for the VBar options.
     """
 
     sorting = param.Selector(
@@ -311,7 +318,8 @@ class VBar(View):
         """Creates the data for the GNN VBar plot.
 
         Returns:
-            pd.DataFrame: a dataframe containing all the information for the GNN VBar plot.
+            pd.DataFrame: a dataframe containing all the information for the 
+            GNN VBar plot.
         """
         inds = self.datastore.individuals_table.data.rx.value
         sample_sets = self.datastore.individuals_table.sample_sets()
@@ -343,7 +351,8 @@ class VBar(View):
         `datastore.tsm.ts` attribute by the gnn() function.
 
         Returns:
-            pn.pane.Alert: a warning pane telling the user that it needs to select a sample.
+            pn.pane.Alert: a warning pane telling the user that it needs to 
+            select a sample.
             pn.pane.plot.Bokeh: a panel with the GNN VBar plot.
         """
         sample_sets = self.datastore.individuals_table.sample_sets()
@@ -380,7 +389,8 @@ class VBar(View):
 
         if self.sorting is not None and self.sorting != "":
             sort_by = (
-                ["sample_set_id"] + [self.sorting] + ["sample_id", "id"]  # pyright: ignore[reportOperatorIssue]
+                ["sample_set_id"] + [self.sorting] + ["sample_id", "id"]  
+                # pyright: ignore[reportOperatorIssue]
             )
             ascending = [True, False, False, False]
 
@@ -453,7 +463,8 @@ class VBar(View):
         """Returns the content of the sidbar options for the VBar plot.
 
         Returns:
-            pn.Card: The layout for the sidebar content area connected to the VBar plot.
+            pn.Card: The layout for the sidebar content area connected to the 
+            VBar plot.
         """
         return pn.Card(
             self.param.sorting,
@@ -472,10 +483,14 @@ class IGNNPage(View):
     Attributes:
         key (str): A unique identifier for the iGNN instance.
         title (str): The display title for the iGNN instance.
-        geomap (GeoMap): An instance of the GeoMap class, providing geographic visualizations of genomic data.
-        vbar (VBar): An instance of the VBar class, providing bar plot visualizations of genomic data.
-        gnnhaplotype (GNNHaplotype): An instance of the GNNHaplotype class, handling GNN-based haplotype analysis.
-        sample_sets (pandas.DataFrame): A DataFrame containing information about the available sample sets.
+        geomap (GeoMap): An instance of the GeoMap class, providing geographic 
+        visualizations of genomic data.
+        vbar (VBar): An instance of the VBar class, providing bar plot 
+        visualizations of genomic data.
+        gnnhaplotype (GNNHaplotype): An instance of the GNNHaplotype class, 
+        handling GNN-based haplotype analysis.
+        sample_sets (pandas.DataFrame): A DataFrame containing information 
+        about the available sample sets.
 
     Methods:
         __panel__() -> pn.Column: Defines the layout of the main content area.

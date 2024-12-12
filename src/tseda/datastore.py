@@ -5,19 +5,26 @@ visualizations.
 
 Key Classes:
 
-- `SampleSetsTable`: Manages and displays information about sample sets, including
+- `SampleSetsTable`: Manages and displays information about sample sets, 
+including
     their names, colors, and predefined status.
-- `IndividualsTable`: Handles individual data, including their population, sample set
-    assignments, and selection status. Enables filtering and modification of individual
+- `IndividualsTable`: Handles individual data, including their population, 
+sample set
+    assignments, and selection status. Enables filtering and modification of 
+    individual
     attributes.
-- `DataStore`: Provides access to the underlying TreeSequence data, sample sets,
-    and individuals data. Also includes methods for calculating haplotype GNNs and
+- `DataStore`: Provides access to the underlying TreeSequence data, sample 
+sets,
+    and individuals data. Also includes methods for calculating haplotype 
+    GNNs and
     retrieving sample and population information.
 
 Methods:
 
-- `make_individuals_table`: Creates an `IndividualsTable` object from a given TreeSequence.
-- `make_sample_sets_table`: Creates a `SampleSetsTable` object from a given TreeSequence.
+- `make_individuals_table`: Creates an `IndividualsTable` object from a given 
+TreeSequence.
+- `make_sample_sets_table`: Creates a `SampleSetsTable` object from a given 
+TreeSequence.
 - `preprocess`: Calls `make_individuals_table`and `make_sample_sets_table`.
 """
 
@@ -44,7 +51,8 @@ class SampleSetsTable(Viewer):
 
     Attributes:
         columns (list):
-            The default columns displayed in the table (["name", "color", "predefined"]).
+            The default columns displayed in the table (["name", "color", 
+            "predefined"]).
         editors (dict):
             Dictionary specifying editor types for each column in the table.
         formatters (dict):
@@ -52,7 +60,8 @@ class SampleSetsTable(Viewer):
         create_sample_set_textinput (String):
             Parameter for entering a new sample set name (default=None).
         create_sample_set_warning (pn.pane.Alert):
-            Warning alert to prompt user to refresh page after creating a dataset.
+            Warning alert to prompt user to refresh page after creating a 
+            dataset.
         sample_set_warning (pn.pane.Alert):
             Warning alert for duplicate sample set names.
         table (param.DataFrame):
@@ -70,11 +79,14 @@ class SampleSetsTable(Viewer):
         sidebar() - > pn.Column:
             Creates the sidebar with options for managing sample sets.
         color_by_name (dict):
-            Returns a dictionary with sample set colors as key-value pairs (name-color).
+            Returns a dictionary with sample set colors as key-value pairs 
+            (name-color).
         names (dict):
-            Returns a dictionary with sample set names as key-value pairs (index-name).
+            Returns a dictionary with sample set names as key-value pairs 
+            (index-name).
         loc(self, i: int) -> pd.core.series.Series:
-            Returns a pd.core.series.Series (row) of a dataframe for a specific id
+            Returns a pd.core.series.Series (row) of a dataframe for a 
+            specific id
     """
 
     columns = ["name", "color", "predefined"]
@@ -134,7 +146,8 @@ class SampleSetsTable(Viewer):
         sample set names and colors, and assigning individuals to sample sets.
 
         Returns:
-            pn.widgets.TooltipIcon: A TooltipIcon widget displaying the instructions.
+            pn.widgets.TooltipIcon: A TooltipIcon widget displaying the 
+            instructions.
         """
         return pn.widgets.TooltipIcon(
             value=(
@@ -316,7 +329,8 @@ class IndividualsTable(Viewer):
         sample_sets_table (param.ClassSelector):
             ClassSelector for the SampleSetsTable class.
         columns (list):
-            The default columns displayed in the table (["name", "color", "predefined"]).
+            The default columns displayed in the table (["name", "color", 
+            "predefined"]).
         editors (dict):
             Dictionary specifying editor types for each column in the table.
         formatters (dict):
@@ -324,7 +338,8 @@ class IndividualsTable(Viewer):
         create_sample_set_textinput (String):
             Parameter for entering a new sample set name (default=None).
         create_sample_set_warning (pn.pane.Alert):
-            Warning alert to prompt user to refresh page after creating a dataset.
+            Warning alert to prompt user to refresh page after creating a 
+            dataset.
         sample_set_warning (pn.pane.Alert):
             Warning alert for duplicate sample set names.
         table (param.DataFrame):
@@ -333,7 +348,8 @@ class IndividualsTable(Viewer):
     Methods:
 
         tooltip()  -> pn.widgets.TooltipIcon :
-            Returns a TooltipIcon widget containing information about the individuals
+            Returns a TooltipIcon widget containing information about the 
+            individuals
             table and how to edit it.
 
         sample_sets(only_selected: Optional[bool] = True):
@@ -349,7 +365,8 @@ class IndividualsTable(Viewer):
                 2. Optional SampleSetsTable object (if defined).
 
         sample2ind -> Dict[int, int]:
-            Creates a dictionary mapping sample (tskit node) IDs to individual IDs.
+            Creates a dictionary mapping sample (tskit node) IDs to 
+            individual IDs.
 
         samples():
             Yields all sample (tskit node) IDs present in the data.
@@ -358,14 +375,18 @@ class IndividualsTable(Viewer):
             Returns the individual data (pd.Series) for a specific index (ID).
 
         reset_modification():
-            Resets the "sample_set_id" column to the original values from "population".
+            Resets the "sample_set_id" column to the original values from 
+            "population".
 
-        combine_tables(individuals_table: param.reactive.rx) -> pn.widgets.Tabulator:
-            Combines individuals and sample set data into a single table using pandas.merge.
+        combine_tables(individuals_table: param.reactive.rx) -> 
+        pn.widgets.Tabulator:
+            Combines individuals and sample set data into a single table using 
+            pandas.merge.
 
         __panel__ -> pn.Column:
             The main content of the page, retrieved from `datastore.tsm.ts`.
-            Updates options based on button interactions and returns a Column layout.
+            Updates options based on button interactions and returns a Column 
+            layout.
 
         options_sidebar() -> pn.Card:
             Creates a Panel card containing options for the individuals table:
@@ -484,7 +505,8 @@ class IndividualsTable(Viewer):
         individuals table and how to edit it.
 
         Returns:
-            pn.widgets.TooltipIcon: A TooltipIcon widget displaying information.
+            pn.widgets.TooltipIcon: A TooltipIcon widget displaying 
+            information.
         """
         return pn.widgets.TooltipIcon(
             value=(
@@ -545,7 +567,8 @@ class IndividualsTable(Viewer):
            (accessed through self.sample_sets_table) iff it is defined.
 
         Returns:
-            list: A sorted list containing all unique sample set IDs found in the data and potentially from the `SampleSetsTable`.
+            list: A sorted list containing all unique sample set IDs found in 
+            the data and potentially from the `SampleSetsTable`.
         """
         individuals_sets = sorted(self.data.rx.value["sample_set_id"].tolist())
         if self.sample_sets_table is not None:  # Nonetype when not yet defined
@@ -559,12 +582,15 @@ class IndividualsTable(Viewer):
         """Creates a dictionary that maps sample (tskit node) IDs to individual
         IDs.
 
-        This method iterates through the underlying data and builds a dictionary where:
-        Keys are sample (tskit node) IDs. Values are the corresponding individual IDs
+        This method iterates through the underlying data and builds a 
+        dictionary where:
+        Keys are sample (tskit node) IDs. Values are the corresponding 
+        individual IDs
         (indices) in the data.
 
         Returns:
-            dict: A dictionary mapping sample (tskit node) IDs to their corresponding
+            dict: A dictionary mapping sample (tskit node) IDs to their 
+            corresponding
             individual IDs.
         """
         inds = self.data.rx.value
@@ -618,14 +644,18 @@ class IndividualsTable(Viewer):
 
         This method merges the data from two sources:
 
-        1. The individuals data (`individuals_table.rx.value`) from the provided
+        1. The individuals data (`individuals_table.rx.value`) from the 
+        provided
            `individuals_table` argument.
         2. The sample set data (`self.sample_sets_table.data.rx.value`)
-           from the `SampleSetsTable` object (accessed through `self.sample_sets_table`)
+           from the `SampleSetsTable` object (accessed through 
+           `self.sample_sets_table`)
            if it's defined.
 
-        The merge is performed using pandas.merge based on the "sample_set_id" column.
-        The resulting table includes additional columns with suffixes indicating their
+        The merge is performed using pandas.merge based on the 
+        "sample_set_id" column.
+        The resulting table includes additional columns with suffixes 
+        indicating their
         origin (e.g., "_individual" for data from `individuals_table`).
 
         Arguments:
@@ -634,7 +664,8 @@ class IndividualsTable(Viewer):
 
         Returns:
             pn.widgets.Tabulator:
-                A Tabulator widget representing the combined individuals and sample set data.
+                A Tabulator widget representing the combined individuals and 
+                sample set data.
         """
 
         combined_df = pd.merge(
@@ -701,7 +732,8 @@ class IndividualsTable(Viewer):
             and self.mod_update_button.value
         ):
             self.table.loc[
-                self.table["population"] == self.population_from.value,  # pyright: ignore[reportIndexIssue]
+                self.table["population"] == self.population_from.value,  
+                # pyright: ignore[reportIndexIssue]
                 "sample_set_id",
             ] = self.sample_set_to.value
 
@@ -722,8 +754,10 @@ class IndividualsTable(Viewer):
 
         Returns:
             pn.Card: A Panel card containing the following options:
-                - Page size selector: Allows the user to adjust the number of rows per page.
-                - Sample set selector: Allows the user to select specific sample sets to filter the data.
+                - Page size selector: Allows the user to adjust the number of 
+                rows per page.
+                - Sample set selector: Allows the user to select specific 
+                sample sets to filter the data.
         """
         return pn.Card(
             self.param.page_size,
@@ -781,21 +815,26 @@ class DataStore(Viewer):
 
     Attributes:
         tsm (param.ClassSelector):
-            ClassSelector for the model.TSModel object holding the TreeSequence data.
+            ClassSelector for the model.TSModel object holding the TreeSequence
+              data.
         sample_sets_table (param.ClassSelector):
-            ClassSelector for the SampleSetsTable object managing sample set information.
+            ClassSelector for the SampleSetsTable object managing sample set 
+            information.
         individuals_table (param.ClassSelector):
-            ClassSelector for the IndividualsTable object handling individual data and filtering.
+            ClassSelector for the IndividualsTable object handling individual 
+            data and filtering.
         views (param.List, constant=True):
             A list of views to be displayed.
 
     Methods:
         color(self) -> pd.core.series.Series:
-            Returns a pandas DataFrame containing the colors of selected individuals
+            Returns a pandas DataFrame containing the colors of selected 
+            individuals
             merged with their corresponding sample set names.
 
         haplotype_gnn(self, focal_ind, windows=None):
-            Calculates and returns the haplotype Genealogical Nearest Neighbors (GNN)
+            Calculates and returns the haplotype Genealogical Nearest 
+            Neighbors (GNN)
             for a specified focal individual and optional window sizes.
     """
 
@@ -825,12 +864,15 @@ class DataStore(Viewer):
         Arguments:
             focal_ind (int): The index (ID) of the focal individual within the
                 individuals table.
-            windows (List[int], optional): A list of window sizes for calculating
-                GNNs within those specific windows. If None, GNNs are calculated
+            windows (List[int], optional): A list of window sizes for 
+            calculating
+                GNNs within those specific windows. If None, GNNs are 
+                calculated
                 across the entire sequence length.
 
         Returns:
-            pandas.DataFrame: A DataFrame containing GNN information for each haplotype.
+            pandas.DataFrame: A DataFrame containing GNN information for each 
+            haplotype.
         """
         print("ksbhflbsdfj", type(focal_ind), type(windows))
         sample_sets = self.individuals_table.sample_sets()
@@ -913,11 +955,14 @@ def preprocess(tsm: model.TSModel) -> Tuple[IndividualsTable, SampleSetsTable]:
     from the data in the provided TSModel object.
 
     Arguments:
-        tsm (model.TSModel): The TSModel object containing the tree sequence data.
+        tsm (model.TSModel): The TSModel object containing the tree sequence 
+        data.
 
     Returns:
-        Tuple[IndividualsTable, SampleSetsTable]: A tuple containing two elements:
-            IndividualsTable: An IndividualsTable object populated with individual
+        Tuple[IndividualsTable, SampleSetsTable]: A tuple containing two 
+        elements:
+            IndividualsTable: An IndividualsTable object populated with 
+            individual
             information from the tree sequence.
             SampleSetsTable: A SampleSetsTable object populated with population
             information from the tree sequence.
