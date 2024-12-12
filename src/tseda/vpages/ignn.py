@@ -234,7 +234,6 @@ class GNNHaplotype(View):
         """
 
         inds = self.datastore.individuals_table.data.rx.value
-        print(type(inds))
         nodes = self.check_inputs(inds)
         if nodes[0] is not None:
             return pn.Column(
