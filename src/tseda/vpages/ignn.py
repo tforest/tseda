@@ -31,6 +31,7 @@ from tseda import config
 
 from .core import View, make_windows
 from .map import GeoMap
+from typing import Union
 
 hv.extension("bokeh")
 pn.extension(sizing_mode="stretch_both")
@@ -78,7 +79,7 @@ class GNNHaplotype(View):
         visible=False,
     )
 
-    def plot(self, haplotype: int = 0):
+    def plot(self, haplotype: int = 0) -> Union[hv.core.overlay.NdOverlay, pn.pane.Markdown]:
         """
         Creates the GNN Haplotype plot.
 
@@ -157,7 +158,7 @@ class GNNHaplotype(View):
         )
         return p
 
-    def plot_haplotype0(self):
+    def plot_haplotype0(self) -> Union[hv.core.overlay.NdOverlay, pn.pane.Markdown]:
         """
         Creates the GNN Haplotype plot for haplotype 0.
 
@@ -168,7 +169,7 @@ class GNNHaplotype(View):
         """
         return self.plot(0)
 
-    def plot_haplotype1(self):
+    def plot_haplotype1(self) -> Union[hv.core.overlay.NdOverlay, pn.pane.Markdown]:
         """
         Creates the GNN Haplotype plot for haplotype 1.
 
@@ -179,7 +180,7 @@ class GNNHaplotype(View):
         """
         return self.plot(1)
 
-    def check_inputs(self, inds: pd.core.frame.DataFrame):
+    def check_inputs(self, inds: pd.core.frame.DataFrame) -> tuple:
         """
         Checks the inputs to the GNN Haplotype plot.
 
@@ -224,7 +225,7 @@ class GNNHaplotype(View):
             return (None, info_column)
 
     @pn.depends("individual_id", "window_size")
-    def __panel__(self, **params):
+    def __panel__(self, **params) -> pn.Column:
         """
         Returns the main content for the GNN Haplotype plot which is retrieved from the `datastore.tsm.ts` attribute
 
@@ -251,7 +252,7 @@ class GNNHaplotype(View):
         else:
             return nodes[1]
 
-    def sidebar(self):
+    def sidebar(self) -> pn.Card:
         """
         Returns the content of the sidbar options for the GNN Haplotype plot.
 
@@ -309,7 +310,7 @@ class VBar(View):
     )
 
     # TODO: move to DataStore class?
-    def gnn(self):
+    def gnn(self) -> pd.DataFrame:
         """
         Creates the data for the GNN VBar plot.
 
@@ -341,16 +342,18 @@ class VBar(View):
         return df
 
     @pn.depends("sorting", "sort_order")
-    def __panel__(self):
+    def __panel__(self) -> Union[pn.pane.plot.Bokeh, pn.pane.Alert]:
         """
         Returns the main content of the plot which is retrieved from the `datastore.tsm.ts` attribute by the gnn() function.
 
 
         Returns:
-            pn.panel: a panel with the GNN VBar plot.
+            pn.pane.Alert: a warning pane telling the user that it needs to select a sample.
+            pn.pane.plot.Bokeh: a panel with the GNN VBar plot.
         """
         sample_sets = self.datastore.individuals_table.sample_sets()
         if len(list(sample_sets.keys())) < 1:
+            print(type(self.warning_pane))
             return self.warning_pane
         df = self.gnn()
         sample_sets = self.datastore.sample_sets_table.data.rx.value
@@ -449,7 +452,6 @@ class VBar(View):
         fig.xaxis.separator_line_width = 2.0
         fig.xaxis.separator_line_color = "grey"
         fig.xaxis.separator_line_alpha = 0.5
-
         return pn.panel(fig)
 
     def sidebar(self):
@@ -502,7 +504,7 @@ class IGNNPage(View):
         self.gnnhaplotype = GNNHaplotype(datastore=self.datastore)
         self.sample_sets = self.datastore.sample_sets_table
 
-    def __panel__(self):
+    def __panel__(self) -> pn.Column:
         """
         Returns the main content of the page which is retrieved from the `datastore.tsm.ts` attribute
 
@@ -537,7 +539,7 @@ class IGNNPage(View):
             ),
         )
 
-    def sidebar(self):
+    def sidebar(self) -> pn.Column:
         """
         Returns the sidebar content of the page which is retrieved from the `datastore.tsm.ts` attribute
 

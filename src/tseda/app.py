@@ -50,7 +50,18 @@ hv.opts.defaults(
 
 
 class DataStoreApp(Viewer):
-    """Main application class for tseda visualization app."""
+    """
+    Main application class for tseda visualization app.
+
+    Attributes:
+        datastore (DataStore): The data store instance for accessing and managing data.
+        title (str): The title of the application.
+        views (List[str]): A list of views to show on startup.
+
+    Methods:
+        __init__(**params): Initializes the application, loads pages, and sets up data update listeners.
+        view(): Creates the main application view, including a header selector for switching between different pages.
+    """
 
     datastore = param.ClassSelector(class_=datastore.DataStore)
 
@@ -82,10 +93,12 @@ class DataStoreApp(Viewer):
 
     @param.depends("views")
     def view(self):
-        """Main application view that renders a radio button group on
-        top with links to pages. Each page consists of a main content
-        page with plots and sidebars that provide user options for
-        configuring plots and outputs."""
+        """
+        Creates the main application view. Main application view that renders a radio button group on top with links to pages. Each page consists of a main content page with plots and sidebars that provide user options for configuring plots and outputs.
+
+        Returns:
+            pn.template.FastListTemplate: A Panel template containing the header selector, sidebar, and main content.
+        """
         page_titles = list(self.pages.keys())
         header_selector = pn.widgets.RadioButtonGroup(
             options=page_titles,
