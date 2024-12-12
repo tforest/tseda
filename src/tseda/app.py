@@ -86,9 +86,11 @@ class DataStoreApp(Viewer):
             | self.datastore.individuals_table.data.rx.updating()
         )
         updating.rx.watch(
-            lambda updating: pn.state.curdoc.hold()
-            if updating
-            else pn.state.curdoc.unhold()
+            lambda updating: (
+                pn.state.curdoc.hold()
+                if updating
+                else pn.state.curdoc.unhold()
+            )
         )
 
     @param.depends("views")
@@ -118,9 +120,11 @@ class DataStoreApp(Viewer):
             yield self.pages[selected_page].sidebar
 
         self._template = pn.template.FastListTemplate(
-            title=self.datastore.tsm.name[:75] + "..."
-            if len(self.datastore.tsm.name) > 75
-            else self.datastore.tsm.name,
+            title=(
+                self.datastore.tsm.name[:75] + "..."
+                if len(self.datastore.tsm.name) > 75
+                else self.datastore.tsm.name
+            ),
             header=[header_selector],
             sidebar=get_sidebar,
             main=get_content,
