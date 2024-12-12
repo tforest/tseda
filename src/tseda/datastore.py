@@ -14,6 +14,8 @@ from tseda.model import Individual, SampleSet
 from .gnn import windowed_genealogical_nearest_neighbours
 
 logger = daiquiri.getLogger("tseda")
+
+
 class SampleSetsTable(Viewer):
     default_columns = ["name", "color", "predefined"]
     editors = {k: None for k in default_columns}
@@ -579,6 +581,7 @@ class DataStore(Viewer):
             self.sample_sets_table,
         )
 
+
 def make_individuals_table(tsm: model.TSModel) -> IndividualsTable:
     """
     Creates an IndividualsTable object from the data in the provided TSModel
@@ -599,6 +602,7 @@ def make_individuals_table(tsm: model.TSModel) -> IndividualsTable:
         ind = Individual(individual=ts_ind)
         result.append(ind)
     return IndividualsTable(table=pd.DataFrame(result))
+
 
 def make_sample_sets_table(tsm: model.TSModel) -> SampleSet:
     """
