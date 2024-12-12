@@ -50,7 +50,7 @@ class OnewayStats(View):
         (e.g., "Tajimas_D", "diversity").
         Names correspond to tskit method names. (default: "diversity")
     window_size (param.Integer):
-        A parameter to define the size of the window for window-based 
+        A parameter to define the size of the window for window-based
         statistics.
         (default: 10000, bounds=(1, None))
     sample_select_warning (pn.pane.Alert):
@@ -196,11 +196,11 @@ class MultiwayStats(View):
         A parameter to select the calculation mode ("site" or "branch").
         Branch mode is only available for calibrated data. (default: "site")
     statistic (param.Selector):
-        A parameter to select the statistic to calculate (e.g., "Fst", 
+        A parameter to select the statistic to calculate (e.g., "Fst",
         "divergence").
         Names correspond to tskit method names. (default: "Fst")
     window_size (param.Integer):
-        A parameter to define the size of the window for window-based 
+        A parameter to define the size of the window for window-based
         statistics.
         (default: 10000, bounds=(1, None))
     comparisons (pn.widgets.MultiChoice):
@@ -210,7 +210,7 @@ class MultiwayStats(View):
     cmaps (dict):
         A dictionary containing available Holoviews colormaps.
     colormap (param.Selector):
-        A parameter to select the colormap for the plot. 
+        A parameter to select the colormap for the plot.
         (default: "glasbey_dark")
 
     Methods:
@@ -431,7 +431,7 @@ class StatsPage(View):
 
     Methods:
     __panel__() -> pn.Column:
-        Generates the panel for the "Statistics" page with one-way and 
+        Generates the panel for the "Statistics" page with one-way and
         multi-way plot accordions.
     sidebar() -> pn.Card:
         Creates the sidebar panel for the "Statistics"

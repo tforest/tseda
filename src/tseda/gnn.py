@@ -93,7 +93,7 @@ def windowed_genealogical_nearest_neighbours(  # noqa: C901
                         break
                     p = parent[p]
                 if p != tskit.NULL:
-                    scale = span / (total - delta)  
+                    scale = span / (total - delta)
                     # pyright: ignore[reportPossiblyUnboundVariable]
                     time_index = np.searchsorted(time_windows, time[p]) - 1
                     if 0 <= time_index < num_time_windows:

@@ -39,16 +39,16 @@ class GeoMap(View):
     where the different samples were collected.
 
     Attributes:
-        tiles_selector (pn.Selector): the selected tiles for the map 
+        tiles_selector (pn.Selector): the selected tiles for the map
         vizualisation.
         tiles (str): the selected tile for the map.
-        individuals_table (IndividualsTable): An instance of the 
+        individuals_table (IndividualsTable): An instance of the
         IndividualsTable class, containing the information from the individuals
         table.
 
     Methods:
         __panel__() -> gdf.hvplot: Returns the Geomap as an Hvplot.
-        sidebar() -> pn.Card: Defines the layout of the sidebar options for 
+        sidebar() -> pn.Card: Defines the layout of the sidebar options for
         the Geomap.
     """
 
@@ -122,7 +122,7 @@ class GeoMap(View):
         """Returns the content of the sidbar options for the Geomap plot.
 
         Returns:
-            pn.Card: The layout for the sidebar content area connected to the 
+            pn.Card: The layout for the sidebar content area connected to the
             Geomap plot.
         """
         return pn.Card(

@@ -27,9 +27,9 @@ class IndividualsPage(View):
         sample_sets_table (param.ClassSelector): A reference to a
             `SampleSetsTable` object containing information about sample sets.
         individuals_table (param.ClassSelector): A reference to an
-            `IndividualsTable` object managing individual data and filtering 
+            `IndividualsTable` object managing individual data and filtering
             options.
-        geomap (param.ClassSelector): A reference to a `GeoMap` object 
+        geomap (param.ClassSelector): A reference to a `GeoMap` object
         displaying
             geographical locations and sample set affiliations (optional).
 
@@ -81,12 +81,12 @@ class IndividualsPage(View):
             This function dynamically adjusts the maximum width of the
             accordion based on its active state. If the accordion is closed
             (active state is an empty list), the width is set to 180 pixels.
-            Otherwise, when the accordion is open, the width is set to 400 
+            Otherwise, when the accordion is open, the width is set to 400
             pixels.
 
             Arguments:
                 event (param.Event): The event object triggered by the
-                accordion's toggle. NOTE: event should not be provided, but 
+                accordion's toggle. NOTE: event should not be provided, but
                 Panel
                 does not recognize the function without it.
             """

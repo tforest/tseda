@@ -100,7 +100,7 @@ class DataStoreApp(Viewer):
         user options for configuring plots and outputs.
 
         Returns:
-            pn.template.FastListTemplate: A Panel template containing the 
+            pn.template.FastListTemplate: A Panel template containing the
             header selector, sidebar, and main content.
         """
         page_titles = list(self.pages.keys())
