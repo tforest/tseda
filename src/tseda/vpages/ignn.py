@@ -43,20 +43,20 @@ class GNNHaplotype(View):
     a GNN haplotype plot for a selected individual.
 
     Attributes:
-        individual_id (int): the ID of the individual to visualize (0-indexed). 
+        individual_id (int): the ID of the individual to visualize (0-indexed).
         Defaults to None.
-        window_size (int): The size of the window to use for visualization. 
+        window_size (int): The size of the window to use for visualization.
         Defaults to 10000. Must be greater than 0.
-        warning_pane (pn.Alert): a warning panel that is displayed if no 
+        warning_pane (pn.Alert): a warning panel that is displayed if no
         samples are selected.
-        individual_id_warning (pn.Alert): a warning panel that is displayed 
+        individual_id_warning (pn.Alert): a warning panel that is displayed
         if an invalid individual ID is entered.
 
     Methods:
         plot(haplotype=0): makes the haplotype plot.
         plot_haplotype0(): calls the plot function for haplotype 0.
         plot_haplotype1(): calls the plot function for haplotype 1.
-        __panel__() -> pn.Column: Defines the layout of the main content area 
+        __panel__() -> pn.Column: Defines the layout of the main content area
         or sends out a warning message if the user input isn't valid.
         sidebar() -> pn.Card: Defines the layout of the sidebar content area.
     """
@@ -89,14 +89,14 @@ class GNNHaplotype(View):
         """Creates the GNN Haplotype plot.
 
         Args:
-            haplotype (int): Can be either 0 or 1 and will be used to plot 
+            haplotype (int): Can be either 0 or 1 and will be used to plot
             haplotype 0 or haplotype 1.
 
 
         Returns:
-            pn.pane.Markdown: A message directed to the user to enter a valid 
+            pn.pane.Markdown: A message directed to the user to enter a valid
             correct sample ID.
-            pn.pane.Markdown: A placeholder pane in place to show the 
+            pn.pane.Markdown: A placeholder pane in place to show the
             warningmessage when a incorrect sample ID is entered.
             hv.core.overlay.NdOverlay: A GNN Haplotype plot.
         """
@@ -172,9 +172,9 @@ class GNNHaplotype(View):
         """Creates the GNN Haplotype plot for haplotype 0.
 
         Returns:
-            pn.pane.Markdown: A message directed to the user to enter a valid 
+            pn.pane.Markdown: A message directed to the user to enter a valid
             correct sample ID.
-            pn.pane.Markdown: A placeholder pane in place to show the 
+            pn.pane.Markdown: A placeholder pane in place to show the
             warningmessage when a incorrect sample ID is entered.
             hv.core.overlay.NdOverlay: A GNN Haplotype plot for haplotype 0.
         """
@@ -186,9 +186,9 @@ class GNNHaplotype(View):
         """Creates the GNN Haplotype plot for haplotype 1.
 
         Returns:
-            pn.pane.Markdown: A message directed to the user to enter a valid 
+            pn.pane.Markdown: A message directed to the user to enter a valid
             correct sample ID.
-            pn.pane.Markdown: A placeholder pane in place to show the 
+            pn.pane.Markdown: A placeholder pane in place to show the
             warningmessage when a incorrect sample ID is entered.
             hv.core.overlay.NdOverlay: A GNN Haplotype plot for haplotype 1.
         """
@@ -198,13 +198,13 @@ class GNNHaplotype(View):
         """Checks the inputs to the GNN Haplotype plot.
 
         Args:
-            inds (pandas.core.frame.DataFrame): Contains the data in the 
+            inds (pandas.core.frame.DataFrame): Contains the data in the
             individuals table.
 
         Returns:
-            pn.pane.Column: If the input argument is valid this coloumn will 
-            return the nodes of the index and an empty Coloumn. Otherwise it 
-            will return a None value and a Coloumn telling the user to enter a 
+            pn.pane.Column: If the input argument is valid this coloumn will
+            return the nodes of the index and an empty Coloumn. Otherwise it
+            will return a None value and a Coloumn telling the user to enter a
             valid sample ID.
         """
         max_id = inds.index.max()
