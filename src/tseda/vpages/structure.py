@@ -35,10 +35,16 @@ class GNN(View):
     )
 
     def __panel__(self):
+        """
+        Returns the GNN cluster plot as a heatmap or a warning message
+        if less than 2 samples are selected.
+
+        Returns:
+            pn.Column: The layout for the GNN cluster plot with a descriptive
+                       markdown element.
+        """
         sample_sets = self.datastore.individuals_table.sample_sets()
-        samples = [
-            sample for sublist in sample_sets.values() for sample in sublist
-        ]
+        samples = [sample for sublist in sample_sets.values() for sample in sublist]
         if len(sample_sets) <= 1:
             return self.warning_pane
         else:
@@ -57,15 +63,12 @@ class GNN(View):
                 columns=[sstable.loc[i]["name"] for i in sample_sets],
             )
             df["focal_population"] = [
-                sstable.loc[inds.loc[i].sample_set_id]["name"]
-                for i in samples2ind
+                sstable.loc[inds.loc[i].sample_set_id]["name"] for i in samples2ind
             ]
             mean_gnn = df.groupby("focal_population").mean()
             # Z-score normalization here!
             return pn.Column(
-                mean_gnn.hvplot.heatmap(
-                    cmap=cc.bgy, height=300, responsive=True
-                ),
+                mean_gnn.hvplot.heatmap(cmap=cc.bgy, height=300, responsive=True),
                 pn.pane.Markdown(
                     "**GNN cluster plot** - This heatmap visualizes the "
                     "genealogical relationships between individuals based on "

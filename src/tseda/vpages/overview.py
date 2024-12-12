@@ -1,4 +1,4 @@
-"""A class for the overview page.
+"""Overview page.
 
 This file contains the class for the application's overview
 page. The page includes both the main content with the information
@@ -39,6 +39,12 @@ class OverviewPage(View):
         return pn.Column(pn.pane.HTML(self.datastore.tsm.ts))
 
     def sidebar(self):
+        """
+        Returns the content of the sidebar,
+
+        Returns:
+            pn.Column: The layout for the sidebar.
+        """
         return pn.Column(
             pn.pane.HTML(
                 "<h2 style='margin: 0;'>Overview</h2>",
