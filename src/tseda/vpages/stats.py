@@ -10,6 +10,7 @@ TODO:
 
 import ast
 import itertools
+from typing import Union
 
 import holoviews as hv
 import pandas as pd
@@ -110,7 +111,7 @@ class OnewayStats(View):
             self.param.mode.objects = ["branch", "site"]
 
     @param.depends("mode", "statistic", "window_size")
-    def __panel__(self) -> pn.Column:
+    def __panel__(self) -> Union[pn.Column, pn.pane.Alert]:
         """Returns the plot.
 
         Returns:

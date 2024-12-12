@@ -732,8 +732,7 @@ class IndividualsTable(Viewer):
             and self.mod_update_button.value
         ):
             self.table.loc[
-                self.table["population"] == self.population_from.value,
-                # pyright: ignore[reportIndexIssue]
+                self.table["population"] == self.population_from.value,  # pyright: ignore[reportIndexIssue]
                 "sample_set_id",
             ] = self.sample_set_to.value
 

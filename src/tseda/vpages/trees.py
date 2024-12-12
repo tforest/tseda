@@ -235,14 +235,12 @@ class Tree(View):
         self.tree_index = min(
             self.datastore.tsm.ts.num_trees - self.num_trees.value,
             int(self.tree_index) + 1,
-        )
-        # pyright: ignore[reportOperatorIssue]
+        )  # pyright: ignore[reportOperatorIssue]
 
     def prev_tree(self):
         """Decrements the tree index to display the previous tree."""
         self.position = None
-        self.tree_index = max(0, int(self.tree_index) - 1)
-        # pyright: ignore[reportOperatorIssue]
+        self.tree_index = max(0, int(self.tree_index) - 1)  # pyright: ignore[reportOperatorIssue]
 
     def check_inputs(self):
         """Checks the inputs for position and tree index.

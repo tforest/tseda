@@ -15,7 +15,7 @@ TODO:
 - linked brushing between the map and the GNN plot
 """
 
-from typing import Union
+from typing import Union, Any
 
 import holoviews as hv
 import hvplot.pandas  # noqa
@@ -362,7 +362,8 @@ class VBar(View):
         return df
 
     @pn.depends("sorting", "sort_order")
-    def __panel__(self) -> Union[pn.pane.plot.Bokeh, pn.pane.Alert]:
+    def __panel__(self) -> Union[pn.pane.plot.Bokeh, pn.pane.Alert, Any]:
+        # TODO: Does not accept pn.panel so Any is included as quickfix
         """Returns the main content of the plot which is retrieved from the
         `datastore.tsm.ts` attribute by the gnn() function.
 
@@ -405,8 +406,7 @@ class VBar(View):
 
         if self.sorting is not None and self.sorting != "":
             sort_by = (
-                ["sample_set_id"] + [self.sorting] + ["sample_id", "id"]
-                # pyright: ignore[reportOperatorIssue]
+                ["sample_set_id"] + [self.sorting] + ["sample_id", "id"]  # pyright: ignore[reportOperatorIssue]
             )
             ascending = [True, False, False, False]
 
