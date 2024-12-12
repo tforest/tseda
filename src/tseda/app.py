@@ -53,13 +53,16 @@ class DataStoreApp(Viewer):
     """Main application class for tseda visualization app.
 
     Attributes:
-        datastore (DataStore): The data store instance for accessing and managing data.
+        datastore (DataStore): The data store instance for accessing and
+        managing data.
         title (str): The title of the application.
         views (List[str]): A list of views to show on startup.
 
     Methods:
-        __init__(**params): Initializes the application, loads pages, and sets up data update listeners.
-        view(): Creates the main application view, including a header selector for switching between different pages.
+        __init__(**params): Initializes the application, loads pages, and sets
+        up data update listeners.
+        view(): Creates the main application view, including a header selector
+        for switching between different pages.
     """
 
     datastore = param.ClassSelector(class_=datastore.DataStore)
