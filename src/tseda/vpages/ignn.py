@@ -31,13 +31,31 @@ from tseda import config
 
 from .core import View, make_windows
 from .map import GeoMap
+from typing import Union
 
 hv.extension("bokeh")
 pn.extension(sizing_mode="stretch_both")
 
 
 class GNNHaplotype(View):
-    """Make GNN haplotype plot."""
+    """
+    Make GNN haplotype plot.
+    This class creates a Panel object that displays a GNN haplotype plot for a selected individual.
+
+    Attributes:
+        individual_id (int): the ID of the individual to visualize (0-indexed). Defaults to None.
+        window_size (int): The size of the window to use for visualization. Defaults to 10000. Must be greater than 0.
+        warning_pane (pn.Alert): a warning panel that is displayed if no samples are selected.
+        individual_id_warning (pn.Alert): a warning panel that is displayed if an invalid individual ID is entered.
+    
+    Methods:
+        plot(haplotype=0): makes the haplotype plot.
+        plot_haplotype0(): calls the plot function for haplotype 0.
+        plot_haplotype1(): calls the plot function for haplotype 1.
+        __panel__() -> pn.Column: Defines the layout of the main content area or sends out a warning message if the user input isn't valid.
+        sidebar() -> pn.Card: Defines the layout of the sidebar content area.
+
+    """
 
     individual_id = param.Integer(
         default=None,
@@ -61,7 +79,20 @@ class GNNHaplotype(View):
         visible=False,
     )
 
-    def plot(self, haplotype=0):
+    def plot(self, haplotype: int = 0):
+        """
+        Creates the GNN Haplotype plot.
+
+        Args:
+            haplotype (int): Can be either 0 or 1 and will be used to plot haplotype 0 or haplotype 1. 
+
+
+        Returns:
+            pn.pane.Markdown: A message directed to the user to enter a valid correct sample ID.
+            pn.pane.Markdown: A placeholder pane in place to show the warningmessage when a incorrect sample ID is entered.
+            hv.core.overlay.NdOverlay: A GNN Haplotype plot.
+        """
+
         if self.individual_id is None:
             return pn.pane.Markdown("Enter a sample ID")
         if self.window_size is not None:
@@ -128,12 +159,37 @@ class GNNHaplotype(View):
         return p
 
     def plot_haplotype0(self):
+        """
+        Creates the GNN Haplotype plot for haplotype 0.
+
+        Returns:
+            pn.pane.Markdown: A message directed to the user to enter a valid correct sample ID.
+            pn.pane.Markdown: A placeholder pane in place to show the warningmessage when a incorrect sample ID is entered.
+            hv.core.overlay.NdOverlay: A GNN Haplotype plot for haplotype 0.
+        """
         return self.plot(0)
 
     def plot_haplotype1(self):
+        """
+        Creates the GNN Haplotype plot for haplotype 1.
+
+        Returns:
+            pn.pane.Markdown: A message directed to the user to enter a valid correct sample ID.
+            pn.pane.Markdown: A placeholder pane in place to show the warningmessage when a incorrect sample ID is entered.
+            hv.core.overlay.NdOverlay: A GNN Haplotype plot for haplotype 1.
+        """
         return self.plot(1)
 
     def check_inputs(self, inds):
+        """
+        Checks the inputs to the GNN Haplotype plot.
+
+        Args:
+            inds (pandas.core.frame.DataFrame): Contains the data in the individuals table.
+
+        Returns:
+            pn.pane.Column: If the input argument is valid this coloumn will return the nodes of the index and an empty Coloumn. Otherwise it will return a None value and a Coloumn telling the user to enter a valid sample ID. 
+        """
         max_id = inds.index.max()
         info_column = pn.Column(
             pn.pane.Markdown(
@@ -170,7 +226,16 @@ class GNNHaplotype(View):
 
     @pn.depends("individual_id", "window_size")
     def __panel__(self, **params):
+        """
+        Returns the main content of the page which is retrieved from the `datastore.tsm.ts` attribute
+
+
+        Returns:
+            pn.Column: The layout for the main content area of the plot or a warning message if the input isn't validated.
+        """
+
         inds = self.datastore.individuals_table.data.rx.value
+        print(type(inds))
         nodes = self.check_inputs(inds)
         if nodes[0] is not None:
             return pn.Column(
@@ -189,6 +254,13 @@ class GNNHaplotype(View):
             return nodes[1]
 
     def sidebar(self):
+        """
+        Returns the content of the sidbar options for the GNN Haplotype plot. 
+
+
+        Returns:
+            pn.Card: The layout for the sidebar content area connected to the GNN Haplotype plot.
+        """
         return pn.Card(
             self.param.individual_id,
             self.param.window_size,
@@ -202,7 +274,21 @@ class GNNHaplotype(View):
 
 
 class VBar(View):
-    """Make VBar plot of GNN output."""
+    """
+    Make VBar plot of GNN output.
+    This class creates a Panel object that displays a VBar plot of the sample sets.
+
+    Attributes:
+        sorting (pn.Selector): the selected population to base the sort order on.
+        sort_order (pn.Selector): the selected sorting order (Ascending/Descending)
+        warning_pane (pn.Alert): a warning panel that is displayed if no samples are selected.
+    
+    Methods:
+        gnn() -> pd.DataFrame: gets the data for the GNN VBar plot.
+        __panel__() -> pn.panel: creates the panel containing the GNN VBar plot.
+        sidebar() -> pn.Card: defines the layout of the sidebar content area for the VBar options.
+
+    """
 
     sorting = param.Selector(
         doc="Select what population to base the sort order on. Default is "
@@ -226,6 +312,12 @@ class VBar(View):
 
     # TODO: move to DataStore class?
     def gnn(self):
+        """
+        Creates the data for the GNN VBar plot. 
+
+        Returns:
+            pd.DataFrame: a dataframe containing all the information for the GNN VBar plot.
+        """
         inds = self.datastore.individuals_table.data.rx.value
         sample_sets = self.datastore.individuals_table.sample_sets()
         samples = [
@@ -252,6 +344,13 @@ class VBar(View):
 
     @pn.depends("sorting", "sort_order")
     def __panel__(self):
+        """
+        Returns the main content of the plot which is retrieved from the `datastore.tsm.ts` attribute by the gnn() function.
+
+
+        Returns:
+            pn.panel: a panel with the GNN VBar plot.
+        """
         sample_sets = self.datastore.individuals_table.sample_sets()
         if len(list(sample_sets.keys())) < 1:
             return self.warning_pane
@@ -356,6 +455,13 @@ class VBar(View):
         return pn.panel(fig)
 
     def sidebar(self):
+        """
+        Returns the content of the sidbar options for the VBar plot. 
+
+
+        Returns:
+            pn.Card: The layout for the sidebar content area connected to the VBar plot.
+        """
         return pn.Card(
             self.param.sorting,
             self.param.sort_order,
@@ -368,6 +474,22 @@ class VBar(View):
 
 
 class IGNNPage(View):
+    """
+    Make the iGNN page.
+    This class creates the iGNN page.
+
+    Attributes:
+        key (str): A unique identifier for the iGNN instance.
+        title (str): The display title for the iGNN instance.
+        geomap (GeoMap): An instance of the GeoMap class, providing geographic visualizations of genomic data.
+        vbar (VBar): An instance of the VBar class, providing bar plot visualizations of genomic data.
+        gnnhaplotype (GNNHaplotype): An instance of the GNNHaplotype class, handling GNN-based haplotype analysis.
+        sample_sets (pandas.DataFrame): A DataFrame containing information about the available sample sets.
+    
+    Methods:
+        __panel__() -> pn.Column: Defines the layout of the main content area.
+        sidebar() -> pn.Column: Defines the layout of the sidebar content area.
+    """
     key = "iGNN"
     title = "iGNN"
     geomap = param.ClassSelector(class_=GeoMap)
@@ -382,6 +504,14 @@ class IGNNPage(View):
         self.sample_sets = self.datastore.sample_sets_table
 
     def __panel__(self):
+        """
+        Returns the main content of the page which is retrieved from the `datastore.tsm.ts` attribute
+
+
+        Returns:
+            pn.Column: The layout for the main content area.
+        """
+
         return pn.Column(
             pn.Accordion(
                 pn.Column(
@@ -409,6 +539,14 @@ class IGNNPage(View):
         )
 
     def sidebar(self):
+        """
+        Returns the sidebar content of the page which is retrieved from the `datastore.tsm.ts` attribute
+
+
+        Returns:
+           pn.Column: The layout for the sidebar content area.
+        """
+
         return pn.Column(
             pn.pane.HTML(
                 "<h2 style='margin: 0;'>iGNN</h2>", sizing_mode="stretch_width"
