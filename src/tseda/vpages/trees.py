@@ -7,13 +7,12 @@ TODO:
 """
 
 import ast
+from typing import Tuple, Union
 
 import holoviews as hv
 import panel as pn
 import param
 import tskit
-
-from typing import Tuple, Union
 
 from tseda import config
 

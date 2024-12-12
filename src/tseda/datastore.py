@@ -23,8 +23,7 @@ Methods:
 """
 
 import random
-from typing import Tuple, List, Dict, Optional
-
+from typing import Dict, List, Optional, Tuple
 
 import daiquiri
 import pandas as pd

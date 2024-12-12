@@ -15,6 +15,8 @@ TODO:
 - linked brushing between the map and the GNN plot
 """
 
+from typing import Union
+
 import holoviews as hv
 import hvplot.pandas  # noqa
 import pandas as pd
@@ -31,7 +33,6 @@ from tseda import config
 
 from .core import View, make_windows
 from .map import GeoMap
-from typing import Union
 
 hv.extension("bokeh")
 pn.extension(sizing_mode="stretch_both")
