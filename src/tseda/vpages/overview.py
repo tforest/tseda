@@ -38,7 +38,7 @@ class OverviewPage(View):
         """
         return pn.Column(pn.pane.HTML(self.datastore.tsm.ts))
 
-    def sidebar(self):
+    def sidebar(self) -> pn.Column:
         """
         Returns the content of the sidebar,
 
