@@ -1,8 +1,8 @@
 """Main application for tseda.
 
-Provides the DataStoreApp class that is the main application for
-tseda. The DataStoreApp subclasses the Viewer class from panel and
-renders a panel.FastListTemplate object.
+Provides the DataStoreApp class that is the main application for tseda. The
+DataStoreApp subclasses the Viewer class from panel and renders a
+panel.FastListTemplate object.
 """
 
 import time
@@ -50,8 +50,7 @@ hv.opts.defaults(
 
 
 class DataStoreApp(Viewer):
-    """
-    Main application class for tseda visualization app.
+    """Main application class for tseda visualization app.
 
     Attributes:
         datastore (DataStore): The data store instance for accessing and managing data.
@@ -95,8 +94,10 @@ class DataStoreApp(Viewer):
 
     @param.depends("views")
     def view(self):
-        """
-        Creates the main application view. Main application view that renders a radio button group on top with links to pages. Each page consists of a main content page with plots and sidebars that provide user options for configuring plots and outputs.
+        """Creates the main application view. Main application view that
+        renders a radio button group on top with links to pages. Each page
+        consists of a main content page with plots and sidebars that provide
+        user options for configuring plots and outputs.
 
         Returns:
             pn.template.FastListTemplate: A Panel template containing the header selector, sidebar, and main content.

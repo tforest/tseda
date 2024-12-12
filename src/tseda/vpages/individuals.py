@@ -19,8 +19,7 @@ from .map import GeoMap
 
 
 class IndividualsPage(View):
-    """
-    This class represents a view for the individuals page.
+    """This class represents a view for the individuals page.
 
     Attributes:
         key (str): A unique identifier for this view.
@@ -38,7 +37,6 @@ class IndividualsPage(View):
             Contains:
             sample_sets_accordion_toggled(event): Handles the toggling event
             of the sample sets accordion
-
     """
 
     key = "individuals and sets"
@@ -59,8 +57,7 @@ class IndividualsPage(View):
         "individuals_table.refresh_button.value",
     )
     def __panel__(self) -> pn.Column:
-        """
-        Defines the layout of the view using Panel components. This method
+        """Defines the layout of the view using Panel components. This method
         is called dynamically when dependent parameters change.
 
         Returns:
@@ -77,8 +74,7 @@ class IndividualsPage(View):
         )
 
         def sample_sets_accordion_toggled(event):
-            """
-            Handles the toggling event of the sample sets accordion.
+            """Handles the toggling event of the sample sets accordion.
 
             This function dynamically adjusts the maximum width of the
             accordion based on its active state. If the accordion is closed
@@ -125,8 +121,7 @@ class IndividualsPage(View):
         )
 
     def sidebar(self) -> pn.Column:
-        """
-        Defines the content for the sidebar of the view containing
+        """Defines the content for the sidebar of the view containing
         descriptive text and control elements.
 
         Returns:

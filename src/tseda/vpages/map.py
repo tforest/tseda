@@ -1,4 +1,4 @@
-"""Module for creating a map of the world with sample locations
+"""Module for creating a map of the world with sample locations.
 
 Generate a hvplot map of the world with sample locations based on a
 GeoPandas representation of the individuals data. The map is
@@ -9,7 +9,6 @@ TODO:
 - Add linked brushing between the map and other panel objects /
   widgets
 - Fix issue where map is rendered small and repeated tiles
-
 """
 
 import geopandas
@@ -36,9 +35,8 @@ tiles_options = {
 
 
 class GeoMap(View):
-    """
-    Make the Geomap plot.
-    This class creates a hvplot that displays the map where the different samples were collected.
+    """Make the Geomap plot. This class creates a hvplot that displays the map
+    where the different samples were collected.
 
     Attributes:
         tiles_selector (pn.Selector): the selected tiles for the map vizualisation.
@@ -48,7 +46,6 @@ class GeoMap(View):
     Methods:
         __panel__() -> gdf.hvplot: Returns the Geomap as an Hvplot.
         sidebar() -> pn.Card: Defines the layout of the sidebar options for the Geomap.
-
     """
 
     individuals_table = param.ClassSelector(class_=IndividualsTable)
@@ -66,9 +63,8 @@ class GeoMap(View):
 
     @pn.depends("individuals_table.refresh_button.value")
     def __panel__(self):
-        """
-        Returns the main content for the Geomap plot which is retrieved from the `datastore.tsm.ts` attribute.
-
+        """Returns the main content for the Geomap plot which is retrieved from
+        the `datastore.tsm.ts` attribute.
 
         Returns:
             gdf.hvplot: the geomap plot as a Hvplot.
@@ -119,9 +115,7 @@ class GeoMap(View):
         )
 
     def sidebar(self):
-        """
-        Returns the content of the sidbar options for the Geomap plot.
-
+        """Returns the content of the sidbar options for the Geomap plot.
 
         Returns:
             pn.Card: The layout for the sidebar content area connected to the Geomap plot.

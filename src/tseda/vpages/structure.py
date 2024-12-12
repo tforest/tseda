@@ -6,7 +6,6 @@ under consideration.
 TODO:
 - add PCA
 - add parameter to subset sample sets of interest
-
 """
 
 import itertools
@@ -27,8 +26,7 @@ pn.extension(sizing_mode="stretch_width")
 
 
 class GNN(View):
-    """
-    Makes the GNN plot.
+    """Makes the GNN plot.
 
     Attributes:
         warnimng_pane (pn.pane.Alert): A warning message that is activated
@@ -45,9 +43,8 @@ class GNN(View):
     )
 
     def __panel__(self) -> Union[pn.Column, pn.pane.Alert]:
-        """
-        Returns the GNN cluster plot as a heatmap or a warning message
-        if less than 2 samples are selected.
+        """Returns the GNN cluster plot as a heatmap or a warning message if
+        less than 2 samples are selected.
 
         Returns:
             Union[pn.Column, pn.pane.Alert]: The layout for the GNN cluster
@@ -96,8 +93,7 @@ class GNN(View):
 
 
 class Fst(View):
-    """
-    Makes the Fst plot.
+    """Makes the Fst plot.
 
     Attributes:
         warnimng_pane (pn.pane.Alert): A warning message that is activated
@@ -114,9 +110,8 @@ class Fst(View):
     )
 
     def __panel__(self) -> Union[pn.Column, pn.pane.Alert]:
-        """
-        Returns the Fst plot as a heatmap or a warning message if less
-        than 2 samples are selected.
+        """Returns the Fst plot as a heatmap or a warning message if less than
+        2 samples are selected.
 
         Returns:
             Union[pn.Column, pn.pane.Alert]: The layout for the Fst
@@ -147,8 +142,7 @@ class Fst(View):
 
 
 class StructurePage(View):
-    """
-    Represents the structure page of the tseda application.
+    """Represents the structure page of the tseda application.
 
     Attributes:
         key (str): A unique identifier for this view within the application.
@@ -173,8 +167,7 @@ class StructurePage(View):
         self.sample_sets = self.datastore.sample_sets_table
 
     def __panel__(self) -> pn.Column:
-        """
-        Returns the main content of the structure page.
+        """Returns the main content of the structure page.
 
         Returns:
             pn.Column: The layout for the main content area.
@@ -188,8 +181,7 @@ class StructurePage(View):
         )
 
     def sidebar(self) -> pn.Column:
-        """
-        Returns the content of the sidebar.
+        """Returns the content of the sidebar.
 
         Returns:
             pn.Column: The layout for the sidebar.

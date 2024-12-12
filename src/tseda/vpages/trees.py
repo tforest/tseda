@@ -34,8 +34,7 @@ def eval_options(options: str) -> dict:
 
 
 class Tree(View):
-    """
-    This class represents a panel component for visualizing tskit trees.
+    """This class represents a panel component for visualizing tskit trees.
 
     Attributes:
         search_by (pn.widgets.ToggleGroup): Select the method for searching
@@ -180,8 +179,7 @@ class Tree(View):
 
     @property
     def default_css(self) -> str:
-        """
-        Default css styles for tree nodes.
+        """Default css styles for tree nodes.
 
         Returns:
             str: A string with the css styling.
@@ -213,9 +211,7 @@ class Tree(View):
         return css_string
 
     def next_tree(self):
-        """
-        Increments the tree index to display the next tree.
-        """
+        """Increments the tree index to display the next tree."""
         self.position = None
         self.tree_index = min(
             self.datastore.tsm.ts.num_trees - self.num_trees.value,
@@ -224,16 +220,13 @@ class Tree(View):
         # pyright: ignore[reportOperatorIssue]
 
     def prev_tree(self):
-        """
-        Decrements the tree index to display the previous tree.
-        """
+        """Decrements the tree index to display the previous tree."""
         self.position = None
         self.tree_index = max(0, int(self.tree_index) - 1)
         # pyright: ignore[reportOperatorIssue]
 
     def check_inputs(self):
-        """
-        Checks the inputs for position and tree index.
+        """Checks the inputs for position and tree index.
 
         Raises
             ValueError: If the position or tree index is invalid.
@@ -259,8 +252,7 @@ class Tree(View):
             self.position_index_warning.visible = False
 
     def handle_advanced(self) -> Tuple[bool, Union[dict, None]]:
-        """
-        Handles advanced options so that they are returned in the correct
+        """Handles advanced options so that they are returned in the correct
         format.
 
         Returns
@@ -283,17 +275,13 @@ class Tree(View):
 
     @param.depends("position", watch=True)
     def update_slider(self):
-        """
-        Updates the slider value based on the selected position.
-        """
+        """Updates the slider value based on the selected position."""
         if self.position is not None:
             self.slider.value = self.position
 
     @param.depends("slider.value_throttled", watch=True)
     def update_position(self):
-        """
-        Updates the position based on the slider value.
-        """
+        """Updates the position based on the slider value."""
         self.position = self.slider.value
 
     def plot_tree(
@@ -304,8 +292,7 @@ class Tree(View):
         node_labels: dict,
         additional_options: dict,
     ) -> Union[pn.Accordion, pn.Column]:
-        """
-        Plots a single tree.
+        """Plots a single tree.
 
         Arguments:
             tree (tskit.trees.Tree): The tree to be plotted.
@@ -360,8 +347,7 @@ class Tree(View):
             )
 
     def get_all_trees(self, trees: list) -> Union[None, pn.Column]:
-        """
-        Returns all trees in columns and rows.
+        """Returns all trees in columns and rows.
 
         Arguments:
             trees: A list of all trees to be displayed.
@@ -377,9 +363,8 @@ class Tree(View):
 
     @param.depends("num_trees.value", watch=True)
     def multiple_trees(self):
-        """
-        Sets the default setting depending on if one or several trees are displayed.
-        """
+        """Sets the default setting depending on if one or several trees are
+        displayed."""
         if int(self.num_trees.value) > 1:
             self.width = 470
             self.height = 470
@@ -400,9 +385,7 @@ class Tree(View):
             self.symbol_size = 8
 
     def advanced_options(self):
-        """
-        Defined the content of the advanced options card in the sidebar.
-        """
+        """Defined the content of the advanced options card in the sidebar."""
         doc_link = """https://tskit.dev/tskit/docs/stable/python-api.html#tskit.TreeSequence.draw_svg"""
         sidebar_content = pn.Column(
             pn.Card(
@@ -449,8 +432,7 @@ class Tree(View):
         "slider.value_throttled",
     )
     def __panel__(self) -> pn.Column:
-        """
-        Returns the main content of the Trees page.
+        """Returns the main content of the Trees page.
 
         Returns:
             pn.Column: The layout for the main content area.
@@ -514,8 +496,7 @@ class Tree(View):
         )
 
     def update_sidebar(self) -> pn.Column:
-        """
-        Renders the content of the sidebar based on searchBy value.
+        """Renders the content of the sidebar based on searchBy value.
 
         Returns:
             pn.Column: The sidebar content.
@@ -544,8 +525,8 @@ class Tree(View):
 
     @param.depends("search_by.value", watch=True)
     def sidebar(self) -> pn.Column:
-        """
-        Makes sure the sidebar is updated whenever the search-by value is toggled.
+        """Makes sure the sidebar is updated whenever the search-by value is
+        toggled.
 
         Returns:
             pn.Column: The sidebar content.
@@ -554,8 +535,7 @@ class Tree(View):
 
 
 class TreesPage(View):
-    """
-    Represents the trees page of the tseda application.
+    """Represents the trees page of the tseda application.
 
     Attributes:
         key (str): A unique identifier for this view within the application.
@@ -578,8 +558,7 @@ class TreesPage(View):
         self.sample_sets = self.datastore.sample_sets_table
 
     def __panel__(self):
-        """
-        Returns the main content of the page.
+        """Returns the main content of the page.
 
         Returns:
             pn.Column: The layout for the main content area.
@@ -589,8 +568,7 @@ class TreesPage(View):
         )
 
     def sidebar(self):
-        """
-        Returns the content of the sidebar.
+        """Returns the content of the sidebar.
 
         Returns:
             pn.Column: The layout for the sidebar.

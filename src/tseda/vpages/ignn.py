@@ -39,9 +39,8 @@ pn.extension(sizing_mode="stretch_both")
 
 
 class GNNHaplotype(View):
-    """
-    Make GNN haplotype plot.
-    This class creates a Panel object that displays a GNN haplotype plot for a selected individual.
+    """Make GNN haplotype plot. This class creates a Panel object that displays
+    a GNN haplotype plot for a selected individual.
 
     Attributes:
         individual_id (int): the ID of the individual to visualize (0-indexed). Defaults to None.
@@ -55,7 +54,6 @@ class GNNHaplotype(View):
         plot_haplotype1(): calls the plot function for haplotype 1.
         __panel__() -> pn.Column: Defines the layout of the main content area or sends out a warning message if the user input isn't valid.
         sidebar() -> pn.Card: Defines the layout of the sidebar content area.
-
     """
 
     individual_id = param.Integer(
@@ -83,8 +81,7 @@ class GNNHaplotype(View):
     def plot(
         self, haplotype: int = 0
     ) -> Union[hv.core.overlay.NdOverlay, pn.pane.Markdown]:
-        """
-        Creates the GNN Haplotype plot.
+        """Creates the GNN Haplotype plot.
 
         Args:
             haplotype (int): Can be either 0 or 1 and will be used to plot haplotype 0 or haplotype 1.
@@ -164,8 +161,7 @@ class GNNHaplotype(View):
     def plot_haplotype0(
         self,
     ) -> Union[hv.core.overlay.NdOverlay, pn.pane.Markdown]:
-        """
-        Creates the GNN Haplotype plot for haplotype 0.
+        """Creates the GNN Haplotype plot for haplotype 0.
 
         Returns:
             pn.pane.Markdown: A message directed to the user to enter a valid correct sample ID.
@@ -177,8 +173,7 @@ class GNNHaplotype(View):
     def plot_haplotype1(
         self,
     ) -> Union[hv.core.overlay.NdOverlay, pn.pane.Markdown]:
-        """
-        Creates the GNN Haplotype plot for haplotype 1.
+        """Creates the GNN Haplotype plot for haplotype 1.
 
         Returns:
             pn.pane.Markdown: A message directed to the user to enter a valid correct sample ID.
@@ -188,8 +183,7 @@ class GNNHaplotype(View):
         return self.plot(1)
 
     def check_inputs(self, inds: pd.core.frame.DataFrame) -> tuple:
-        """
-        Checks the inputs to the GNN Haplotype plot.
+        """Checks the inputs to the GNN Haplotype plot.
 
         Args:
             inds (pandas.core.frame.DataFrame): Contains the data in the individuals table.
@@ -233,9 +227,8 @@ class GNNHaplotype(View):
 
     @pn.depends("individual_id", "window_size")
     def __panel__(self, **params) -> pn.Column:
-        """
-        Returns the main content for the GNN Haplotype plot which is retrieved from the `datastore.tsm.ts` attribute
-
+        """Returns the main content for the GNN Haplotype plot which is
+        retrieved from the `datastore.tsm.ts` attribute.
 
         Returns:
             pn.Column: The layout for the main content area of the GNN Haplotype plot or a warning message if the input isn't validated.
@@ -260,9 +253,8 @@ class GNNHaplotype(View):
             return nodes[1]
 
     def sidebar(self) -> pn.Card:
-        """
-        Returns the content of the sidbar options for the GNN Haplotype plot.
-
+        """Returns the content of the sidbar options for the GNN Haplotype
+        plot.
 
         Returns:
             pn.Card: The layout for the sidebar content area connected to the GNN Haplotype plot.
@@ -280,9 +272,8 @@ class GNNHaplotype(View):
 
 
 class VBar(View):
-    """
-    Make VBar plot of GNN output.
-    This class creates a Panel object that displays a VBar plot of the sample sets.
+    """Make VBar plot of GNN output. This class creates a Panel object that
+    displays a VBar plot of the sample sets.
 
     Attributes:
         sorting (pn.Selector): the selected population to base the sort order on.
@@ -293,7 +284,6 @@ class VBar(View):
         gnn() -> pd.DataFrame: gets the data for the GNN VBar plot.
         __panel__() -> pn.panel: creates the panel containing the GNN VBar plot.
         sidebar() -> pn.Card: defines the layout of the sidebar content area for the VBar options.
-
     """
 
     sorting = param.Selector(
@@ -318,8 +308,7 @@ class VBar(View):
 
     # TODO: move to DataStore class?
     def gnn(self) -> pd.DataFrame:
-        """
-        Creates the data for the GNN VBar plot.
+        """Creates the data for the GNN VBar plot.
 
         Returns:
             pd.DataFrame: a dataframe containing all the information for the GNN VBar plot.
@@ -350,9 +339,8 @@ class VBar(View):
 
     @pn.depends("sorting", "sort_order")
     def __panel__(self) -> Union[pn.pane.plot.Bokeh, pn.pane.Alert]:
-        """
-        Returns the main content of the plot which is retrieved from the `datastore.tsm.ts` attribute by the gnn() function.
-
+        """Returns the main content of the plot which is retrieved from the
+        `datastore.tsm.ts` attribute by the gnn() function.
 
         Returns:
             pn.pane.Alert: a warning pane telling the user that it needs to select a sample.
@@ -462,9 +450,7 @@ class VBar(View):
         return pn.panel(fig)
 
     def sidebar(self):
-        """
-        Returns the content of the sidbar options for the VBar plot.
-
+        """Returns the content of the sidbar options for the VBar plot.
 
         Returns:
             pn.Card: The layout for the sidebar content area connected to the VBar plot.
@@ -481,9 +467,7 @@ class VBar(View):
 
 
 class IGNNPage(View):
-    """
-    Make the iGNN page.
-    This class creates the iGNN page.
+    """Make the iGNN page. This class creates the iGNN page.
 
     Attributes:
         key (str): A unique identifier for the iGNN instance.
@@ -512,9 +496,8 @@ class IGNNPage(View):
         self.sample_sets = self.datastore.sample_sets_table
 
     def __panel__(self) -> pn.Column:
-        """
-        Returns the main content of the page which is retrieved from the `datastore.tsm.ts` attribute
-
+        """Returns the main content of the page which is retrieved from the
+        `datastore.tsm.ts` attribute.
 
         Returns:
             pn.Column: The layout for the main content area.
@@ -547,9 +530,8 @@ class IGNNPage(View):
         )
 
     def sidebar(self) -> pn.Column:
-        """
-        Returns the sidebar content of the page which is retrieved from the `datastore.tsm.ts` attribute
-
+        """Returns the sidebar content of the page which is retrieved from the
+        `datastore.tsm.ts` attribute.
 
         Returns:
            pn.Column: The layout for the sidebar content area.

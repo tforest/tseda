@@ -1,7 +1,5 @@
-"""
-This module provides a caching mechanism for the TSeDA application, utilizing the `diskcache` library.
-
-"""
+"""This module provides a caching mechanism for the TSeDA application,
+utilizing the `diskcache` library."""
 
 import pathlib
 
@@ -13,9 +11,9 @@ logger = daiquiri.getLogger("cache")
 
 
 def get_cache_dir() -> pathlib.Path:
-    """
-    Retrieves the user's cache directory for the TSeDA application.
-    Creates the directory if it doesn't exist, ensuring its creation along with any necessary parent directories.
+    """Retrieves the user's cache directory for the TSeDA application. Creates
+    the directory if it doesn't exist, ensuring its creation along with any
+    necessary parent directories.
 
     Returns:
         pathlib.Path: The path to the cache directory.

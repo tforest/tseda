@@ -38,8 +38,8 @@ def eval_indexes(indexes):
 
 
 class OnewayStats(View):
-    """
-    This class defines a view for one-way population genetic statistics plots.
+    """This class defines a view for one-way population genetic statistics
+    plots.
 
     Attributes:
     mode (param.Selector):
@@ -89,9 +89,8 @@ class OnewayStats(View):
 
     @property
     def tooltip(self):
-        """
-        Returns a TooltipIcon widget containing information
-        about the oneway statistical plot and how to edit it.
+        """Returns a TooltipIcon widget containing information about the oneway
+        statistical plot and how to edit it.
 
         Returns:
             pn.widgets.TooltipIcon: A TooltipIcon widget displaying
@@ -111,8 +110,7 @@ class OnewayStats(View):
 
     @param.depends("mode", "statistic", "window_size")
     def __panel__(self) -> pn.Column:
-        """
-        Returns the plot.
+        """Returns the plot.
 
         Returns:
             pn.Column: The layout for the plot.
@@ -171,8 +169,8 @@ class OnewayStats(View):
         )
 
     def sidebar(self) -> pn.Card:
-        """
-        Returns the content of the sidebar.
+        """Returns the content of the sidebar.
+
         Returns:
             pn.Card: The layout for the sidebar.
         """
@@ -189,8 +187,8 @@ class OnewayStats(View):
 
 
 class MultiwayStats(View):
-    """
-    This class defines a view for multi-way population genetic statistics plots.
+    """This class defines a view for multi-way population genetic statistics
+    plots.
 
     Attributes:
     mode (param.Selector):
@@ -264,9 +262,8 @@ class MultiwayStats(View):
 
     @property
     def tooltip(self):
-        """
-        Returns a TooltipIcon widget containing information
-        about the multiway statistical plot and how to edit it.
+        """Returns a TooltipIcon widget containing information about the
+        multiway statistical plot and how to edit it.
 
         Returns:
             pn.widgets.TooltipIcon: A TooltipIcon widget displaying
@@ -280,11 +277,9 @@ class MultiwayStats(View):
         )
 
     def set_multichoice_options(self):
-        """
-        This method dynamically populates the `comparisons` widget with a list of
-        possible sample set pairs based on the currently selected sample sets in the
-        `individuals_table`.
-        """
+        """This method dynamically populates the `comparisons` widget with a
+        list of possible sample set pairs based on the currently selected
+        sample sets in the `individuals_table`."""
         sample_sets = self.datastore.individuals_table.sample_sets()
         all_comparisons = list(
             f"{x}-{y}"
@@ -299,8 +294,7 @@ class MultiwayStats(View):
         "mode", "statistic", "window_size", "colormap", "comparisons.value"
     )
     def __panel__(self):
-        """
-        Returns the multiway plot.
+        """Returns the multiway plot.
 
         Returns:
             pn.Column: The layout for the main content area.
@@ -397,8 +391,8 @@ class MultiwayStats(View):
         )
 
     def sidebar(self) -> pn.Card:
-        """
-        Returns the content of the sidebar.
+        """Returns the content of the sidebar.
+
         Returns:
             pn.Card: The layout for the sidebar.
         """
@@ -417,8 +411,7 @@ class MultiwayStats(View):
 
 
 class StatsPage(View):
-    """
-    This class defines a view for the "Statistics" page.
+    """This class defines a view for the "Statistics" page.
 
     Attributes:
     key (str):
@@ -451,8 +444,7 @@ class StatsPage(View):
         self.sample_sets = self.datastore.sample_sets_table
 
     def __panel__(self):
-        """
-        Returns the main content of the page.
+        """Returns the main content of the page.
 
         Returns:
             pn.Column: The layout for the main content area.
@@ -474,8 +466,8 @@ class StatsPage(View):
         )
 
     def sidebar(self):
-        """
-        Returns the content of the sidebar.
+        """Returns the content of the sidebar.
+
         Returns:
             pn.Card: The layout for the sidebar.
         """

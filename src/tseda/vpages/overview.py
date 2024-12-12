@@ -1,10 +1,9 @@
 """Overview page.
 
-This file contains the class for the application's overview
-page. The page includes both the main content with the information
-about the data file given to the application as well as a sidebar
-with a short description of the application.
-
+This file contains the class for the application's overview page. The page
+includes both the main content with the information about the data file given
+to the application as well as a sidebar with a short description of the
+application.
 """
 
 import panel as pn
@@ -13,8 +12,7 @@ from .core import View
 
 
 class OverviewPage(View):
-    """
-    Represents the overview page of the tseda application.
+    """Represents the overview page of the tseda application.
 
     Attributes:
         key (str): A unique identifier for this view within the application.
@@ -29,8 +27,7 @@ class OverviewPage(View):
     title = "Overview"
 
     def __panel__(self) -> pn.Column:
-        """
-        Returns the main content of the page which is retrieved from the
+        """Returns the main content of the page which is retrieved from the
         `datastore.tsm.ts` attribute.
 
         Returns:
@@ -39,8 +36,7 @@ class OverviewPage(View):
         return pn.Column(pn.pane.HTML(self.datastore.tsm.ts))
 
     def sidebar(self) -> pn.Column:
-        """
-        Returns the content of the sidebar.
+        """Returns the content of the sidebar.
 
         Returns:
             pn.Column: The layout for the sidebar.

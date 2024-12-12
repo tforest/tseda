@@ -1,7 +1,7 @@
-"""
-This module provides a collection of classes and functions for analyzing and visualizing
-population genetic data. It uses the `tsbrowse` library for working with TreeSequence data and
-the `panel` library for creating interactive visualizations.
+"""This module provides a collection of classes and functions for analyzing and
+visualizing population genetic data. It uses the `tsbrowse` library for working
+with TreeSequence data and the `panel` library for creating interactive
+visualizations.
 
 Key Classes:
 
@@ -19,7 +19,6 @@ Methods:
 - `make_individuals_table`: Creates an `IndividualsTable` object from a given TreeSequence.
 - `make_sample_sets_table`: Creates a `SampleSetsTable` object from a given TreeSequence.
 - `preprocess`: Calls `make_individuals_table`and `make_sample_sets_table`.
-
 """
 
 import random
@@ -41,8 +40,7 @@ logger = daiquiri.getLogger("tseda")
 
 
 class SampleSetsTable(Viewer):
-    """
-    SampleSetsTable class represents a table for managing sample sets.
+    """SampleSetsTable class represents a table for managing sample sets.
 
     Attributes:
         columns (list):
@@ -132,9 +130,8 @@ class SampleSetsTable(Viewer):
 
     @property
     def tooltip(self) -> pn.widgets.TooltipIcon:
-        """
-        Returns a TooltipIcon widget containing instructions for editing sample set
-        names and colors, and assigning individuals to sample sets.
+        """Returns a TooltipIcon widget containing instructions for editing
+        sample set names and colors, and assigning individuals to sample sets.
 
         Returns:
             pn.widgets.TooltipIcon: A TooltipIcon widget displaying the instructions.
@@ -148,11 +145,9 @@ class SampleSetsTable(Viewer):
         )
 
     def create_new_sample_set(self):
-        """
-        Creates a new sample set with the provided name in the
-        create_sample_set_textinput widget, if a name is entered
-        and it's not already in use
-        """
+        """Creates a new sample set with the provided name in the
+        create_sample_set_textinput widget, if a name is entered and it's not
+        already in use."""
         if self.create_sample_set_textinput is not None:
             self.create_sample_set_warning.visible = True
             previous_names = [
@@ -183,8 +178,7 @@ class SampleSetsTable(Viewer):
                 self.create_sample_set_textinput = None
 
     def get_ids(self) -> List:
-        """
-        Returns the sample set IDs
+        """Returns the sample set IDs.
 
         Returns:
             List: A list of the sample set IDs as integers
@@ -200,9 +194,8 @@ class SampleSetsTable(Viewer):
 
     @property
     def color_by_name(self) -> Dict[str, str]:
-        """
-        Return the color of all sample sets as a dictionary with
-        sample set names as keys
+        """Return the color of all sample sets as a dictionary with sample set
+        names as keys.
 
         Returns:
             Dict: dictionary of
@@ -215,8 +208,7 @@ class SampleSetsTable(Viewer):
     @property
     def names(self) -> Dict[int, str]:
         # TODO: see why this is called 6 times in a row - unecessary
-        """
-        Return the names of all sample sets as a dictionary
+        """Return the names of all sample sets as a dictionary.
 
         Returns:
             Dict: dictionary of indices (int) as keys and
@@ -229,9 +221,8 @@ class SampleSetsTable(Viewer):
         return d
 
     def loc(self, i: int) -> pd.core.series.Series:
-        """
-        Returns sample set pd.core.series.Series object (dataframe row)
-        by index
+        """Returns sample set pd.core.series.Series object (dataframe row) by
+        index.
 
         Arguments:
             i: Index for the sample set wanted
@@ -244,8 +235,8 @@ class SampleSetsTable(Viewer):
 
     @pn.depends("create_sample_set_textinput")
     def __panel__(self) -> pn.Column:
-        """
-        Returns the main content of the page which is retrieved from the `datastore.tsm.ts` attribute
+        """Returns the main content of the page which is retrieved from the
+        `datastore.tsm.ts` attribute.
 
         Returns:
             pn.Column: The layout for the main content area.
@@ -272,8 +263,7 @@ class SampleSetsTable(Viewer):
         )
 
     def sidebar_table(self) -> pn.Card:
-        """
-        Generates a sidebar table with quick view functionalities.
+        """Generates a sidebar table with quick view functionalities.
 
         Returns:
             pn.Card: The layout for the sidebar.
@@ -299,8 +289,8 @@ class SampleSetsTable(Viewer):
         )
 
     def sidebar(self) -> pn.Column:
-        """
-        Returns the content of the sidebar.
+        """Returns the content of the sidebar.
+
         Returns:
             pn.Column: The layout for the sidebar.
         """
@@ -319,9 +309,8 @@ class SampleSetsTable(Viewer):
 
 
 class IndividualsTable(Viewer):
-    """
-    Class represents a table for managing individuals and perform calculations to
-    change filters.
+    """Class represents a table for managing individuals and perform
+    calculations to change filters.
 
     Attributes:
         sample_sets_table (param.ClassSelector):
@@ -491,9 +480,8 @@ class IndividualsTable(Viewer):
 
     @property
     def tooltip(self) -> pn.widgets.TooltipIcon:
-        """
-        Returns a TooltipIcon widget containing information about the individuals
-        table and how to edit it.
+        """Returns a TooltipIcon widget containing information about the
+        individuals table and how to edit it.
 
         Returns:
             pn.widgets.TooltipIcon: A TooltipIcon widget displaying information.
@@ -515,8 +503,7 @@ class IndividualsTable(Viewer):
         )
 
     def sample_sets(self, only_selected: Optional[bool] = True):
-        """
-        Returns a dictionary with a sample set id to samples list mapping.
+        """Returns a dictionary with a sample set id to samples list mapping.
 
         Arguments:
             only_selected (bool, optional): If True, only considers
@@ -540,8 +527,7 @@ class IndividualsTable(Viewer):
         return sample_sets
 
     def get_population_ids(self) -> List[int]:
-        """
-        Returns a sorted list of unique population IDs present in the data.
+        """Returns a sorted list of unique population IDs present in the data.
 
         Returns:
             list: A list containing all unique population IDs in the table.
@@ -549,8 +535,7 @@ class IndividualsTable(Viewer):
         return sorted(self.data.rx.value["population"].unique().tolist())
 
     def get_sample_set_ids(self) -> List[int]:
-        """
-        Returns a sorted list of unique sample set IDs present in the data.
+        """Returns a sorted list of unique sample set IDs present in the data.
 
         This method combines sample set IDs from two sources:
 
@@ -571,8 +556,8 @@ class IndividualsTable(Viewer):
 
     @property
     def sample2ind(self) -> Dict[int, int]:
-        """
-        Creates a dictionary that maps sample (tskit node) IDs to individual IDs.
+        """Creates a dictionary that maps sample (tskit node) IDs to individual
+        IDs.
 
         This method iterates through the underlying data and builds a dictionary where:
         Keys are sample (tskit node) IDs. Values are the corresponding individual IDs
@@ -590,8 +575,7 @@ class IndividualsTable(Viewer):
         return d
 
     def samples(self):
-        """
-        Yields all sample (tskit node) IDs present in the data.
+        """Yields all sample (tskit node) IDs present in the data.
 
         This method iterates through the underlying data and yields each sample
         (tskit node) ID.
@@ -605,9 +589,8 @@ class IndividualsTable(Viewer):
                 yield node
 
     def loc(self, i: int) -> pd.core.series.Series:
-        """
-        Returns the individual data, pd.core.series.Series object,
-        for a specific index (ID) i.
+        """Returns the individual data, pd.core.series.Series object, for a
+        specific index (ID) i.
 
         Arguments:
             i (int): The index (ID) of the individual to retrieve.
@@ -619,18 +602,19 @@ class IndividualsTable(Viewer):
         return self.data.rx.value.loc[i]
 
     def reset_modification(self):
-        """
-        Resets the "sample_set_id" column of the underlying data
-        (`self.data.rx.value`) back to the original values from the "population" column.
-        This effectively undoes any modifications made to sample set assignments.
+        """Resets the "sample_set_id" column of the underlying data
+        (`self.data.rx.value`) back to the original values from the
+        "population" column.
+
+        This effectively undoes any modifications made to sample set
+        assignments.
         """
         self.data.rx.value.sample_set_id = self.data.rx.value.population
 
     def combine_tables(
         self, individuals_table: param.reactive.rx
     ) -> pn.widgets.Tabulator:
-        """
-        Combines individuals data and sample set data into a single table.
+        """Combines individuals data and sample set data into a single table.
 
         This method merges the data from two sources:
 
@@ -694,9 +678,8 @@ class IndividualsTable(Viewer):
         "restore_button.value",
     )
     def __panel__(self) -> pn.Column:
-        """
-        Returns the main content of the page which is retrieved
-        from the `datastore.tsm.ts` attribute
+        """Returns the main content of the page which is retrieved from the
+        `datastore.tsm.ts` attribute.
 
         Returns:
             pn.Column: The layout for the main content area.
@@ -735,8 +718,7 @@ class IndividualsTable(Viewer):
         return pn.Column(pn.Row(self.tooltip, align=("start", "end")), table)
 
     def options_sidebar(self) -> pn.Card:
-        """
-        Creates a Panel card containing options for the individuals table.
+        """Creates a Panel card containing options for the individuals table.
 
         Returns:
             pn.Card: A Panel card containing the following options:
@@ -754,8 +736,7 @@ class IndividualsTable(Viewer):
         )
 
     def modification_sidebar(self) -> pn.Column:
-        """
-        Creates a Panel column containing the data modification options.
+        """Creates a Panel column containing the data modification options.
 
         Returns:
             pn.Column: A Panel column containing the following elements:
@@ -793,10 +774,10 @@ class IndividualsTable(Viewer):
 
 
 class DataStore(Viewer):
-    """
-    Class representing a data store for managing and accessing data used for analysis.
-    This class provides access to various data sources and functionalities related to
-    individuals, sample sets, and the underlying TreeSequenceModel.
+    """Class representing a data store for managing and accessing data used for
+    analysis. This class provides access to various data sources and
+    functionalities related to individuals, sample sets, and the underlying
+    TreeSequenceModel.
 
     Attributes:
         tsm (param.ClassSelector):
@@ -826,7 +807,7 @@ class DataStore(Viewer):
 
     @property
     def color(self) -> pd.core.series.Series:
-        """Return colors of selected individuals"""
+        """Return colors of selected individuals."""
         color = pd.merge(
             self.individuals_table.data.rx.value,
             self.sample_sets_table.data.rx.value,
@@ -838,9 +819,8 @@ class DataStore(Viewer):
     def haplotype_gnn(
         self, focal_ind: int, windows: Optional[List[int]] = None
     ) -> pd.DataFrame:
-        """
-        Calculates and returns the haplotype Genealogical Nearest Neighbors (GNN)
-        for a specified focal individual and optional window sizes.
+        """Calculates and returns the haplotype Genealogical Nearest Neighbors
+        (GNN) for a specified focal individual and optional window sizes.
 
         Arguments:
             focal_ind (int): The index (ID) of the focal individual within the
@@ -885,8 +865,7 @@ class DataStore(Viewer):
 
 
 def make_individuals_table(tsm: model.TSModel) -> IndividualsTable:
-    """
-    Creates an IndividualsTable object from the data in the provided TSModel
+    """Creates an IndividualsTable object from the data in the provided TSModel
     object, by iterating through the individuals in the tree sequence and
     creates an Individual object for each one, creating a Pandas DataFrame
     populated with the individual level information.
@@ -907,8 +886,7 @@ def make_individuals_table(tsm: model.TSModel) -> IndividualsTable:
 
 
 def make_sample_sets_table(tsm: model.TSModel) -> SampleSetsTable:
-    """
-    Creates a SampleSetsTable object from the data in the provided TSModel
+    """Creates a SampleSetsTable object from the data in the provided TSModel
     object, by iterating through the populations in the tree sequence and
     creates a SampleSet object for each one, creating a Pandas DataFrame
     populated with the population level information.
@@ -931,9 +909,8 @@ def make_sample_sets_table(tsm: model.TSModel) -> SampleSetsTable:
 
 
 def preprocess(tsm: model.TSModel) -> Tuple[IndividualsTable, SampleSetsTable]:
-    """
-    Take a TSModel and creates IndividualsTable and SampleSetsTable
-    objects from the data in the provided TSModel object.
+    """Take a TSModel and creates IndividualsTable and SampleSetsTable objects
+    from the data in the provided TSModel object.
 
     Arguments:
         tsm (model.TSModel): The TSModel object containing the tree sequence data.
