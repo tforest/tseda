@@ -408,8 +408,10 @@ class Tree(View):
 
     def advanced_options(self):
         """Defined the content of the advanced options card in the sidebar."""
-        doc_link = """https://tskit.dev/tskit/docs/"
-        "stable/python-api.html#tskit.TreeSequence.draw_svg"""  #######33
+        doc_link = (
+            "https://tskit.dev/tskit/docs/"
+            "stable/python-api.html#tskit.TreeSequence.draw_svg"
+        )
         sidebar_content = pn.Column(
             pn.Card(
                 pn.pane.HTML(
