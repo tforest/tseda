@@ -1,7 +1,8 @@
-"""Module to plot local trees
+"""Tree page structure.
+
+This is a module to plot local trees.
 
 TODO:
-
 - fix bounds of position / treeid parameters
 """
 
@@ -10,6 +11,9 @@ import ast
 import holoviews as hv
 import panel as pn
 import param
+import tskit
+
+from typing import Tuple, Union
 
 from tseda import config
 
@@ -18,12 +22,68 @@ from .core import View
 hv.extension("bokeh")
 
 
-def eval_options(options):
-    """Evaluate options parameter."""
+def eval_options(options: str) -> dict:
+    """Converts the option string to a dictionary.
+
+    Args:
+    options (str): The options inputted by the user.
+
+    Returns:
+    dict: A dictionary containing the options.
+    """
     return ast.literal_eval(options)
 
 
 class Tree(View):
+    """
+    This class represents a panel component for visualizing tskit trees.
+
+    Attributes:
+        search_by (pn.widgets.ToggleGroup): Select the method for searching
+        for trees.
+        tree_index (param.Integer): Get tree by zero-based index.
+        position (param.Integer): Get tree at genome position (bp).
+        position_index_warning (pn.pane.Alert): Warning message displayed
+        when position or tree index is invalid.
+        width (param.Integer): Width of the tree plot.
+        height (param.Integer): Height of the tree plot.
+        num_trees (pn.widgets.Select): Select the number of trees to display.
+        y_axis (pn.widgets.Checkbox): Toggle to include y-axis in the plot.
+        y_ticks (pn.widgets.Checkbox): Toggle to include y-axis ticks in the plot.
+        x_axis (pn.widgets.Checkbox): Toggle to include x-axis in the plot.
+        sites_mutations (pn.widgets.Checkbox): Toggle to clude sites and mutations
+        in the plot.
+        pack_unselected (pn.widgets.Checkbox): Toggle to pack unselected sample sets
+        in the plot.
+        options_doc (pn.widgets.TooltipIcon): Tooltip explaining advanced options.
+        symbol_size (param.Number): Size of the symbols representing tree nodes.
+        node_labels (param.String): Dictionary specifying custom labels for tree nodes.
+        additional_options (param.String): Dictionary specifying additional plot options.
+        advanced_warning (pn.pane.Alert): Warning message displayed when advanced options
+        are invalid.
+        next (param.Action): Action triggered by the "Next tree" button.
+        prev (param.Action): Action triggered by the "Previous tree" button.
+        slider (pn.widgets.IntSlider): Slider for selecting chromosome position.
+
+    Methods:
+        __init__(self, **params): Initializes the `Tree` class with provided parameters.
+        default_css(self): Generates default CSS styles for tree nodes.
+        next_tree(self): Increments the tree index to display the next tree.
+        prev_tree(self): Decrements the tree index to display the previous tree.
+        check_inputs(self): Raises a ValueError if position or tree index is invalid.
+        handle_advanced(self): Processes advanced  options for plotting.
+        update_slider(self): Updates the slider value based on the selected position.
+        update_position(self): Updates the position based on the slider value.
+        plot_tree(self, tree, omit_sites, y_ticks, node_labels, additional_options): Generates
+        the HTML plot for a single tree with specified options.
+        get_all_trees(self, trees): Constructs a panel layout displaying all provided trees.
+        multiple_trees(self): Adjusts layout and options for displaying multiple trees.
+        advanced_options(self): Defines the layout for the advanced options in the sidebar.
+        __panel__(self): Defines the layout of the main content on the page.
+        update_sidebar(self): Created the sidebar based on the chosen search method.
+        sidebar(self): Calls the update_sidebar method whenever chosen search method changes.
+    """
+
     search_by = pn.widgets.ToggleGroup(
         name="Search By",
         options=["Position", "Tree Index"],
@@ -52,12 +112,6 @@ class Tree(View):
 
     width = param.Integer(default=750, doc="Width of the tree plot")
     height = param.Integer(default=520, doc="Height of the tree plot")
-    next = param.Action(
-        lambda x: x.next_tree(), doc="Next tree", label="Next tree"
-    )
-    prev = param.Action(
-        lambda x: x.prev_tree(), doc="Previous tree", label="Previous tree"
-    )
 
     num_trees = pn.widgets.Select(
         name="Number of trees",
@@ -87,6 +141,8 @@ class Tree(View):
         ),
     )
 
+    symbol_size = param.Number(default=8, bounds=(0, None), doc="Symbol size")
+
     node_labels = param.String(
         default="{}",
         doc=(
@@ -104,12 +160,17 @@ class Tree(View):
         ),
     )
 
-    symbol_size = param.Number(default=8, bounds=(0, None), doc="Symbol size")
-
     advanced_warning = pn.pane.Alert(
         "The inputs for the advanced options are not valid.",
         alert_type="warning",
         visible=False,
+    )
+
+    next = param.Action(
+        lambda x: x.next_tree(), doc="Next tree", label="Next tree"
+    )
+    prev = param.Action(
+        lambda x: x.prev_tree(), doc="Previous tree", label="Previous tree"
     )
 
     slider = pn.widgets.IntSlider(name="Chromosome Position")
@@ -118,22 +179,14 @@ class Tree(View):
         super().__init__(**params)
         self.slider.end = int(self.datastore.tsm.ts.sequence_length - 1)
 
-    def next_tree(self):
-        self.position = None
-        self.tree_index = min(
-            self.datastore.tsm.ts.num_trees - self.num_trees.value,
-            int(self.tree_index) + 1,
-        )
-        # pyright: ignore[reportOperatorIssue]
-
-    def prev_tree(self):
-        self.position = None
-        self.tree_index = max(0, int(self.tree_index) - 1)
-        # pyright: ignore[reportOperatorIssue]
-
     @property
-    def default_css(self):
-        """Default css styles for tree nodes"""
+    def default_css(self) -> str:
+        """
+        Default css styles for tree nodes.
+
+        Returns:
+            str: A string with the css styling.
+        """
         styles = []
         sample_sets = self.datastore.sample_sets_table.data.rx.value
         individuals = self.datastore.individuals_table.data.rx.value
@@ -160,7 +213,32 @@ class Tree(View):
         css_string = " ".join(styles)
         return css_string
 
+    def next_tree(self):
+        """
+        Increments the tree index to display the next tree.
+        """
+        self.position = None
+        self.tree_index = min(
+            self.datastore.tsm.ts.num_trees - self.num_trees.value,
+            int(self.tree_index) + 1,
+        )
+        # pyright: ignore[reportOperatorIssue]
+
+    def prev_tree(self):
+        """
+        Decrements the tree index to display the previous tree.
+        """
+        self.position = None
+        self.tree_index = max(0, int(self.tree_index) - 1)
+        # pyright: ignore[reportOperatorIssue]
+
     def check_inputs(self):
+        """
+        Checks the inputs for position and tree index.
+
+        Raises
+            ValueError: If the position or tree index is invalid.
+        """
         if self.position is not None:
             if (
                 int(self.position) < 0
@@ -181,7 +259,15 @@ class Tree(View):
         else:
             self.position_index_warning.visible = False
 
-    def handle_advanced(self):
+    def handle_advanced(self) -> Tuple[bool, Union[dict, None]]:
+        """
+        Handles advanced options so that they are returned in the correct
+        format.
+
+        Returns
+            bool: Whether mutations & sites should be included in the tree.
+            Union[dict, None]: Specified the option for ticks on the y-axis.
+        """
         if self.sites_mutations.value is True:
             omit_sites = not self.sites_mutations.value
         else:
@@ -198,16 +284,40 @@ class Tree(View):
 
     @param.depends("position", watch=True)
     def update_slider(self):
+        """
+        Updates the slider value based on the selected position.
+        """
         if self.position is not None:
             self.slider.value = self.position
 
     @param.depends("slider.value_throttled", watch=True)
     def update_position(self):
+        """
+        Updates the position based on the slider value.
+        """
         self.position = self.slider.value
 
     def plot_tree(
-        self, tree, omit_sites, y_ticks, node_labels, additional_options
-    ):
+        self,
+        tree: tskit.trees.Tree,
+        omit_sites: bool,
+        y_ticks: Union[None, dict],
+        node_labels: dict,
+        additional_options: dict,
+    ) -> Union[pn.Accordion, pn.Column]:
+        """
+        Plots a single tree.
+
+        Arguments:
+            tree (tskit.trees.Tree): The tree to be plotted.
+            omit_sites (bool): If sites & mutaions should be included in the plot.
+            y_ticks (Union[None, dict]): If y_ticks should be included in the plot.
+            nodel_labels (dict): Any customised node labels.
+            additional_options (dict): Any additional plotting options.
+
+        Returns:
+            Union[pn.Accordion, pn.Column]: A panel element containing the tree.
+        """
         try:
             plot = tree.draw_svg(
                 size=(self.width, self.height),
@@ -250,7 +360,17 @@ class Tree(View):
                 pn.pane.HTML(plot),
             )
 
-    def get_all_trees(self, trees):
+    def get_all_trees(self, trees: list) -> Union[None, pn.Column]:
+        """
+        Returns all trees in columns and rows.
+
+        Arguments:
+            trees: A list of all trees to be displayed.
+
+        Returns:
+            Union[None, pn.Column]: A column of rows with trees,
+            if there are any trees to display.
+        """
         if not trees:
             return None
         rows = [pn.Row(*trees[i : i + 2]) for i in range(0, len(trees), 2)]
@@ -258,6 +378,9 @@ class Tree(View):
 
     @param.depends("num_trees.value", watch=True)
     def multiple_trees(self):
+        """
+        Sets the default setting depending on if one or several trees are displayed.
+        """
         if int(self.num_trees.value) > 1:
             self.width = 470
             self.height = 470
@@ -277,6 +400,39 @@ class Tree(View):
             self.pack_unselected.value = False
             self.symbol_size = 8
 
+    def advanced_options(self):
+        """
+        Defined the content of the advanced options card in the sidebar.
+        """
+        doc_link = """https://tskit.dev/tskit/docs/stable/python-api.html#tskit.TreeSequence.draw_svg"""
+        sidebar_content = pn.Column(
+            pn.Card(
+                pn.pane.HTML(
+                    f"""<b>See the <a 
+                    href={doc_link}>
+                    tskit documentation</a> for more information
+                    about these plotting options.<b>"""
+                ),
+                self.num_trees,
+                pn.Row(pn.pane.HTML("Options", width=30), self.options_doc),
+                self.x_axis,
+                self.y_axis,
+                self.y_ticks,
+                self.sites_mutations,
+                self.pack_unselected,
+                self.param.symbol_size,
+                self.param.node_labels,
+                self.param.additional_options,
+                collapsed=True,
+                title="Advanced plotting options",
+                header_background=config.SIDEBAR_BACKGROUND,
+                active_header_background=config.SIDEBAR_BACKGROUND,
+                styles=config.VCARD_STYLE,
+            ),
+            self.advanced_warning,
+        )
+        return sidebar_content
+
     @param.depends(
         "width",
         "height",
@@ -293,7 +449,16 @@ class Tree(View):
         "additional_options",
         "slider.value_throttled",
     )
-    def __panel__(self):
+    def __panel__(self) -> pn.Column:
+        """
+        Returns the main content of the Trees page.
+
+        Returns:
+            pn.Column: The layout for the main content area.
+
+        Raises:
+            ValueError: If inputs are not in the correct format
+        """
         try:
             self.check_inputs()
         except ValueError:
@@ -349,8 +514,13 @@ class Tree(View):
             ),
         )
 
-    def update_sidebar(self):
-        """Dynamically update the sidebar based on searchBy value."""
+    def update_sidebar(self) -> pn.Column:
+        """
+        Renders the content of the sidebar based on searchBy value.
+
+        Returns:
+            pn.Column: The sidebar content.
+        """
         if self.search_by.value == "Tree Index":
             self.position = None
             fields = [self.param.tree_index]
@@ -374,41 +544,31 @@ class Tree(View):
         return sidebar_content
 
     @param.depends("search_by.value", watch=True)
-    def sidebar(self):
-        return self.update_sidebar()
+    def sidebar(self) -> pn.Column:
+        """
+        Makes sure the sidebar is updated whenever the search-by value is toggled.
 
-    def advanced_options(self):
-        doc_link = """https://tskit.dev/tskit/docs/stable/python-api.html#tskit.TreeSequence.draw_svg"""
-        sidebar_content = pn.Column(
-            pn.Card(
-                pn.pane.HTML(
-                    f"""<b>See the <a 
-                    href={doc_link}>
-                    tskit documentation</a> for more information
-                    about these plotting options.<b>"""
-                ),
-                self.num_trees,
-                pn.Row(pn.pane.HTML("Options", width=30), self.options_doc),
-                self.x_axis,
-                self.y_axis,
-                self.y_ticks,
-                self.sites_mutations,
-                self.pack_unselected,
-                self.param.symbol_size,
-                self.param.node_labels,
-                self.param.additional_options,
-                collapsed=True,
-                title="Advanced plotting options",
-                header_background=config.SIDEBAR_BACKGROUND,
-                active_header_background=config.SIDEBAR_BACKGROUND,
-                styles=config.VCARD_STYLE,
-            ),
-            self.advanced_warning,
-        )
-        return sidebar_content
+        Returns:
+            pn.Column: The sidebar content.
+        """
+        return self.update_sidebar()
 
 
 class TreesPage(View):
+    """
+    Represents the trees page of the tseda application.
+
+    Attributes:
+        key (str): A unique identifier for this view within the application.
+        title (str): The title displayed on the page.
+        data (param.ClassSelector): The main content of the page.
+
+    Methods:
+        __init__(self, **params): Initializes the `TreesPage` class with provided parameters.
+        __panel__() -> pn.Column: Defines the layout of the main content area.
+        sidebar() -> pn.Column: Defines the layout of the sidebar content area.
+    """
+
     key = "trees"
     title = "Trees"
     data = param.ClassSelector(class_=Tree)
@@ -419,11 +579,23 @@ class TreesPage(View):
         self.sample_sets = self.datastore.sample_sets_table
 
     def __panel__(self):
+        """
+        Returns the main content of the page.
+
+        Returns:
+            pn.Column: The layout for the main content area.
+        """
         return pn.Column(
             self.data,
         )
 
     def sidebar(self):
+        """
+        Returns the content of the sidebar.
+
+        Returns:
+            pn.Column: The layout for the sidebar.
+        """
         return pn.Column(
             pn.pane.HTML(
                 "<h2 style='margin: 0;'>Trees</h2>",
