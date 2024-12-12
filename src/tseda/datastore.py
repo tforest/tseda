@@ -192,15 +192,7 @@ class SampleSetsTable(Viewer):
         d = {}
         for index, row in self.data.rx.value.iterrows():
             d[index] = row["name"]
-        return d
-
-    @property
-    def names2id(self):
-        """Return the sample sets as dictionary with names as keys,
-        ids as values"""
-        d = {}
-        for index, row in self.data.rx.value.iterrows():
-            d[row["name"]] = index
+            
         return d
 
     def loc(self, i):
