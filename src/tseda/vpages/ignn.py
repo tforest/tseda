@@ -226,11 +226,11 @@ class GNNHaplotype(View):
     @pn.depends("individual_id", "window_size")
     def __panel__(self, **params):
         """
-        Returns the main content of the page which is retrieved from the `datastore.tsm.ts` attribute
+        Returns the main content for the GNN Haplotype plot which is retrieved from the `datastore.tsm.ts` attribute
 
 
         Returns:
-            pn.Column: The layout for the main content area of the plot or a warning message if the input isn't validated.
+            pn.Column: The layout for the main content area of the GNN Haplotype plot or a warning message if the input isn't validated.
         """
 
         inds = self.datastore.individuals_table.data.rx.value
