@@ -1,11 +1,18 @@
+"""
+Add sth here
+
+
+"""
+
 import random
+from typing import Tuple, List, Dict
+
 
 import daiquiri
 import pandas as pd
 import panel as pn
 import param
 from panel.viewable import Viewer
-from typing import Tuple, List
 from tsbrowse import model
 
 from tseda import config
@@ -47,15 +54,10 @@ class SampleSetsTable(Viewer):
             Generates a sidebar table with quick view functionalities.
         sidebar():
             Creates the sidebar with options for managing sample sets.
-        color (dict):
-            Returns a dictionary with sample set colors as key-value pairs (index-color).
         color_by_name (dict):
             Returns a dictionary with sample set colors as key-value pairs (name-color).
         names (dict):
             Returns a dictionary with sample set names as key-value pairs (index-name).
-        names2id (dict):
-            Returns a dictionary with sample set names as keys and IDs as values.
-        loc(i): Returns the sample set information for a given index (i).
     """
 
     columns = ["name", "color", "predefined"]
@@ -128,8 +130,8 @@ class SampleSetsTable(Viewer):
 
     def create_new_sample_set(self):
         """
-        Creates a new sample set with the provided name in the 
-        create_sample_set_textinput widget, if a name is entered 
+        Creates a new sample set with the provided name in the
+        create_sample_set_textinput widget, if a name is entered
         and it's not already in use
         """
         if self.create_sample_set_textinput is not None:
@@ -169,7 +171,7 @@ class SampleSetsTable(Viewer):
             List: A list of the sample set IDs as integers
 
         Raises:
-            TypeError: If the sample set table is not a valid 
+            TypeError: If the sample set table is not a valid
             Dataframe (not yet populated)
         """
         if isinstance(self.table, pd.DataFrame):
@@ -178,25 +180,47 @@ class SampleSetsTable(Viewer):
             raise TypeError("self.table is not a valid pandas DataFrame.")
 
     @property
-    def color_by_name(self):
-        """Return the color of all sample sets as a dictionary with
-        sample set names as keys"""
+    def color_by_name(self) -> Dict[str, str]:
+        """
+        Return the color of all sample sets as a dictionary with
+        sample set names as keys
+
+        Returns:
+            Dict: dictionary of
+        """
         d = {}
         for _, row in self.data.rx.value.iterrows():
             d[row["name"]] = row.color
         return d
 
     @property
-    def names(self):
-        """Return the names of all sample sets as a dictionary"""
+    def names(self) -> Dict[int, str]:
+        #TODO: see why this is called 6 times in a row - unecessary
+        """
+        Return the names of all sample sets as a dictionary
+        
+        Returns:
+            Dict: dictionary of indices (int) as keys and 
+            names (str) as values
+        """
         d = {}
         for index, row in self.data.rx.value.iterrows():
             d[index] = row["name"]
             
         return d
 
-    def loc(self, i):
-        """Return sample set by index"""
+    def loc(self, i) -> pd.core.series.Series:
+        """
+        Returns sample set pd.core.series.Series object (dataframe row)
+        by index
+
+        Arguments:
+            i: Index for the sample set wanted
+        
+        Returns: 
+            pd.core.series.Series object:
+                Containing name, color and predefined status.
+        """
         return self.data.rx.value.loc[i]
 
     @pn.depends("create_sample_set_textinput")
@@ -249,7 +273,12 @@ class SampleSetsTable(Viewer):
             styles=config.VCARD_STYLE,
         )
 
-    def sidebar(self):
+    def sidebar(self) -> pn.Column:
+        """
+        Returns the content of the sidebar.
+        Returns:
+            pn.Column: The layout for the sidebar.
+        """
         return pn.Column(
             pn.Card(
                 self.param.create_sample_set_textinput,
@@ -262,8 +291,6 @@ class SampleSetsTable(Viewer):
             ),
             self.sample_set_warning,
         )
-
-
 
 
 class IndividualsTable(Viewer):
