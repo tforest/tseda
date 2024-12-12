@@ -80,7 +80,9 @@ class GNNHaplotype(View):
         visible=False,
     )
 
-    def plot(self, haplotype: int = 0) -> Union[hv.core.overlay.NdOverlay, pn.pane.Markdown]:
+    def plot(
+        self, haplotype: int = 0
+    ) -> Union[hv.core.overlay.NdOverlay, pn.pane.Markdown]:
         """
         Creates the GNN Haplotype plot.
 
@@ -159,7 +161,9 @@ class GNNHaplotype(View):
         )
         return p
 
-    def plot_haplotype0(self) -> Union[hv.core.overlay.NdOverlay, pn.pane.Markdown]:
+    def plot_haplotype0(
+        self,
+    ) -> Union[hv.core.overlay.NdOverlay, pn.pane.Markdown]:
         """
         Creates the GNN Haplotype plot for haplotype 0.
 
@@ -170,7 +174,9 @@ class GNNHaplotype(View):
         """
         return self.plot(0)
 
-    def plot_haplotype1(self) -> Union[hv.core.overlay.NdOverlay, pn.pane.Markdown]:
+    def plot_haplotype1(
+        self,
+    ) -> Union[hv.core.overlay.NdOverlay, pn.pane.Markdown]:
         """
         Creates the GNN Haplotype plot for haplotype 1.
 
