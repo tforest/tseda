@@ -31,7 +31,7 @@ class OverviewPage(View):
     def __panel__(self) -> pn.Column:
         """
         Returns the main content of the page which is retrieved from the
-        `datastore.tsm.ts` attribute
+        `datastore.tsm.ts` attribute.
 
         Returns:
             pn.Column: The layout for the main content area.
@@ -40,7 +40,7 @@ class OverviewPage(View):
 
     def sidebar(self) -> pn.Column:
         """
-        Returns the content of the sidebar,
+        Returns the content of the sidebar.
 
         Returns:
             pn.Column: The layout for the sidebar.

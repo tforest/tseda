@@ -189,7 +189,7 @@ class StructurePage(View):
 
     def sidebar(self) -> pn.Column:
         """
-        Returns the content of the sidebar,
+        Returns the content of the sidebar.
 
         Returns:
             pn.Column: The layout for the sidebar.
