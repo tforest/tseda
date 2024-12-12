@@ -23,6 +23,8 @@ from .gnn import windowed_genealogical_nearest_neighbours
 logger = daiquiri.getLogger("tseda")
 
 
+
+
 class SampleSetsTable(Viewer):
     """
     SampleSetsTable class represents a table for managing sample sets.
