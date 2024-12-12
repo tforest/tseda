@@ -15,7 +15,7 @@ TODO:
 - linked brushing between the map and the GNN plot
 """
 
-from typing import Union, Any
+from typing import Any, Union
 
 import holoviews as hv
 import hvplot.pandas  # noqa
