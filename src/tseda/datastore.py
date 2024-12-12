@@ -1,6 +1,24 @@
 """
-Add sth here
+This module provides a collection of classes and functions for analyzing and visualizing
+population genetic data. It uses the `tsbrowse` library for working with TreeSequence data and
+the `panel` library for creating interactive visualizations.
 
+Key Classes:
+
+- `SampleSetsTable`: Manages and displays information about sample sets, including
+    their names, colors, and predefined status.
+- `IndividualsTable`: Handles individual data, including their population, sample set
+    assignments, and selection status. Enables filtering and modification of individual
+    attributes.
+- `DataStore`: Provides access to the underlying TreeSequence data, sample sets,
+    and individuals data. Also includes methods for calculating haplotype GNNs and
+    retrieving sample and population information.
+
+Methods:
+
+- `make_individuals_table`: Creates an `IndividualsTable` object from a given TreeSequence.
+- `make_sample_sets_table`: Creates a `SampleSetsTable` object from a given TreeSequence.
+- `preprocess`: Calls `make_individuals_table`and `make_sample_sets_table`.
 
 """
 
