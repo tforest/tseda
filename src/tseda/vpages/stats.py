@@ -38,6 +38,34 @@ def eval_indexes(indexes):
 
 
 class OnewayStats(View):
+    """
+    This class defines a view for one-way population genetic statistics plots.
+
+    Attributes:
+    mode (param.Selector):
+        A parameter to select the calculation mode ("site" or "branch").
+        Branch mode is only available for calibrated data. (default: "site")
+    statistic (param.Selector):
+        A parameter to select the statistic to calculate 
+        (e.g., "Tajimas_D", "diversity").
+        Names correspond to tskit method names. (default: "diversity")
+    window_size (param.Integer):
+        A parameter to define the size of the window for window-based statistics. 
+        (default: 10000, bounds=(1, None))
+    sample_select_warning (pn.pane.Alert):
+        An alert panel displayed when no sample sets are selected.
+    tooltip (pn.widgets.TooltipIcon):
+        A tooltip icon providing information about the plot.
+
+    Methods:
+    tooltip() -> pn.widgets.TooltipIcon:
+            Returns a tooltip for the plot.
+    __panel__() -> pn.Column:
+        Generates the view containing the one-way statistics plot.
+        Raises a warning if no sample sets are selected.
+    sidebar() -> pn.Card:
+        Creates the sidebar panel with controls for the plot.
+    """
     mode = param.Selector(
         objects=["site"],
         default="site",
@@ -52,7 +80,6 @@ class OnewayStats(View):
     window_size = param.Integer(
         default=10000, bounds=(1, None), doc="Size of window"
     )
-
     sample_select_warning = pn.pane.Alert(
         """Select at least 1 sample set to see this plot.
         Sample sets are selected on the Individuals page""",
@@ -61,6 +88,14 @@ class OnewayStats(View):
 
     @property
     def tooltip(self):
+        """
+        Returns a TooltipIcon widget containing information 
+        about the oneway statistical plot and how to edit it.
+
+        Returns:
+            pn.widgets.TooltipIcon: A TooltipIcon widget displaying 
+            the information.
+        """
         return pn.widgets.TooltipIcon(
             value=(
                 "Oneway statistical plot. The colors can be modified "
@@ -74,7 +109,13 @@ class OnewayStats(View):
             self.param.mode.objects = ["branch", "site"]
 
     @param.depends("mode", "statistic", "window_size")
-    def __panel__(self):
+    def __panel__(self) -> pn.Column:
+        """
+        Returns the plot. 
+
+        Returns:
+            pn.Column: The layout for the plot.
+        """
         data = None
         windows = make_windows(
             self.window_size, self.datastore.tsm.ts.sequence_length
@@ -128,7 +169,12 @@ class OnewayStats(View):
             pn.pane.Markdown(fig_text),
         )
 
-    def sidebar(self):
+    def sidebar(self)-> pn.Card:
+        """
+        Returns the content of the sidebar.
+        Returns:
+            pn.Card: The layout for the sidebar.
+        """
         return pn.Card(
             self.param.mode,
             self.param.statistic,
@@ -142,6 +188,39 @@ class OnewayStats(View):
 
 
 class MultiwayStats(View):
+    """
+    This class defines a view for multi-way population genetic statistics plots.
+
+    Attributes:
+    mode (param.Selector):
+        A parameter to select the calculation mode ("site" or "branch").
+        Branch mode is only available for calibrated data. (default: "site")
+    statistic (param.Selector):
+        A parameter to select the statistic to calculate (e.g., "Fst", "divergence").
+        Names correspond to tskit method names. (default: "Fst")
+    window_size (param.Integer):
+        A parameter to define the size of the window for window-based statistics. 
+        (default: 10000, bounds=(1, None))
+    comparisons (pn.widgets.MultiChoice):
+        A multi-choice widget for selecting sample set pairs to compare.
+    sample_select_warning (pn.pane.Alert):
+        An alert panel displayed when no sample sets are selected.
+    cmaps (dict):
+        A dictionary containing available Holoviews colormaps.
+    colormap (param.Selector):
+        A parameter to select the colormap for the plot. (default: "glasbey_dark")
+
+    Methods:
+    set_multichoice_options():
+        Updates the options for the comparisons multi-choice widget based 
+        on available sample sets.
+    __panel__() -> pn.Column:
+        Generates the view containing the multiway statistics plot.
+        Raises a warning if no sample sets are selected.
+    sidebar() -> pn.Card:
+        Creates the sidebar panel with controls for the plot.
+    """
+
     mode = param.Selector(
         objects=["site"],
         default="site",
@@ -159,7 +238,6 @@ class MultiwayStats(View):
     comparisons = pn.widgets.MultiChoice(
         name="Comparisons", description="Choose indexes to compare.", value=[]
     )
-
     sample_select_warning = pn.pane.Alert(
         """Select at least 2 sample sets to see this plot.
         Sample sets are selected on the Individuals page""",
@@ -185,6 +263,14 @@ class MultiwayStats(View):
 
     @property
     def tooltip(self):
+        """
+        Returns a TooltipIcon widget containing information 
+        about the multiway statistical plot and how to edit it.
+
+        Returns:
+            pn.widgets.TooltipIcon: A TooltipIcon widget displaying 
+            the information.
+        """
         return pn.widgets.TooltipIcon(
             value=(
                 "Multiway statistical plot. The colors can be modified "
@@ -193,6 +279,11 @@ class MultiwayStats(View):
         )
 
     def set_multichoice_options(self):
+        """
+        This method dynamically populates the `comparisons` widget with a list of
+        possible sample set pairs based on the currently selected sample sets in the
+        `individuals_table`.
+        """
         sample_sets = self.datastore.individuals_table.sample_sets()
         all_comparisons = list(
             f"{x}-{y}"
@@ -207,6 +298,12 @@ class MultiwayStats(View):
         "mode", "statistic", "window_size", "colormap", "comparisons.value"
     )
     def __panel__(self):
+        """
+        Returns the multiway plot.
+
+        Returns:
+            pn.Column: The layout for the main content area.
+        """
         self.set_multichoice_options()
 
         data = None
@@ -298,7 +395,12 @@ class MultiwayStats(View):
             pn.pane.Markdown(fig_text),
         )
 
-    def sidebar(self):
+    def sidebar(self) -> pn.Card:
+        """
+        Returns the content of the sidebar.
+        Returns:
+            pn.Card: The layout for the sidebar.
+        """
         return pn.Card(
             self.param.mode,
             self.param.statistic,
@@ -314,6 +416,27 @@ class MultiwayStats(View):
 
 
 class StatsPage(View):
+    """
+    This class defines a view for the "Statistics" page.
+
+    Attributes:
+    key (str):
+        The unique key for the page (default: "stats").
+    title (str):
+        The title of the page (default: "Statistics").
+    oneway (param.ClassSelector):
+        A parameter to select the OnewayStats class for one-way plots.
+    multiway (param.ClassSelector):
+        A parameter to select the MultiwayStats class for multi-way plots.
+    sample_sets (SampleSetsTable):  # Assuming SampleSetsTable exists elsewhere
+        The SampleSetsTable object for managing sample set information.
+
+    Methods:
+    __panel__() -> pn.Column:
+        Generates the panel for the "Statistics" page with one-way and multi-way plot accordions.
+    sidebar() -> pn.Card:
+        Creates the sidebar panel for the "Statistics" 
+    """
     key = "stats"
     title = "Statistics"
     oneway = param.ClassSelector(class_=OnewayStats)
@@ -326,6 +449,12 @@ class StatsPage(View):
         self.sample_sets = self.datastore.sample_sets_table
 
     def __panel__(self):
+        """
+        Returns the main content of the page.
+
+        Returns:
+            pn.Column: The layout for the main content area.
+        """
         return pn.Column(
             pn.Accordion(
                 pn.Column(
@@ -343,6 +472,11 @@ class StatsPage(View):
         )
 
     def sidebar(self):
+        """
+        Returns the content of the sidebar.
+        Returns:
+            pn.Card: The layout for the sidebar.
+        """
         return pn.Column(
             pn.pane.HTML(
                 "<h2 style='margin: 0;'>Statistics</h2>",
