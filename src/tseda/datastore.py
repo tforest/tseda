@@ -5,7 +5,7 @@ import pandas as pd
 import panel as pn
 import param
 from panel.viewable import Viewer
-from typing import Tuple
+from typing import Tuple, List
 from tsbrowse import model
 
 from tseda import config
@@ -14,15 +14,57 @@ from tseda.model import Individual, SampleSet
 from .gnn import windowed_genealogical_nearest_neighbours
 
 logger = daiquiri.getLogger("tseda")
+
+
 class SampleSetsTable(Viewer):
-    default_columns = ["name", "color", "predefined"]
-    editors = {k: None for k in default_columns}
+    """
+    SampleSetsTable class represents a table for managing sample sets.
+
+    Attributes:
+        columns (list):
+            The default columns displayed in the table (["name", "color", "predefined"]).
+        editors (dict):
+            Dictionary specifying editor types for each column in the table.
+        formatters (dict):
+            Dictionary defining formatters for each column.
+        create_sample_set_textinput (String):
+            Parameter for entering a new sample set name (default=None).
+        create_sample_set_warning (pn.pane.Alert):
+            Warning alert to prompt user to refresh page after creating a dataset.
+        sample_set_warning (pn.pane.Alert):
+            Warning alert for duplicate sample set names.
+        table (param.DataFrame):
+            Underlying DataFrame holding sample set data.
+
+    Methods:
+        tooltip (pn.widgets.TooltipIcon):
+            Returns a tooltip for the table.
+        def __panel__():
+            Creates the main panel for the table with functionalities.
+        get_ids():
+            Returns a list of sample set IDs.
+        sidebar_table():
+            Generates a sidebar table with quick view functionalities.
+        sidebar():
+            Creates the sidebar with options for managing sample sets.
+        color (dict):
+            Returns a dictionary with sample set colors as key-value pairs (index-color).
+        color_by_name (dict):
+            Returns a dictionary with sample set colors as key-value pairs (name-color).
+        names (dict):
+            Returns a dictionary with sample set names as key-value pairs (index-name).
+        names2id (dict):
+            Returns a dictionary with sample set names as keys and IDs as values.
+        loc(i): Returns the sample set information for a given index (i).
+    """
+
+    columns = ["name", "color", "predefined"]
+    editors = {k: None for k in columns}
     editors["color"] = {
         "type": "list",
         "values": config.COLORS,
         "valueLookup": True,
     }
-
     editors = {
         "name": {"type": "input", "validator": "unique", "search": True},
         "color": {
@@ -41,30 +83,25 @@ class SampleSetsTable(Viewer):
         "predefined": {"type": "tickCross"},
         "valueLookup": True,
     }
-
     formatters = {
         "color": {"type": "color"},
         "predefined": {"type": "tickCross"},
     }
-
     create_sample_set_textinput = param.String(
         doc="Enter name of new sample set. Press Enter (⏎) to create",
         default=None,
         label="Create new sample set",
     )
-
     create_sample_set_warning = pn.pane.Alert(
         "If the new sample set is not shown immediately, click Refresh above",
         alert_type="warning",
         visible=False,
     )
-
     sample_set_warning = pn.pane.Alert(
         "This sample set name already exists, pick a unique name.",
         alert_type="warning",
         visible=False,
     )
-
     table = param.DataFrame()
 
     def __init__(self, **params):
@@ -73,7 +110,14 @@ class SampleSetsTable(Viewer):
         self.data = self.param.table.rx()
 
     @property
-    def tooltip(self):
+    def tooltip(self) -> pn.widgets.TooltipIcon:
+        """
+        Returns a TooltipIcon widget containing instructions for editing sample set
+        names and colors, and assigning individuals to sample sets.
+
+        Returns:
+            pn.widgets.TooltipIcon: A TooltipIcon widget displaying the instructions.
+        """
         return pn.widgets.TooltipIcon(
             value=(
                 "The name and color of each sample set are editable. In the "
@@ -82,8 +126,12 @@ class SampleSetsTable(Viewer):
             ),
         )
 
-    @pn.depends("create_sample_set_textinput")
-    def __panel__(self):
+    def create_new_sample_set(self):
+        """
+        Creates a new sample set with the provided name in the 
+        create_sample_set_textinput widget, if a name is entered 
+        and it's not already in use
+        """
         if self.create_sample_set_textinput is not None:
             self.create_sample_set_warning.visible = True
             previous_names = [
@@ -112,65 +160,22 @@ class SampleSetsTable(Viewer):
                     False,
                 ]
                 self.create_sample_set_textinput = None
-        table = pn.widgets.Tabulator(
-            self.data,
-            layout="fit_data_table",
-            selectable=True,
-            page_size=10,
-            pagination="remote",
-            margin=10,
-            formatters=self.formatters,
-            editors=self.editors,
-            configuration={
-                "rowHeight": 40,
-            },
-            height=500,
-        )
-        return pn.Column(
-            self.tooltip,
-            table,
-        )
 
-    def get_ids(self):
+    def get_ids(self) -> List:
+        """
+        Returns the sample set IDs
+
+        Returns:
+            List: A list of the sample set IDs as integers
+
+        Raises:
+            TypeError: If the sample set table is not a valid 
+            Dataframe (not yet populated)
+        """
         if isinstance(self.table, pd.DataFrame):
             return self.table.index.values.tolist()
         else:
             raise TypeError("self.table is not a valid pandas DataFrame.")
-
-    def sidebar_table(self):
-        table = pn.widgets.Tabulator(
-            self.data,
-            layout="fit_data_table",
-            selectable=True,
-            page_size=10,
-            pagination="remote",
-            margin=10,
-            formatters=self.formatters,
-            editors=self.editors,
-            hidden_columns=["id"],
-        )
-        return pn.Card(
-            pn.Column(self.tooltip, table),
-            title="Sample sets table quick view",
-            collapsed=True,
-            header_background=config.SIDEBAR_BACKGROUND,
-            active_header_background=config.SIDEBAR_BACKGROUND,
-            styles=config.VCARD_STYLE,
-        )
-
-    def sidebar(self):
-        return pn.Column(
-            pn.Card(
-                self.param.create_sample_set_textinput,
-                self.create_sample_set_warning,
-                title="Sample sets table options",
-                collapsed=False,
-                header_background=config.SIDEBAR_BACKGROUND,
-                active_header_background=config.SIDEBAR_BACKGROUND,
-                styles=config.VCARD_STYLE,
-            ),
-            self.sample_set_warning,
-        )
 
     @property
     def color(self):
@@ -209,6 +214,72 @@ class SampleSetsTable(Viewer):
     def loc(self, i):
         """Return sample set by index"""
         return self.data.rx.value.loc[i]
+
+    @pn.depends("create_sample_set_textinput")
+    def __panel__(self) -> pn.Column:
+        """
+        Returns the main content of the page which is retrieved from the `datastore.tsm.ts` attribute
+
+        Returns:
+            pn.Column: The layout for the main content area.
+        """
+        self.create_new_sample_set()
+
+        table = pn.widgets.Tabulator(
+            self.data,
+            layout="fit_data_table",
+            selectable=True,
+            page_size=10,
+            pagination="remote",
+            margin=10,
+            formatters=self.formatters,
+            editors=self.editors,
+            configuration={
+                "rowHeight": 40,
+            },
+            height=500,
+        )
+        return pn.Column(
+            self.tooltip,
+            table,
+        )
+
+    def sidebar_table(self):
+        table = pn.widgets.Tabulator(
+            self.data,
+            layout="fit_data_table",
+            selectable=True,
+            page_size=10,
+            pagination="remote",
+            margin=10,
+            formatters=self.formatters,
+            editors=self.editors,
+            hidden_columns=["id"],
+        )
+        return pn.Card(
+            pn.Column(self.tooltip, table),
+            title="Sample sets table quick view",
+            collapsed=True,
+            header_background=config.SIDEBAR_BACKGROUND,
+            active_header_background=config.SIDEBAR_BACKGROUND,
+            styles=config.VCARD_STYLE,
+        )
+
+    def sidebar(self):
+        return pn.Column(
+            pn.Card(
+                self.param.create_sample_set_textinput,
+                self.create_sample_set_warning,
+                title="Sample sets table options",
+                collapsed=False,
+                header_background=config.SIDEBAR_BACKGROUND,
+                active_header_background=config.SIDEBAR_BACKGROUND,
+                styles=config.VCARD_STYLE,
+            ),
+            self.sample_set_warning,
+        )
+
+
 
 
 class IndividualsTable(Viewer):
@@ -579,6 +650,7 @@ class DataStore(Viewer):
             self.sample_sets_table,
         )
 
+
 def make_individuals_table(tsm: model.TSModel) -> IndividualsTable:
     """
     Creates an IndividualsTable object from the data in the provided TSModel
@@ -599,6 +671,7 @@ def make_individuals_table(tsm: model.TSModel) -> IndividualsTable:
         ind = Individual(individual=ts_ind)
         result.append(ind)
     return IndividualsTable(table=pd.DataFrame(result))
+
 
 def make_sample_sets_table(tsm: model.TSModel) -> SampleSet:
     """
