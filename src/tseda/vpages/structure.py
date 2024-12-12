@@ -10,6 +10,7 @@ TODO:
 """
 
 import itertools
+from typing import Union
 
 import colorcet as cc
 import holoviews as hv
@@ -20,7 +21,6 @@ import panel as pn
 import param
 
 from .core import View
-from typing import Union
 
 hv.extension("bokeh")
 pn.extension(sizing_mode="stretch_width")

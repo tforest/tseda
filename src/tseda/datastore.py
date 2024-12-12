@@ -1,11 +1,11 @@
 import random
+from typing import Tuple
 
 import daiquiri
 import pandas as pd
 import panel as pn
 import param
 from panel.viewable import Viewer
-from typing import Tuple
 from tsbrowse import model
 
 from tseda import config
