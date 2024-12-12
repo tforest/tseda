@@ -1,6 +1,6 @@
 """Config file.
 
-This file stores configurations for the entire application such as 
+This file stores configurations for the entire application such as
 figure dimensions and color schemes.
 
 """
