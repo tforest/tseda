@@ -65,6 +65,13 @@ class GeoMap(View):
 
     @pn.depends("individuals_table.refresh_button.value")
     def __panel__(self):
+        """
+        Returns the main content for the Geomap plot which is retrieved from the `datastore.tsm.ts` attribute.
+
+
+        Returns:
+            gdf.hvplot: the geomap plot as a Hvplot.
+        """
         self.tiles = tiles_options[self.tiles_selector]
         df = self.datastore.individuals_table.data.rx.value
         df = df.loc[df.selected]
@@ -111,6 +118,13 @@ class GeoMap(View):
         )
 
     def sidebar(self):
+        """
+        Returns the content of the sidbar options for the Geomap plot. 
+
+
+        Returns:
+            pn.Card: The layout for the sidebar content area connected to the Geomap plot.
+        """
         return pn.Card(
             self.param.tiles_selector,
             collapsed=True,
