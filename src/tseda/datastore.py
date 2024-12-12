@@ -5,6 +5,7 @@ import pandas as pd
 import panel as pn
 import param
 from panel.viewable import Viewer
+from typing import Tuple
 from tsbrowse import model
 
 from tseda import config
@@ -15,7 +16,21 @@ from .gnn import windowed_genealogical_nearest_neighbours
 logger = daiquiri.getLogger("tseda")
 
 
-def make_individuals_table(tsm):
+def make_individuals_table(tsm: model.TSModel) -> IndividualsTable:
+    """
+    Creates an IndividualsTable object from the data in the provided TSModel
+    object, by iterating through the individuals in the tree sequence and
+    creates an Individual object for each one, creating a Pandas DataFrame
+    populated with the individual level information.
+
+    Arguments:
+        tsm (model.TSModel): The TSModel object containing the tree
+        sequence data.
+
+    Returns:
+        IndividualsTable: An IndividualsTable object populated with
+        individual level information from the tree sequence.
+    """
     result = []
     for ts_ind in tsm.ts.individuals():
         ind = Individual(individual=ts_ind)
@@ -23,7 +38,21 @@ def make_individuals_table(tsm):
     return IndividualsTable(table=pd.DataFrame(result))
 
 
-def make_sample_sets_table(tsm):
+def make_sample_sets_table(tsm: model.TSModel) -> SampleSet:
+    """
+    Creates a SampleSetsTable object from the data in the provided TSModel
+    object, by iterating through the populations in the tree sequence and
+    creates a SampleSet object for each one, creating a Pandas DataFrame
+    populated with the population level information.
+
+    Arguments:
+        tsm (model.TSModel): The TSModel object containing the tree
+        sequence data.
+
+    Returns:
+        SampleSet: A SampleSet object populated with
+        population level information from the tree sequence.
+    """
     result = []
     for ts_pop in tsm.ts.populations():
         ss = SampleSet(
@@ -33,11 +62,25 @@ def make_sample_sets_table(tsm):
     return SampleSetsTable(table=pd.DataFrame(result))
 
 
-def preprocess(tsm):
-    """Take a tsbrowse.TSModel and make individuals and sample sets tables."""
+def preprocess(tsm: model.TSModel) -> Tuple[IndividualsTable, SampleSetsTable]:
+    """
+    Take a TSModel and creates IndividualsTable and SampleSetsTable
+    objects from the data in the provided TSModel object.
+
+    Arguments:
+        tsm (model.TSModel): The TSModel object containing the tree sequence data.
+
+    Returns:
+        Tuple[IndividualsTable, SampleSetsTable]: A tuple containing two elements:
+            IndividualsTable: An IndividualsTable object populated with individual
+            information from the tree sequence.
+            SampleSetsTable: A SampleSetsTable object populated with population
+            information from the tree sequence.
+    """
     logger.info(
         "Preprocessing data: making individuals and sample sets tables"
     )
+    print(type(tsm), tsm)
 
     sample_sets_table = make_sample_sets_table(tsm)
     individuals_table = make_individuals_table(tsm)
