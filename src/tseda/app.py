@@ -1,8 +1,8 @@
 """Main application for tseda.
 
-Provides the DataStoreApp class that is the main application for
-tseda. The DataStoreApp subclasses the Viewer class from panel and
-renders a panel.FastListTemplate object.
+Provides the DataStoreApp class that is the main application for tseda. The
+DataStoreApp subclasses the Viewer class from panel and renders a
+panel.FastListTemplate object.
 """
 
 import time
@@ -50,7 +50,20 @@ hv.opts.defaults(
 
 
 class DataStoreApp(Viewer):
-    """Main application class for tseda visualization app."""
+    """Main application class for tseda visualization app.
+
+    Attributes:
+        datastore (DataStore): The data store instance for accessing and
+        managing data.
+        title (str): The title of the application.
+        views (List[str]): A list of views to show on startup.
+
+    Methods:
+        __init__(**params): Initializes the application, loads pages, and sets
+        up data update listeners.
+        view(): Creates the main application view, including a header selector
+        for switching between different pages.
+    """
 
     datastore = param.ClassSelector(class_=datastore.DataStore)
 
@@ -75,17 +88,24 @@ class DataStoreApp(Viewer):
             | self.datastore.individuals_table.data.rx.updating()
         )
         updating.rx.watch(
-            lambda updating: pn.state.curdoc.hold()
-            if updating
-            else pn.state.curdoc.unhold()
+            lambda updating: (
+                pn.state.curdoc.hold()
+                if updating
+                else pn.state.curdoc.unhold()
+            )
         )
 
     @param.depends("views")
     def view(self):
-        """Main application view that renders a radio button group on
-        top with links to pages. Each page consists of a main content
-        page with plots and sidebars that provide user options for
-        configuring plots and outputs."""
+        """Creates the main application view. Main application view that
+        renders a radio button group on top with links to pages. Each page
+        consists of a main content page with plots and sidebars that provide
+        user options for configuring plots and outputs.
+
+        Returns:
+            pn.template.FastListTemplate: A Panel template containing the
+            header selector, sidebar, and main content.
+        """
         page_titles = list(self.pages.keys())
         header_selector = pn.widgets.RadioButtonGroup(
             options=page_titles,
@@ -105,9 +125,11 @@ class DataStoreApp(Viewer):
             yield self.pages[selected_page].sidebar
 
         self._template = pn.template.FastListTemplate(
-            title=self.datastore.tsm.name[:75] + "..."
-            if len(self.datastore.tsm.name) > 75
-            else self.datastore.tsm.name,
+            title=(
+                self.datastore.tsm.name[:75] + "..."
+                if len(self.datastore.tsm.name) > 75
+                else self.datastore.tsm.name
+            ),
             header=[header_selector],
             sidebar=get_sidebar,
             main=get_content,

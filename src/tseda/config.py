@@ -1,3 +1,9 @@
+"""Config file.
+
+This file stores configurations for the entire application such as figure
+dimensions and color schemes.
+"""
+
 import holoviews as hv
 from holoviews.plotting.util import process_cmap
 

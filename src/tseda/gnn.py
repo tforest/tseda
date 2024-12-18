@@ -1,10 +1,8 @@
-"""Helper code to compute genealogical nearest neighbours along
-haplotypes.
+"""Helper code to compute genealogical nearest neighbours along haplotypes.
 
 Based on code from tskit.tests.test_stats:
 
 https://github.com/tskit-dev/tskit/pull/683/files#diff-e5e589330499b325320b2e3c205eaf350660b50691d3e1655f8789683e49dca6R399
-
 """
 
 import numpy as np
