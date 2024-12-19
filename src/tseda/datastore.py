@@ -476,16 +476,22 @@ class IndividualsTable(Viewer):
         description=("Reassign individuals to this sample set ID."),
     )
     mod_update_button = pn.widgets.Button(
-        name="Reassign", button_type="success", margin=(10, 10),
-        description= "Apply reassignment."
+        name="Reassign",
+        button_type="success",
+        margin=(10, 10),
+        description="Apply reassignment.",
     )
     refresh_button = pn.widgets.Button(
-        name="Refresh", button_type="success", margin=(10, 0),
-        description= "Refresh to apply updates to entire page."
+        name="Refresh",
+        button_type="success",
+        margin=(10, 0),
+        description="Refresh to apply updates to entire page.",
     )
     restore_button = pn.widgets.Button(
-        name="Restore", button_type="danger", margin=(10, 10),
-        description= "Restore sample sets to their original state."
+        name="Restore",
+        button_type="danger",
+        margin=(10, 10),
+        description="Restore sample sets to their original state.",
     )
     data_mod_warning = pn.pane.Alert(
         """Please enter a valid population ID and
