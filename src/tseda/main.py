@@ -1,14 +1,16 @@
-"""Helper module for serving the TSEda app from the command line using
-panel serve.
+"""Helper module for serving the TSEda app from the command line using panel
+serve.
 
-This module is used to serve the TSEda app from the command line using
-panel serve. One use case is for development purposes where the --dev
-argument enables automated reloading of the app when the source code
-changes. To launch the app from the command line run:
+This module is used to serve the TSEda app from the command line using panel
+serve. One use case is for development purposes where the --dev argument
+enables automated reloading of the app when the source code changes. To launch
+the app from the command line run:
 
-    $ panel serve --dev --admin --show --args path/to/tszip_file.zip
+$ panel serve --dev --admin --show --args path/to/tszip_file.zip
 
-See https://panel.holoviz.org/how_to/server/commandline.html for more
+See
+https://panel.holoviz.org/how_to/server/commandline.html
+for more
 information.
 """
 
