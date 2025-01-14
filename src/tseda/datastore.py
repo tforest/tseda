@@ -123,10 +123,10 @@ class SampleSetsTable(Viewer):
         label="Create new sample set",
     )
     create_sample_set_button = pn.widgets.Button(
-        description='Create new sample set.',
+        description="Create new sample set.",
         name="Create",
-        button_type = "success",
-        align = "end",
+        button_type="success",
+        align="end",
     )
     sample_set_warning = pn.pane.Alert(
         "This sample set name already exists, pick a unique name.",
@@ -334,25 +334,25 @@ class IndividualsTable(Viewer):
             Dictionary specifying editor types for each column in the table.
         formatters (dict):
             Dictionary defining formatters for each column.
-        filters (dict): 
+        filters (dict):
             Filter configurations for the columns.
-        table (param.DataFrame): 
+        table (param.DataFrame):
             Underlying data stored as a DataFrame.
-        page_size (param.Selector): 
+        page_size (param.Selector):
             Number of rows per page to display.
-        sample_select (pn.widgets.MultiChoice): 
+        sample_select (pn.widgets.MultiChoice):
             Widget for selecting sample sets.
-        population_from (pn.widgets.Select): 
+        population_from (pn.widgets.Select):
             Widget for selecting the original population ID.
-        sample_set_to (pn.widgets.Select): 
+        sample_set_to (pn.widgets.Select):
             Widget for selecting the new sample set ID.
-        mod_update_button (pn.widgets.Button): 
+        mod_update_button (pn.widgets.Button):
             Button to apply reassignment of population IDs.
-        refresh_button (pn.widgets.Button): 
+        refresh_button (pn.widgets.Button):
             Button to refresh the table view.
-        restore_button (pn.widgets.Button): 
+        restore_button (pn.widgets.Button):
             Button to restore data to its original state.
-        data_mod_warning (pn.pane.Alert): 
+        data_mod_warning (pn.pane.Alert):
             Warning alert for invalid modifications.
 
 
