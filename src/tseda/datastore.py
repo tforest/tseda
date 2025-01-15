@@ -59,9 +59,8 @@ class SampleSetsTable(Viewer):
             Dictionary defining formatters for each column.
         create_sample_set_textinput (String):
             Parameter for entering a new sample set name (default=None).
-        create_sample_set_warning (pn.pane.Alert):
-            Warning alert to prompt user to refresh page after creating a
-            dataset.
+        create_sample_set_button (pn.widget.Button):
+            Button to create sample set.
         sample_set_warning (pn.pane.Alert):
             Warning alert for duplicate sample set names.
         table (param.DataFrame):
@@ -119,15 +118,15 @@ class SampleSetsTable(Viewer):
         "predefined": {"type": "tickCross"},
     }
     create_sample_set_textinput = param.String(
-        doc="Enter name of new sample set. Press Enter (⏎) to create",
+        doc="Enter name of new sample set.",
         default=None,
         label="Create new sample set",
     )
-    create_sample_set_warning = pn.pane.Alert(
-        "If options are not updated after creation of the new sample set,"
-        " click Refresh above",
-        alert_type="warning",
-        visible=False,
+    create_sample_set_button = pn.widgets.Button(
+        description="Create new sample set.",
+        name="Create",
+        button_type="success",
+        align="end",
     )
     sample_set_warning = pn.pane.Alert(
         "This sample set name already exists, pick a unique name.",
@@ -163,7 +162,6 @@ class SampleSetsTable(Viewer):
         create_sample_set_textinput widget, if a name is entered and it's not
         already in use."""
         if self.create_sample_set_textinput is not None:
-            self.create_sample_set_warning.visible = True
             previous_names = [
                 self.table.name[i] for i in range(len(self.table))
             ]
@@ -247,7 +245,7 @@ class SampleSetsTable(Viewer):
         """
         return self.data.rx.value.loc[i]
 
-    @pn.depends("create_sample_set_textinput")
+    @pn.depends("create_sample_set_button.value")
     def __panel__(self) -> pn.Column:
         """Returns the main content of the page which is retrieved from the
         `datastore.tsm.ts` attribute.
@@ -311,7 +309,7 @@ class SampleSetsTable(Viewer):
         return pn.Column(
             pn.Card(
                 self.param.create_sample_set_textinput,
-                self.create_sample_set_warning,
+                self.create_sample_set_button,
                 title="Sample sets table options",
                 collapsed=False,
                 header_background=config.SIDEBAR_BACKGROUND,
@@ -336,15 +334,27 @@ class IndividualsTable(Viewer):
             Dictionary specifying editor types for each column in the table.
         formatters (dict):
             Dictionary defining formatters for each column.
-        create_sample_set_textinput (String):
-            Parameter for entering a new sample set name (default=None).
-        create_sample_set_warning (pn.pane.Alert):
-            Warning alert to prompt user to refresh page after creating a
-            dataset.
-        sample_set_warning (pn.pane.Alert):
-            Warning alert for duplicate sample set names.
+        filters (dict):
+            Filter configurations for the columns.
         table (param.DataFrame):
-            Underlying DataFrame holding sample set data.
+            Underlying data stored as a DataFrame.
+        page_size (param.Selector):
+            Number of rows per page to display.
+        sample_select (pn.widgets.MultiChoice):
+            Widget for selecting sample sets.
+        population_from (pn.widgets.Select):
+            Widget for selecting the original population ID.
+        sample_set_to (pn.widgets.Select):
+            Widget for selecting the new sample set ID.
+        mod_update_button (pn.widgets.Button):
+            Button to apply reassignment of population IDs.
+        refresh_button (pn.widgets.Button):
+            Button to refresh the table view.
+        restore_button (pn.widgets.Button):
+            Button to restore data to its original state.
+        data_mod_warning (pn.pane.Alert):
+            Warning alert for invalid modifications.
+
 
     Methods:
 
@@ -713,6 +723,7 @@ class IndividualsTable(Viewer):
         "mod_update_button.value",
         "refresh_button.value",
         "restore_button.value",
+        "sample_sets_table.create_sample_set_button.value",
     )
     def __panel__(self) -> pn.Column:
         """Returns the main content of the page which is retrieved from the
