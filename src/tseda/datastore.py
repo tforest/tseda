@@ -124,7 +124,8 @@ class SampleSetsTable(Viewer):
         label="Create new sample set",
     )
     create_sample_set_warning = pn.pane.Alert(
-        "If the new sample set is not shown immediately, click Refresh above",
+        "If options are not updated after creation of the new sample set,"
+        " click Refresh above",
         alert_type="warning",
         visible=False,
     )
@@ -476,13 +477,22 @@ class IndividualsTable(Viewer):
         description=("Reassign individuals to this sample set ID."),
     )
     mod_update_button = pn.widgets.Button(
-        name="Reassign", button_type="success", margin=(10, 10)
+        name="Reassign",
+        button_type="success",
+        margin=(10, 10),
+        description="Apply reassignment.",
     )
     refresh_button = pn.widgets.Button(
-        name="Refresh", button_type="success", margin=(10, 0)
+        name="Refresh",
+        button_type="success",
+        margin=(10, 0),
+        description="Refresh to apply updates to entire page.",
     )
     restore_button = pn.widgets.Button(
-        name="Restore", button_type="danger", margin=(10, 10)
+        name="Restore",
+        button_type="danger",
+        margin=(10, 10),
+        description="Restore sample sets to their original state.",
     )
     data_mod_warning = pn.pane.Alert(
         """Please enter a valid population ID and
@@ -679,17 +689,13 @@ class IndividualsTable(Viewer):
         combined_df["id"] = combined_df.index
         combined_df = combined_df[self.columns]
 
-        formatters = self.formatters
-        filters = self.filters
-        page_size = self.page_size
-
         combined_table = pn.widgets.Tabulator(
             combined_df,
             pagination="remote",
             layout="fit_columns",
             selectable=True,
-            page_size=page_size,
-            formatters=formatters,
+            page_size=self.page_size,
+            formatters=self.formatters,
             editors=self.editors,
             sorters=[
                 {"field": "id", "dir": "asc"},
@@ -697,7 +703,7 @@ class IndividualsTable(Viewer):
             ],
             margin=10,
             text_align={col: "right" for col in self.columns},
-            header_filters=filters,
+            header_filters=self.filters,
         )
         return combined_table
 
