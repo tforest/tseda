@@ -6,10 +6,10 @@ under consideration.
 TODO:
 - add PCA
 - add parameter to subset sample sets of interest
-
 """
 
 import itertools
+from typing import Union
 
 import colorcet as cc
 import holoviews as hv
@@ -26,7 +26,15 @@ pn.extension(sizing_mode="stretch_width")
 
 
 class GNN(View):
-    """Make aggregated GNN plot."""
+    """Makes the GNN plot.
+
+    Attributes:
+        warnimng_pane (pn.pane.Alert): A warning message that is activated
+        if less than two sample sets are selected.
+
+    Methods:
+        __panel__() -> Union[pn.Column, pn.pane.Alert]: Defines the GNN plot.
+    """
 
     warning_pane = pn.pane.Alert(
         """Please select at least 2 samples to visualize this graph. 
@@ -34,12 +42,20 @@ class GNN(View):
         alert_type="warning",
     )
 
-    def __panel__(self):
-        samples, sample_sets = self.datastore.individuals_table.sample_sets()
+    def __panel__(self) -> Union[pn.Column, pn.pane.Alert]:
+        """Returns the GNN cluster plot as a heatmap or a warning message if
+        less than 2 samples are selected.
+
+        Returns:
+            Union[pn.Column, pn.pane.Alert]: The layout for the GNN cluster
+            plot with a descriptive markdown element or a warning message.
+        """
+        sample_sets = self.datastore.individuals_table.sample_sets()
+        samples = [
+            sample for sublist in sample_sets.values() for sample in sublist
+        ]
         if len(sample_sets) <= 1:
-            return pn.Column(
-                pn.pane.Markdown("## GNN cluster plot\n"), self.warning_pane
-            )
+            return self.warning_pane
         else:
             sstable = self.datastore.sample_sets_table.data.rx.value
             inds = self.datastore.individuals_table.data.rx.value
@@ -62,16 +78,30 @@ class GNN(View):
             mean_gnn = df.groupby("focal_population").mean()
             # Z-score normalization here!
             return pn.Column(
-                pn.pane.Markdown("## GNN cluster plot\n"),
                 mean_gnn.hvplot.heatmap(
                     cmap=cc.bgy, height=300, responsive=True
+                ),
+                pn.pane.Markdown(
+                    "**GNN cluster plot** - This heatmap visualizes the "
+                    "genealogical relationships between individuals based on "
+                    "the proportions of their genealogical nearest neighbors "
+                    "(GNN).",
+                    sizing_mode="stretch_width",
                 ),
                 pn.pane.Markdown("FIXME: dendrogram and Z-score\n"),
             )
 
 
 class Fst(View):
-    """Make Fst plot."""
+    """Makes the Fst plot.
+
+    Attributes:
+        warnimng_pane (pn.pane.Alert): A warning message that is activated
+        if less than two sample sets are selected.
+
+    Methods:
+        __panel__() -> Union[pn.Column, pn.pane.Alert]: Defines the Fst plot.
+    """
 
     warning_pane = pn.pane.Alert(
         """Please select at least 2 samples to visualize this graph. 
@@ -79,10 +109,17 @@ class Fst(View):
         alert_type="warning",
     )
 
-    def __panel__(self):
-        samples, sample_sets = self.datastore.individuals_table.sample_sets()
+    def __panel__(self) -> Union[pn.Column, pn.pane.Alert]:
+        """Returns the Fst plot as a heatmap or a warning message if less than
+        2 samples are selected.
+
+        Returns:
+            Union[pn.Column, pn.pane.Alert]: The layout for the Fst
+            plot with a descriptive markdown element or a warning message.
+        """
+        sample_sets = self.datastore.individuals_table.sample_sets()
         if len(sample_sets) <= 1:
-            return pn.Column(pn.pane.Markdown("## Fst\n"), self.warning_pane)
+            return self.warning_pane
         else:
             sstable = self.datastore.sample_sets_table.data.rx.value
             ts = self.datastore.tsm.ts
@@ -94,13 +131,29 @@ class Fst(View):
                 np.reshape(fst, newshape=(k, k)), columns=groups, index=groups
             )
             return pn.Column(
-                pn.pane.Markdown("## Fst\n"),
                 df.hvplot.heatmap(cmap=cc.bgy, height=300, responsive=True),
+                pn.pane.Markdown(
+                    "**Fst Plot** - Shows the fixation index (Fst) between "
+                    "different sample sets, allowing comparison of genetic "
+                    "diversity across populations.",
+                    sizing_mode="stretch_width",
+                ),
             )
 
 
 class StructurePage(View):
-    """Make structure page."""
+    """Represents the structure page of the tseda application.
+
+    Attributes:
+        key (str): A unique identifier for this view within the application.
+        title (str): The title displayed on the page.
+        gnn (param.ClassSelector): The gnn plot.
+        fst (param.ClassSelector): The fst plot.
+
+    Methods:
+        __panel__() -> pn.Column: Defines the layout of the main content area.
+        sidebar() -> pn.Column: Defines the layout of the sidebar content area.
+    """
 
     key = "structure"
     title = "Structure"
@@ -111,9 +164,40 @@ class StructurePage(View):
         super().__init__(**params)
         self.gnn = GNN(datastore=self.datastore)
         self.fst = Fst(datastore=self.datastore)
+        self.sample_sets = self.datastore.sample_sets_table
 
-    def __panel__(self):
+    def __panel__(self) -> pn.Column:
+        """Returns the main content of the structure page.
+
+        Returns:
+            pn.Column: The layout for the main content area.
+        """
         return pn.Column(
-            self.gnn,
-            self.fst,
+            pn.Accordion(
+                pn.Column(self.gnn, name="GNN Cluster Plot"),
+                pn.Column(self.fst, name="Fst"),
+                active=[0, 1],
+            )
+        )
+
+    def sidebar(self) -> pn.Column:
+        """Returns the content of the sidebar.
+
+        Returns:
+            pn.Column: The layout for the sidebar.
+        """
+        return pn.Column(
+            pn.pane.HTML(
+                "<h2 style='margin: 0;'>Structure</h2>",
+                sizing_mode="stretch_width",
+            ),
+            pn.pane.Markdown(
+                (
+                    "This section provides an analysis of the **population "
+                    "structure** based on genomic data. "
+                    "You can explore two types of plots."
+                ),
+                sizing_mode="stretch_width",
+            ),
+            self.sample_sets.sidebar_table,
         )

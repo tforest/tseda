@@ -9,6 +9,8 @@ TODO:
 """
 
 import ast
+import itertools
+from typing import Union
 
 import holoviews as hv
 import pandas as pd
@@ -25,9 +27,10 @@ pn.extension(sizing_mode="stretch_width")
 
 
 # TODO: make sure this is safe
-def eval_sample_sets(sample_sets):
-    """Evaluate sample sets parameter."""
-    return ast.literal_eval(sample_sets)
+def eval_comparisons(comparisons):
+    """Evaluate comparisons parameter."""
+    evaluated = ast.literal_eval(str(comparisons).replace(" & ", ","))
+    return [tuple(map(int, item.split(","))) for item in evaluated]
 
 
 def eval_indexes(indexes):
@@ -36,10 +39,41 @@ def eval_indexes(indexes):
 
 
 class OnewayStats(View):
+    """This class defines a view for one-way population genetic statistics
+    plots.
+
+    Attributes:
+    mode (param.Selector):
+        A parameter to select the calculation mode ("site" or "branch").
+        Branch mode is only available for calibrated data. (default: "site")
+    statistic (param.Selector):
+        A parameter to select the statistic to calculate
+        (e.g., "Tajimas_D", "diversity").
+        Names correspond to tskit method names. (default: "diversity")
+    window_size (param.Integer):
+        A parameter to define the size of the window for window-based
+        statistics.
+        (default: 10000, bounds=(1, None))
+    sample_select_warning (pn.pane.Alert):
+        An alert panel displayed when no sample sets are selected.
+    tooltip (pn.widgets.TooltipIcon):
+        A tooltip icon providing information about the plot.
+
+    Methods:
+    tooltip() -> pn.widgets.TooltipIcon:
+            Returns a tooltip for the plot.
+    __panel__() -> pn.Column:
+        Generates the view containing the one-way statistics plot.
+        Raises a warning if no sample sets are selected.
+    sidebar() -> pn.Card:
+        Creates the sidebar panel with controls for the plot.
+    """
+
     mode = param.Selector(
-        objects=["branch", "site"],
+        objects=["site"],
         default="site",
-        doc="Select mode for statistics.",
+        doc="""Select mode (site or branch) for statistics. 
+        Branch mode is only available for calibrated data.""",
     )
     statistic = param.Selector(
         objects=["Tajimas_D", "diversity"],
@@ -49,13 +83,21 @@ class OnewayStats(View):
     window_size = param.Integer(
         default=10000, bounds=(1, None), doc="Size of window"
     )
-    sample_sets = param.String(
-        default="[0,1]",
-        doc="Comma-separated list of sample sets (0-indexed) to plot.",
+    sample_select_warning = pn.pane.Alert(
+        """Select at least 1 sample set to see this plot.
+        Sample sets are selected on the Individuals page""",
+        alert_type="warning",
     )
 
     @property
     def tooltip(self):
+        """Returns a TooltipIcon widget containing information about the oneway
+        statistical plot and how to edit it.
+
+        Returns:
+            pn.widgets.TooltipIcon: A TooltipIcon widget displaying
+            the information.
+        """
         return pn.widgets.TooltipIcon(
             value=(
                 "Oneway statistical plot. The colors can be modified "
@@ -63,28 +105,38 @@ class OnewayStats(View):
             )
         )
 
-    @param.depends("mode", "statistic", "window_size", "sample_sets")
-    def __panel__(self):
+    def __init__(self, **params):
+        super().__init__(**params)
+        if self.datastore.tsm.ts.time_units != "uncalibrated":
+            self.param.mode.objects = ["branch", "site"]
+
+    @param.depends("mode", "statistic", "window_size")
+    def __panel__(self) -> Union[pn.Column, pn.pane.Alert]:
+        """Returns the plot.
+
+        Returns:
+            pn.Column: The layout for the plot.
+        """
         data = None
         windows = make_windows(
             self.window_size, self.datastore.tsm.ts.sequence_length
         )
-        sample_sets_list = eval_sample_sets(self.sample_sets)
-        try:
-            sample_sets = self.datastore.individuals_table.get_sample_sets(
-                sample_sets_list
-            )
-        except KeyError:
-            return pn.pane.Alert("Sample set error. Check sample set indexes.")
+        sample_sets_dictionary = self.datastore.individuals_table.sample_sets()
+        sample_sets_ids = list(sample_sets_dictionary.keys())
+        if len(sample_sets_ids) < 1:
+            return self.sample_select_warning
+        sample_sets_individuals = list(sample_sets_dictionary.values())
 
         if self.statistic == "Tajimas_D":
             data = self.datastore.tsm.ts.Tajimas_D(
-                sample_sets, windows=windows, mode=self.mode
+                sample_sets_individuals, windows=windows, mode=self.mode
             )
+            fig_text = "**Oneway Tajimas_D plot** - Lorem Ipsum"
         elif self.statistic == "diversity":
             data = self.datastore.tsm.ts.diversity(
-                sample_sets, windows=windows, mode=self.mode
+                sample_sets_individuals, windows=windows, mode=self.mode
             )
+            fig_text = "**Oneway Diversity plot** - Lorem Ipsum"
         else:
             raise ValueError("Invalid statistic")
 
@@ -92,7 +144,7 @@ class OnewayStats(View):
             data,
             columns=[
                 self.datastore.sample_sets_table.names[i]
-                for i in sample_sets_list
+                for i in sample_sets_ids
             ],
         )
         position = hv.Dimension(
@@ -110,17 +162,24 @@ class OnewayStats(View):
         }
         kdims = [hv.Dimension("ss", label="Sample set")]
         holomap = hv.HoloMap(data_dict, kdims=kdims)
-        return pn.panel(
-            holomap.overlay("ss").opts(legend_position="right"),
-            sizing_mode="stretch_width",
+        return pn.Column(
+            pn.panel(
+                holomap.overlay("ss").opts(legend_position="right"),
+                sizing_mode="stretch_width",
+            ),
+            pn.pane.Markdown(fig_text),
         )
 
-    def sidebar(self):
+    def sidebar(self) -> pn.Card:
+        """Returns the content of the sidebar.
+
+        Returns:
+            pn.Card: The layout for the sidebar.
+        """
         return pn.Card(
             self.param.mode,
             self.param.statistic,
             self.param.window_size,
-            self.param.sample_sets,
             collapsed=False,
             title="Oneway statistics plotting options",
             header_background=config.SIDEBAR_BACKGROUND,
@@ -130,10 +189,47 @@ class OnewayStats(View):
 
 
 class MultiwayStats(View):
+    """This class defines a view for multi-way population genetic statistics
+    plots.
+
+    Attributes:
+    mode (param.Selector):
+        A parameter to select the calculation mode ("site" or "branch").
+        Branch mode is only available for calibrated data. (default: "site")
+    statistic (param.Selector):
+        A parameter to select the statistic to calculate (e.g., "Fst",
+        "divergence").
+        Names correspond to tskit method names. (default: "Fst")
+    window_size (param.Integer):
+        A parameter to define the size of the window for window-based
+        statistics.
+        (default: 10000, bounds=(1, None))
+    comparisons (pn.widgets.MultiChoice):
+        A multi-choice widget for selecting sample set pairs to compare.
+    sample_select_warning (pn.pane.Alert):
+        An alert panel displayed when no sample sets are selected.
+    cmaps (dict):
+        A dictionary containing available Holoviews colormaps.
+    colormap (param.Selector):
+        A parameter to select the colormap for the plot.
+        (default: "glasbey_dark")
+
+    Methods:
+    set_multichoice_options():
+        Updates the options for the comparisons multi-choice widget based
+        on available sample sets.
+    __panel__() -> pn.Column:
+        Generates the view containing the multiway statistics plot.
+        Raises a warning if no sample sets are selected.
+    sidebar() -> pn.Card:
+        Creates the sidebar panel with controls for the plot.
+    """
+
     mode = param.Selector(
-        objects=["branch", "site"],
+        objects=["site"],
         default="site",
-        doc="Select mode for statistics.",
+        doc="""Select mode (site or branch) for statistics. 
+        Branch mode is only available for calibrated data.""",
     )
     statistic = param.Selector(
         objects=["Fst", "divergence"],
@@ -143,16 +239,13 @@ class MultiwayStats(View):
     window_size = param.Integer(
         default=10000, bounds=(1, None), doc="Size of window"
     )
-    sample_sets = param.String(
-        default="[0,1,2]",
-        doc="Comma-separated list of sample sets (0-indexed) to compare.",
+    comparisons = pn.widgets.MultiChoice(
+        name="Comparisons", description="Choose indexes to compare.", value=[]
     )
-    indexes = param.String(
-        default="[(0,1), (0,2), (1,2)]",
-        doc=(
-            "Comma-separated list of tuples of sample sets "
-            "(0-indexed) indexes to compare."
-        ),
+    sample_select_warning = pn.pane.Alert(
+        """Select at least 2 sample sets to see this plot.
+        Sample sets are selected on the Individuals page""",
+        alert_type="warning",
     )
     cmaps = {
         cm.name: cm
@@ -167,8 +260,20 @@ class MultiwayStats(View):
         doc="Holoviews colormap for sample set pairs",
     )
 
+    def __init__(self, **params):
+        super().__init__(**params)
+        if self.datastore.tsm.ts.time_units != "uncalibrated":
+            self.param.mode.objects = ["branch", "site"]
+
     @property
     def tooltip(self):
+        """Returns a TooltipIcon widget containing information about the
+        multiway statistical plot and how to edit it.
+
+        Returns:
+            pn.widgets.TooltipIcon: A TooltipIcon widget displaying
+            the information.
+        """
         return pn.widgets.TooltipIcon(
             value=(
                 "Multiway statistical plot. The colors can be modified "
@@ -176,44 +281,81 @@ class MultiwayStats(View):
             )
         )
 
+    def set_multichoice_options(self):
+        """This method dynamically populates the `comparisons` widget with a
+        list of possible sample set pairs based on the currently selected
+        sample sets in the `individuals_table`."""
+        sample_sets = self.datastore.individuals_table.sample_sets()
+        all_comparisons = list(
+            f"{x} & {y}"
+            for x, y in itertools.combinations(
+                list(sample_sets.keys()),
+                2,
+            )
+        )
+        self.comparisons.options = all_comparisons
+
     @pn.depends(
-        "mode",
-        "statistic",
-        "window_size",
-        "sample_sets",
-        "indexes",
-        "colormap",
+        "mode", "statistic", "window_size", "colormap", "comparisons.value"
     )
     def __panel__(self):
+        """Returns the multiway plot.
+
+        Returns:
+            pn.Column: The layout for the main content area.
+        """
+        self.set_multichoice_options()
+
         data = None
         tsm = self.datastore.tsm
-        sample_sets_list = []
         windows = []
-        indexes_list = []
         colormap_list = []
         windows = make_windows(self.window_size, tsm.ts.sequence_length)
-        sample_sets_list = eval_sample_sets(self.sample_sets)
-        indexes_list = eval_indexes(self.indexes)
-        try:
-            sample_sets = self.datastore.individuals_table.get_sample_sets(
-                sample_sets_list
+        comparisons = eval_comparisons(self.comparisons.value)
+
+        selected_sample_sets = self.datastore.individuals_table.sample_sets()
+        selected_sample_sets_ids = list(selected_sample_sets.keys())
+        if len(selected_sample_sets_ids) < 2:
+            return self.sample_select_warning
+        elif self.comparisons.value == []:
+            return pn.pane.Markdown(
+                "**Select which sample sets to compare to see this plot.**"
             )
-        except KeyError:
-            return pn.pane.Alert("Sample set error. Check sample set indexes.")
+        all_sample_sets = self.datastore.individuals_table.sample_sets(
+            only_selected=False
+        )
+        all_sample_sets_sorted = {
+            key: all_sample_sets[key] for key in sorted(all_sample_sets)
+        }
+        sample_sets_individuals = list(all_sample_sets_sorted.values())
+        comparisons_indexes = [
+            (
+                list(all_sample_sets_sorted.keys()).index(x),
+                list(all_sample_sets_sorted.keys()).index(y),
+            )
+            for x, y in comparisons
+            if x in all_sample_sets_sorted and y in all_sample_sets_sorted
+        ]
+        if comparisons_indexes == []:
+            return pn.pane.Markdown(
+                "**Select which sample sets to compare to see this plot.**"
+            )
         if self.statistic == "Fst":
             data = tsm.ts.Fst(
-                sample_sets,
+                sample_sets_individuals,
                 windows=windows,
-                indexes=indexes_list,
+                indexes=comparisons_indexes,
                 mode=self.mode,
             )
+            fig_text = "**Multiway Fst plot** - Lorem Ipsum"
         elif self.statistic == "divergence":
             data = tsm.ts.divergence(
-                sample_sets,
+                sample_sets_individuals,
                 windows=windows,
-                indexes=indexes_list,
+                indexes=comparisons_indexes,
                 mode=self.mode,
             )
+            fig_text = "**Multiway divergence plot** - Lorem Ipsum"
         else:
             raise ValueError("Invalid statistic")
         sample_sets_table = self.datastore.sample_sets_table
@@ -226,7 +368,7 @@ class MultiwayStats(View):
                         sample_sets_table.loc(j)["name"],
                     ]
                 )
-                for i, j in indexes_list
+                for i, j in comparisons_indexes
             ],
         )
         position = hv.Dimension(
@@ -245,18 +387,25 @@ class MultiwayStats(View):
         }
         kdims = [hv.Dimension("sspair", label="Sample set combination")]
         holomap = hv.HoloMap(data_dict, kdims=kdims)
-        return pn.panel(
-            holomap.overlay("sspair").opts(legend_position="right"),
-            sizing_mode="stretch_width",
+        return pn.Column(
+            pn.panel(
+                holomap.overlay("sspair").opts(legend_position="right"),
+                sizing_mode="stretch_width",
+            ),
+            pn.pane.Markdown(fig_text),
         )
 
-    def sidebar(self):
+    def sidebar(self) -> pn.Card:
+        """Returns the content of the sidebar.
+
+        Returns:
+            pn.Card: The layout for the sidebar.
+        """
         return pn.Card(
             self.param.mode,
             self.param.statistic,
             self.param.window_size,
-            self.param.sample_sets,
-            self.param.indexes,
+            self.comparisons,
             self.param.colormap,
             collapsed=False,
             title="Multiway statistics plotting options",
@@ -267,6 +416,28 @@ class MultiwayStats(View):
 
 
 class StatsPage(View):
+    """This class defines a view for the "Statistics" page.
+
+    Attributes:
+    key (str):
+        The unique key for the page (default: "stats").
+    title (str):
+        The title of the page (default: "Statistics").
+    oneway (param.ClassSelector):
+        A parameter to select the OnewayStats class for one-way plots.
+    multiway (param.ClassSelector):
+        A parameter to select the MultiwayStats class for multi-way plots.
+    sample_sets (SampleSetsTable):  # Assuming SampleSetsTable exists elsewhere
+        The SampleSetsTable object for managing sample set information.
+
+    Methods:
+    __panel__() -> pn.Column:
+        Generates the panel for the "Statistics" page with one-way and
+        multi-way plot accordions.
+    sidebar() -> pn.Card:
+        Creates the sidebar panel for the "Statistics"
+    """
+
     key = "stats"
     title = "Statistics"
     oneway = param.ClassSelector(class_=OnewayStats)
@@ -276,22 +447,52 @@ class StatsPage(View):
         super().__init__(**kwargs)
         self.oneway = OnewayStats(datastore=self.datastore)
         self.multiway = MultiwayStats(datastore=self.datastore)
+        self.sample_sets = self.datastore.sample_sets_table
 
     def __panel__(self):
+        """Returns the main content of the page.
+
+        Returns:
+            pn.Column: The layout for the main content area.
+        """
         return pn.Column(
-            pn.Column(
-                self.oneway.tooltip,
-                self.oneway,
-            ),
-            pn.Column(
-                self.multiway.tooltip,
-                self.multiway,
+            pn.Accordion(
+                pn.Column(
+                    self.oneway.tooltip,
+                    self.oneway,
+                    name="Oneway Statistics Plot",
+                ),
+                pn.Column(
+                    self.multiway.tooltip,
+                    self.multiway,
+                    name="Multiway Statistics Plot",
+                ),
+                active=[0, 1],
             ),
         )
 
     def sidebar(self):
+        """Returns the content of the sidebar.
+
+        Returns:
+            pn.Card: The layout for the sidebar.
+        """
         return pn.Column(
-            pn.pane.Markdown("# Statistics"),
+            pn.pane.HTML(
+                "<h2 style='margin: 0;'>Statistics</h2>",
+                sizing_mode="stretch_width",
+            ),
+            pn.pane.Markdown(
+                (
+                    "This section provides **population genetic "
+                    "statistics** to analyze genetic variation "
+                    "and divergence among sample sets.<br><br>"
+                    "Use the controls below to customize the plots and "
+                    "adjust parameters."
+                ),
+                sizing_mode="stretch_width",
+            ),
             self.oneway.sidebar,
             self.multiway.sidebar,
+            self.sample_sets.sidebar_table,
         )

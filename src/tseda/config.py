@@ -1,3 +1,9 @@
+"""Config file.
+
+This file stores configurations for the entire application such as figure
+dimensions and color schemes.
+"""
+
 import holoviews as hv
 from holoviews.plotting.util import process_cmap
 
@@ -8,9 +14,9 @@ THRESHOLD = 1000  # max number of points to overlay on a plot
 PLOT_COLOURS = ["#15E3AC", "#0FA57E", "#0D5160"]
 
 # VCard settings
-SIDEBAR_BACKGROUND = "#15E3AC"
+SIDEBAR_BACKGROUND = "#5CB85D"
 VCARD_STYLE = {
-    "background": "#15E3AC",
+    "background": "WhiteSmoke",
 }
 
 # Global color map

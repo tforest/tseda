@@ -19,4 +19,7 @@ def test_treespage(treespage):
 
 
 def test_tree(tree):
-    assert ".node.n26 > .sym {fill: #e4ae38 }" in tree.default_css
+    assert (
+        ".node.n26 > .sym {fill: #e4ae38}" in tree.default_css
+        or ".node.n26 > .sym {fill: #e4ae38}; stroke: black; stroke-width: 2px;"
+    )

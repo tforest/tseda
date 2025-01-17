@@ -49,8 +49,8 @@ def cli():
     ),
 )
 def preprocess(tszip_path, output):
-    """
-    Preprocess a tskit tree sequence or tszip file, producing a .tseda file.
+    """Preprocess a tskit tree sequence or tszip file, producing a .tseda file.
+
     Calls tsbrowse.preprocess.preprocess.
     """
     tszip_path = pathlib.Path(tszip_path)
@@ -79,9 +79,7 @@ def preprocess(tszip_path, output):
     help="Do not filter the output log (advanced debugging only)",
 )
 def serve(path, port, show, log_level, no_log_filter, admin):
-    """
-    Run the tseda datastore server, version based on View base class.
-    """
+    """Run the tseda datastore server, version based on View base class."""
     setup_logging(log_level, no_log_filter)
 
     tsm = TSModel(path)
@@ -91,8 +89,8 @@ def serve(path, port, show, log_level, no_log_filter, admin):
     app_ = app.DataStoreApp(
         datastore=datastore.DataStore(
             tsm=tsm,
-            individuals_table=individuals_table,
             sample_sets_table=sample_sets_table,
+            individuals_table=individuals_table,
         ),
         title="TSEda Datastore App",
         views=[IndividualsTable],

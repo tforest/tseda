@@ -13,7 +13,6 @@ TODO:
 
 - simplify haplotype_gnn function
 - cache computations!
-
 """
 
 import dataclasses
@@ -32,9 +31,7 @@ logger = daiquiri.getLogger("tseda")
 
 
 class DataTypes(Enum):
-    """
-    Enum for getter method data types
-    """
+    """Enum for getter method data types."""
 
     LIST = "list"
     DATAFRAME = "df"
@@ -42,7 +39,7 @@ class DataTypes(Enum):
 
 
 def decode_metadata(obj):
-    """Decode metadata from bytes to dict"""
+    """Decode metadata from bytes to dict."""
     if not hasattr(obj, "metadata"):
         return None
     if isinstance(obj.metadata, bytes):
@@ -55,7 +52,7 @@ def decode_metadata(obj):
 
 
 def parse_metadata(obj, regex):
-    """Retrieve metadata value pairs based on key regex"""
+    """Retrieve metadata value pairs based on key regex."""
     md = decode_metadata(obj)
     if md is None:
         return
@@ -66,7 +63,7 @@ def parse_metadata(obj, regex):
 
 
 def palette(cmap=Set3[12], n=12, start=0, end=1):
-    """Make a small colorblind-friendly palette"""
+    """Make a small colorblind-friendly palette."""
     import matplotlib
 
     linspace = np.linspace(start, end, n)
@@ -80,13 +77,11 @@ def palette(cmap=Set3[12], n=12, start=0, end=1):
 
 @dataclasses.dataclass
 class SampleSet:
-    """
-    A class to contain sample sets.
-    """
+    """A class to contain sample sets."""
 
     name_re = re.compile(r"^(name|Name|population|Population)$")
 
-    id: np.int32
+    sample_set_id: np.int32
     name: str = None
     color: str = None
     population: dataclasses.InitVar[tskit.Population | None] = None
@@ -96,18 +91,16 @@ class SampleSet:
 
     def __post_init__(self, population):
         if self.color is None:
-            self.color = self.colormap[self.id % len(self.colormap)]
+            self.color = self.colormap[self.sample_set_id % len(self.colormap)]
         if population is not None:
             self.name = parse_metadata(population, self.name_re)
         if self.name is None:
-            self.name = f"SampleSet-{self.id}"
+            self.name = f"SampleSet-{self.sample_set_id}"
 
 
 @dataclasses.dataclass
 class Individual(tskit.Individual):
-    """
-    A class to handle individuals.
-    """
+    """A class to handle individuals."""
 
     name_re = re.compile(r"^(name|Name|SM)$")
     longitude_re = re.compile(r"^(longitude|Longitude|lng|long)$")
@@ -140,17 +133,17 @@ class Individual(tskit.Individual):
 
     @property
     def samples(self):
-        """Return samples (nodes) associated with individual"""
+        """Return samples (nodes) associated with individual."""
         return self.nodes
 
     def toggle(self) -> None:
-        """Toggle selection status"""
+        """Toggle selection status."""
         self.selected = not self.selected
 
     def select(self) -> None:
-        """Select individual"""
+        """Select individual."""
         self.selected = True
 
     def deselect(self) -> None:
-        """Deselect individual"""
+        """Deselect individual."""
         self.selected = False

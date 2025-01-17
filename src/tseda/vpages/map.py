@@ -1,4 +1,4 @@
-"""Module for creating a map of the world with sample locations
+"""Module for creating a map of the world with sample locations.
 
 Generate a hvplot map of the world with sample locations based on a
 GeoPandas representation of the individuals data. The map is
@@ -9,16 +9,17 @@ TODO:
 - Add linked brushing between the map and other panel objects /
   widgets
 - Fix issue where map is rendered small and repeated tiles
-
 """
 
 import geopandas
 import hvplot.pandas  # noqa
+import pandas as pd
 import panel as pn
 import param
 import xyzservices.providers as xyz
 
 from tseda import config
+from tseda.datastore import IndividualsTable
 
 from .core import View
 
@@ -34,8 +35,24 @@ tiles_options = {
 
 
 class GeoMap(View):
-    height = param.Integer(default=400, doc="Height of the map")
-    width = param.Integer(default=1200, doc="Width of the map")
+    """Make the Geomap plot. This class creates a hvplot that displays the map
+    where the different samples were collected.
+
+    Attributes:
+        tiles_selector (pn.Selector): the selected tiles for the map
+        vizualisation.
+        tiles (str): the selected tile for the map.
+        individuals_table (IndividualsTable): An instance of the
+        IndividualsTable class, containing the information from the individuals
+        table.
+
+    Methods:
+        __panel__() -> gdf.hvplot: Returns the Geomap as an Hvplot.
+        sidebar() -> pn.Card: Defines the layout of the sidebar options for
+        the Geomap.
+    """
+
+    individuals_table = param.ClassSelector(class_=IndividualsTable)
 
     tiles_selector = param.Selector(
         default="WorldPhysical",
@@ -44,8 +61,18 @@ class GeoMap(View):
     )
     tiles = tiles_options[tiles_selector.default]
 
-    @pn.depends("tiles_selector", "height", "width")
+    def __init__(self, **params):
+        super().__init__(**params)
+        self.individuals_table = self.datastore.individuals_table
+
+    @pn.depends("individuals_table.refresh_button.value")
     def __panel__(self):
+        """Returns the main content for the Geomap plot which is retrieved from
+        the `datastore.tsm.ts` attribute.
+
+        Returns:
+            gdf.hvplot: the geomap plot as a Hvplot.
+        """
         self.tiles = tiles_options[self.tiles_selector]
         df = self.datastore.individuals_table.data.rx.value
         df = df.loc[df.selected]
@@ -56,25 +83,51 @@ class GeoMap(View):
         )
         color = color.loc[~gdf.geometry.is_empty.values]
         gdf = gdf[~gdf.geometry.is_empty]
-        return gdf.hvplot.points(
+
+        kw = {
+            "geo": True,
+            "tiles": self.tiles,
+            "tiles_opts": {"alpha": 0.5},
+            "responsive": True,
+            "max_height": 200,
+            "min_height": 199,
+            "xlim": (-180, 180),
+            "ylim": (-60, 70),
+            "tools": ["wheel_zoom", "box_select", "tap", "pan", "reset"],
+        }
+
+        if gdf.empty:
+            gdf = geopandas.GeoDataFrame(
+                pd.DataFrame(index=[0]),
+                geometry=geopandas.points_from_xy([0.0], [0.0]),
+            )
+            return gdf.hvplot(
+                **kw,
+                hover_cols=None,
+                size=100,
+                color=None,
+                fill_alpha=0.0,
+                line_color=None,
+            )
+        return gdf.hvplot(
+            **kw,
             hover_cols=["name", "population", "sample_set_id"],
-            geo=True,
-            tiles=self.tiles,
-            tiles_opts={"alpha": 0.5},
-            max_height=self.height,
-            min_height=self.height,
             size=100,
             color=color,
-            tools=["wheel_zoom", "box_select", "tap", "pan", "reset"],
             fill_alpha=0.5,
             line_color="black",
-            responsive=True,
         )
 
     def sidebar(self):
+        """Returns the content of the sidbar options for the Geomap plot.
+
+        Returns:
+            pn.Card: The layout for the sidebar content area connected to the
+            Geomap plot.
+        """
         return pn.Card(
             self.param.tiles_selector,
-            collapsed=False,
+            collapsed=True,
             title="Map options",
             header_background=config.SIDEBAR_BACKGROUND,
             active_header_background=config.SIDEBAR_BACKGROUND,
