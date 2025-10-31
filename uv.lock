@@ -443,18 +443,6 @@ wheels = [
 ]
 
 [[package]]
-name = "daiquiri"
-version = "3.4.0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "python-json-logger" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/78/bb/9320d99cff3163a9c61074d456f3346b5ce29445627aa507c70bd1620a35/daiquiri-3.4.0.tar.gz", hash = "sha256:ca1d32c2c0a06f3614ff803a87ac1d50d628db34d0bf7ed97df0ca576332054f", size = 19527, upload-time = "2025-09-04T08:30:34.927Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/ee/e2/74cecee2fd1383efc689c9836255af02f497e2111be40909b4eee8f479d0/daiquiri-3.4.0-py3-none-any.whl", hash = "sha256:64d2d6e1cd5f03d86a3a111b2a526cf335e5e85332b7835a9199404785df0753", size = 19498, upload-time = "2025-09-04T08:30:33.858Z" },
-]
-
-[[package]]
 name = "dask"
 version = "2025.9.1"
 source = { registry = "https://pypi.org/simple" }
@@ -2834,7 +2822,6 @@ dependencies = [
     { name = "appdirs" },
     { name = "cartopy" },
     { name = "click" },
-    { name = "daiquiri" },
     { name = "dask", extra = ["dataframe"] },
     { name = "diskcache" },
     { name = "geopandas" },
@@ -2869,7 +2856,6 @@ requires-dist = [
     { name = "appdirs", specifier = ">=1.4.4" },
     { name = "cartopy", specifier = ">=0.23.0" },
     { name = "click", specifier = ">=8.2.1" },
-    { name = "daiquiri", specifier = ">=3.2.5.1" },
     { name = "dask", extras = ["dataframe"], specifier = ">=2024.8.1" },
     { name = "diskcache", specifier = ">=5.6.3" },
     { name = "geopandas", specifier = ">=1.0.1" },

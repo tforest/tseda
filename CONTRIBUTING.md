@@ -62,7 +62,9 @@ The basic task to run the linting toolchain is
 Development is facilitated by loading the small data set that is
 provided and reloading upon code changes:
 
-    uv run python -m tseda tests/data/test.trees
+    uv run python -m tseda serve tests/data/test.trees.tsdate.tseda
+
+Alternatively, you can run the command as `pixi run serve`.
 
 The test data is a modified simulation of the [out of Africa]
 demographic model (stdpopsim model `OutOfAfrica_3G09`), amended with
@@ -75,7 +77,11 @@ reflect typical metadata.
 
 The `--admin` option will activate the `/admin` panel:
 
-    uv run python -m tseda tests/data/test.trees --admin
+    uv run python -m tseda serve tests/data/test.trees.tsdate.tseda --admin
+
+or
+
+    pixi run admin
 
 If the project is served locally on port 5006, the `/admin` endpoint
 would be available at <http://localhost:5006/admin>. See [admin] for
@@ -90,6 +96,10 @@ with `panel serve`:
 
     uv run panel serve src/tseda --dev --show --args tests/data/test.trees
 
+or
+
+    pixi run dev
+
 ## Adding a new application page
 
 Adding a new application page boils down to adding a new module to
@@ -103,7 +113,7 @@ template:
 <!-- markdownlint-disable MD046 -->
 
 ```python
-import panel as pn
+import panel as on
 
 from .core import View
 
@@ -113,7 +123,7 @@ class MyAnalysisPage(View):
     title = "My Analysis"
 
     def __panel__(self):
-        return pn.Column()
+        return on.Column()
 ```
 
 <!-- markdownlint-enable MD046 -->
@@ -155,10 +165,10 @@ class NucDivPlot(View):
         windows = make_windows(self.window_size, self.datastore.tsm.ts.sequence_length)
         data = pd.DataFrame(self.datastore.tsm.ts.diversity(windows=windows))
         data.columns = ["pi"]
-        return pn.panel(data.hvplot.line(y="pi"))
+        return on.panel(data.hvplot.line(y="pi"))
 
     def sidebar(self):
-        return pn.Card(
+        return on.Card(
             self.param.window_size,
             collapsed=True,
             title="Nucleotide diversity plotting options",
@@ -185,10 +195,10 @@ class MyAnalysisPage(View):
         self.nucdiv = NucDivPlot(datastore=self.datastore)
 
     def __panel__(self):
-        return pn.Column(self.nucdiv)
+        return on.Column(self.nucdiv)
 
     def sidebar(self):
-        return pn.Column(self.nucdiv.sidebar)
+        return on.Column(self.nucdiv.sidebar)
 ```
 
 <!-- markdownlint-enable MD046 -->

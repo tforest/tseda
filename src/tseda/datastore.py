@@ -31,18 +31,16 @@ TreeSequence.
 import random
 from typing import Dict, List, Optional, Tuple
 
-import daiquiri
 import pandas as pd
 import panel as pn
 import param
 from panel.viewable import Viewer
 
 from tseda import config, model
+from tseda.logging import app_logger as logger
 from tseda.model import Individual, SampleSet
 
 from .gnn import windowed_genealogical_nearest_neighbours
-
-logger = daiquiri.getLogger("tseda")
 
 
 class SampleSetsTable(Viewer):
@@ -711,6 +709,7 @@ class IndividualsTable(Viewer):
                 {"field": "selected", "dir": "des"},
             ],
             margin=10,
+            sizing_mode="stretch_both",
             text_align={col: "right" for col in self.columns},
             header_filters=self.filters,
         )
@@ -805,9 +804,9 @@ class IndividualsTable(Viewer):
         return pn.Column(
             pn.Card(
                 modification_header,
-                pn.Row(self.population_from, self.sample_set_to),
+                pn.Column(self.population_from, self.sample_set_to),
                 pn.Row(
-                    pn.Spacer(width=120),
+                    pn.Spacer(width=80),
                     self.restore_button,
                     self.mod_update_button,
                     align="end",
@@ -822,7 +821,7 @@ class IndividualsTable(Viewer):
         )
 
 
-class DataStore(Viewer):
+class DataStore(param.Parameterized):
     """Class representing a data store for managing and accessing data used for
     analysis. This class provides access to various data sources and
     functionalities related to individuals, sample sets, and the underlying
@@ -853,11 +852,20 @@ class DataStore(Viewer):
             for a specified focal individual and optional window sizes.
     """
 
-    tsm = param.ClassSelector(class_=model.TSModel)
-    sample_sets_table = param.ClassSelector(class_=SampleSetsTable)
-    individuals_table = param.ClassSelector(class_=IndividualsTable)
-
     views = param.List(constant=True)
+
+    def __init__(
+        self,
+        *,
+        tsm: model.TSModel,
+        sample_sets_table: SampleSetsTable,
+        individuals_table: IndividualsTable,
+        **params,
+    ):
+        super().__init__(**params)
+        self.tsm = tsm
+        self.sample_sets_table = sample_sets_table
+        self.individuals_table = individuals_table
 
     @property
     def color(self) -> pd.core.series.Series:
@@ -964,7 +972,9 @@ def make_sample_sets_table(tsm: model.TSModel) -> SampleSetsTable:
     return SampleSetsTable(table=pd.DataFrame(result))
 
 
-def preprocess(tsm: model.TSModel) -> Tuple[IndividualsTable, SampleSetsTable]:
+def make_tables(
+    tsm: model.TSModel,
+) -> Tuple[IndividualsTable, SampleSetsTable]:
     """Take a TSModel and creates IndividualsTable and SampleSetsTable objects
     from the data in the provided TSModel object.
 

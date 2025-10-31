@@ -7,16 +7,15 @@ panel.FastListTemplate object.
 
 import time
 
-import daiquiri
 import holoviews as hv
 import panel as pn
 import param
 from holoviews import opts
 from panel.viewable import Viewer
 
-from tseda import config, datastore, vpages
-
-logger = daiquiri.getLogger("tseda")
+from tseda import config, vpages
+from tseda.datastore import DataStore
+from tseda.logging import app_logger as logger
 
 RAW_CSS = """
         .sidenav#sidebar {
@@ -65,7 +64,7 @@ class DataStoreApp(Viewer):
         for switching between different pages.
     """
 
-    datastore = param.ClassSelector(class_=datastore.DataStore)
+    datastore: DataStore = param.ClassSelector(class_=DataStore)
 
     title = param.String(doc="Application title")
 
