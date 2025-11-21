@@ -1,1 +1,1 @@
-Sitemap: https://percyfal.github.io/tseda/sitemap.xml
+Sitemap: https://tforest.github.io/tseda/sitemap.xml
